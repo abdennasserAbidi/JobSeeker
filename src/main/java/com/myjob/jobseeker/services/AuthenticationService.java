@@ -16,9 +16,11 @@ import com.myjob.jobseeker.dtos.RegisterUserDto;
 import com.myjob.jobseeker.dtos.UserResponse;
 import com.myjob.jobseeker.model.Education;
 import com.myjob.jobseeker.model.Experience;
+import com.myjob.jobseeker.model.FavoriteModel;
 import com.myjob.jobseeker.model.User;
 import com.myjob.jobseeker.repo.UserRepository;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -42,12 +44,28 @@ public class AuthenticationService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void updateFavorite(int id, boolean input) {
-        User user = userRepository.findById(id).orElseThrow();
+    public void updateFavorite(int idConnected, int id) {
+        User user = userRepository.findById(idConnected).orElseThrow();
         
-        user.setFavorite(input);
+        List<FavoriteModel> l = user.getFavorites();
+        FavoriteModel f = new FavoriteModel();
+    
+        User candidate = userRepository.findById(id).orElseThrow();
+
+        f.setId(candidate.getId());
+        f.setEmail(candidate.getEmail());
+        f.setName(candidate.getFullName());
+        f.setPhone(candidate.getPhone());
+
+        l.add(f);
+        user.setFavorites(l);
 
         userRepository.save(user);
+    }
+
+
+    public Page<FavoriteModel> getPaginatedFavorites(int id, int page, int size) {
+        return userRepository.findPaginatedFavorites(id, page, size);
     }
 
     public void savePersonal(PersonalInfoDto input) {

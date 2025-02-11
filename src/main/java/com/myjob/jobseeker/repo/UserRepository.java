@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import com.myjob.jobseeker.model.User;
 
 @Repository
-public interface UserRepository extends MongoRepository<User, Integer>, ExperienceRepository, EducationRepository {
+public interface UserRepository extends MongoRepository<User, Integer>, ExperienceRepository, EducationRepository, FavoritesRepository {
     Optional<User> findByEmail(String email);
 }

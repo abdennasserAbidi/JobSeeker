@@ -66,7 +66,11 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Education> education = new ArrayList<>();
 
-    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FavoriteModel> favorites = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InvitationModel> invitations = new ArrayList<>();
 
     public void setIsResetPasswordTokenValid(boolean isResetPasswordTokenValid) {
         this.isResetPasswordTokenValid = isResetPasswordTokenValid;

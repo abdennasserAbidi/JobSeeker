@@ -25,6 +25,7 @@ import com.myjob.jobseeker.dtos.RegistrationResponse;
 import com.myjob.jobseeker.dtos.UserResponse;
 import com.myjob.jobseeker.model.Education;
 import com.myjob.jobseeker.model.Experience;
+import com.myjob.jobseeker.model.FavoriteModel;
 import com.myjob.jobseeker.model.FileExistingResponse;
 import com.myjob.jobseeker.model.LoginResponse;
 import com.myjob.jobseeker.model.User;
@@ -261,16 +262,27 @@ public class AuthenticationController {
     }
 
     @PostMapping("/updatefavorite")
-    public ResponseEntity<ExperienceResponse> updateFavorite(@RequestParam int id, @RequestParam boolean isFavorite) {
+    public ResponseEntity<ExperienceResponse> updateFavorite(@RequestParam int idUserConnected, @RequestParam int candidateId) {
 
 
-        authenticationService.updateFavorite(id, isFavorite);
+        authenticationService.updateFavorite(idUserConnected, candidateId);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
         experienceResponse.setMessage("saved successfully");
 
         return ResponseEntity.ok(experienceResponse);
+    }
+
+    @GetMapping("/getFavorites")
+    public ResponseEntity<Page<FavoriteModel>> getFavoritesPages(
+        @RequestParam int id,
+        @RequestParam int page,
+        @RequestParam int size) {  
+            
+            Page<FavoriteModel> experiences = authenticationService.getPaginatedFavorites(id, page, size);
+
+        return ResponseEntity.ok(experiences);
     }
 
     @PostMapping("/removeExperience")
@@ -305,7 +317,6 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(user);
     }
-
 
     @PostMapping("/uploadCV")
     public ResponseEntity<ExperienceResponse> uploadFile(@RequestParam("file") MultipartFile file) {
