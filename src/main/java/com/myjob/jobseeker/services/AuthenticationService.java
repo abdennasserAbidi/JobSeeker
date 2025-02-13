@@ -2,7 +2,12 @@ package com.myjob.jobseeker.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,9 +19,11 @@ import com.myjob.jobseeker.dtos.LoginUserDto;
 import com.myjob.jobseeker.dtos.PersonalInfoDto;
 import com.myjob.jobseeker.dtos.RegisterUserDto;
 import com.myjob.jobseeker.dtos.UserResponse;
+import com.myjob.jobseeker.model.Candidat;
 import com.myjob.jobseeker.model.Education;
 import com.myjob.jobseeker.model.Experience;
 import com.myjob.jobseeker.model.FavoriteModel;
+import com.myjob.jobseeker.model.InvitationModel;
 import com.myjob.jobseeker.model.User;
 import com.myjob.jobseeker.repo.UserRepository;
 import java.time.LocalDateTime;
@@ -180,11 +187,70 @@ public class AuthenticationService {
         userRepository.save(user);
     }
 
-    public Page<User> getUsers(int page, int size) {
-
+    public Page<User> getUsers1(int page, int size) {
         return userRepository.findAll(PageRequest.of(page - 1, size));
     }
 
+    public void sendInvitaion(int id, InvitationModel input) {
+
+        boolean isPresent = false;
+        int index = -1;
+
+        InvitationModel experience = new InvitationModel();
+        experience.setIdInvitation(input.getIdInvitation());
+        experience.setIdTo(input.getIdTo());
+        experience.setMessage(input.getMessage());
+        experience.setTypeContract(input.getTypeContract());
+
+        User user = userRepository.findById(id).orElseThrow();
+        List<InvitationModel> list = user.getInvitations();
+
+        for(int i = 0; i < list.size(); i++) {
+            if (list.get(i).getIdInvitation() == input.getIdInvitation()) {
+                isPresent = true;
+                index = i;
+            }
+        }
+
+        if (isPresent) {
+            list.set(index, experience);
+        } else {
+            list.add(experience);
+            user.setInvitations(list);
+        }
+        userRepository.save(user);
+    }
+
+    public List<User> getUsers(int id, int page, int size) {
+        
+        User user = userRepository.findById(id).orElseThrow();
+
+        PageRequest pageable = PageRequest.of(page-1, size);
+        Page<User> pu = userRepository.findByRole("Candidate", pageable);
+        //Page<Candidat> pu1 = userRepository.findPaginatedCandidate("Candidate", page, size);
+
+
+        List<User> newUsers = new ArrayList<>();
+        List<User> lu = pu.getContent();
+        //List<Candidat> lu1 = pu1.getContent();
+        boolean isSended = false;
+
+        for(User u : lu) {
+            for(InvitationModel i : user.getInvitations()) {
+                isSended = i.getIdTo() == u.getId();
+            }
+
+            if (!isSended) newUsers.add(u);
+        }
+
+        for(User u1 : newUsers) {
+            System.out.println("fzlaallalalalal    :   "+u1.getFullName());
+
+        }
+
+        
+        return newUsers;
+    }
 
     public Page<Experience> getPaginatedExperiences(int id, int page, int size) {
         return userRepository.findPaginatedExperiences(id, page, size);

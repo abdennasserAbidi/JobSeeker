@@ -3,7 +3,6 @@ package com.myjob.jobseeker.model;
 public class InvitationModel {
 
     private int idInvitation;
-    private int idFrom;
     private int idTo;
     private String message;
     private String typeContract;
@@ -14,12 +13,7 @@ public class InvitationModel {
     public void setIdInvitation(int idInvitation) {
         this.idInvitation = idInvitation;
     }
-    public int getIdFrom() {
-        return idFrom;
-    }
-    public void setIdFrom(int idFrom) {
-        this.idFrom = idFrom;
-    }
+    
     public int getIdTo() {
         return idTo;
     }
