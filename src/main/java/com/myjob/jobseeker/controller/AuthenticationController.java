@@ -28,7 +28,6 @@ import com.myjob.jobseeker.model.Education;
 import com.myjob.jobseeker.model.Experience;
 import com.myjob.jobseeker.model.FavoriteModel;
 import com.myjob.jobseeker.model.FileExistingResponse;
-import com.myjob.jobseeker.model.InvitationModel;
 import com.myjob.jobseeker.model.LoginResponse;
 import com.myjob.jobseeker.model.User;
 import com.myjob.jobseeker.services.AuthenticationService;
