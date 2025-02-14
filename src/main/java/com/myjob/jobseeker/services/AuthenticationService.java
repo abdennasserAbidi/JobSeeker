@@ -2,12 +2,7 @@ package com.myjob.jobseeker.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +14,6 @@ import com.myjob.jobseeker.dtos.LoginUserDto;
 import com.myjob.jobseeker.dtos.PersonalInfoDto;
 import com.myjob.jobseeker.dtos.RegisterUserDto;
 import com.myjob.jobseeker.dtos.UserResponse;
-import com.myjob.jobseeker.model.Candidat;
 import com.myjob.jobseeker.model.Education;
 import com.myjob.jobseeker.model.Experience;
 import com.myjob.jobseeker.model.FavoriteModel;
@@ -225,14 +219,11 @@ public class AuthenticationService {
         
         User user = userRepository.findById(id).orElseThrow();
 
-        PageRequest pageable = PageRequest.of(page-1, size);
+        PageRequest pageable = PageRequest.of(page-1, 3);
         Page<User> pu = userRepository.findByRole("Candidate", pageable);
-        //Page<Candidat> pu1 = userRepository.findPaginatedCandidate("Candidate", page, size);
-
 
         List<User> newUsers = new ArrayList<>();
         List<User> lu = pu.getContent();
-        //List<Candidat> lu1 = pu1.getContent();
         boolean isSended = false;
 
         for(User u : lu) {

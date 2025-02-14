@@ -17,6 +17,7 @@ import com.myjob.jobseeker.dtos.EducationDto;
 import com.myjob.jobseeker.dtos.EmailResponse;
 import com.myjob.jobseeker.dtos.ExperienceDto;
 import com.myjob.jobseeker.dtos.ExperienceResponse;
+import com.myjob.jobseeker.dtos.InvitationDto;
 import com.myjob.jobseeker.dtos.LoginUserDto;
 import com.myjob.jobseeker.dtos.PasswordResponse;
 import com.myjob.jobseeker.dtos.PersonalInfoDto;
@@ -203,7 +204,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(experiences);
     }
 
-    @GetMapping("/getAllJobs")
+    @GetMapping("/getAllJobs1")
     public ResponseEntity<Page<User>> getJobsPages(
         @RequestParam int page,
         @RequestParam int size) {  
@@ -211,10 +212,10 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.getUsers1(page, size));
     }
 
-    @PostMapping("/send")
-    public ResponseEntity<ExperienceResponse> sendInvi(@RequestBody InvitationModel experienceDto) {
+    @PostMapping("/sendInvitation")
+    public ResponseEntity<ExperienceResponse> sendInvi(@RequestBody InvitationDto invitationDto) {
 
-        authenticationService.sendInvitaion(10, experienceDto);
+        authenticationService.sendInvitaion(invitationDto.getIdConnected(), invitationDto.getInvitationModel());
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -223,7 +224,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(experienceResponse);
     }
 
-    @GetMapping("/getAllJobs1")
+    @GetMapping("/getAllJobs")
     public ResponseEntity<List<User>> getJobsPages1(
         @RequestParam int page,
         @RequestParam int size) {  
