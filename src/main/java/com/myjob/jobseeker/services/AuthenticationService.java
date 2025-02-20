@@ -2,6 +2,7 @@ package com.myjob.jobseeker.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -185,16 +186,35 @@ public class AuthenticationService {
         return userRepository.findAll(PageRequest.of(page - 1, size));
     }
 
-    public void sendInvitaion(int id, InvitationModel input) {
+    public void saveUserInvitation(int idUser, InvitationModel input) {
 
         boolean isPresent = false;
         int index = -1;
 
-        InvitationModel experience = new InvitationModel();
-        experience.setIdInvitation(input.getIdInvitation());
-        experience.setIdTo(input.getIdTo());
-        experience.setMessage(input.getMessage());
-        experience.setTypeContract(input.getTypeContract());
+        User user = userRepository.findById(idUser).orElseThrow();
+        List<InvitationModel> list = user.getInvitations();
+
+        for(int i = 0; i < list.size(); i++) {
+            if (list.get(i).getIdInvitation() == input.getIdInvitation()) {
+                isPresent = true;
+                index = i;
+            }
+        }
+
+        if (isPresent) {
+            list.set(index, input);
+        } else {
+            list.add(input);
+            user.setInvitations(list);
+        }
+
+        userRepository.save(user);
+    }
+
+    public void saveCompanyInvitation(int id, InvitationModel input) {
+
+        boolean isPresent = false;
+        int index = -1;
 
         User user = userRepository.findById(id).orElseThrow();
         List<InvitationModel> list = user.getInvitations();
@@ -207,40 +227,100 @@ public class AuthenticationService {
         }
 
         if (isPresent) {
-            list.set(index, experience);
+            list.set(index, input);
         } else {
-            list.add(experience);
+            list.add(input);
             user.setInvitations(list);
+        }
+
+        userRepository.save(user);
+    }
+
+    public void sendInvitaion(int id, InvitationModel input) {
+
+        System.out.println("post name   :   "+input.getMessage());
+        System.out.println("description   :   "+input.getDescription());
+
+        //company
+
+        InvitationModel experience = new InvitationModel();
+        experience.setIdInvitation(input.getIdInvitation());
+        experience.setIdTo(input.getIdTo());
+        experience.setIdCompany(input.getIdCompany());
+        experience.setCompanyName(input.getCompanyName());
+        experience.setMessage(input.getMessage());
+        experience.setDescription(input.getDescription());
+        experience.setTypeContract(input.getTypeContract());
+
+
+        saveCompanyInvitation(id, experience);
+
+
+        //user
+
+        saveUserInvitation(input.getIdTo(), experience);
+    }
+
+
+    public Page<InvitationModel> getPaginatedInvitations(int id, int page, int size) {
+        return userRepository.findPaginatedInvitations(id, page, size);
+    }
+
+    List<InvitationModel> getAllInvitations(int idCompany) {
+
+        User user = userRepository.findById(idCompany).orElseThrow();
+        List<InvitationModel> invitations = user.getInvitations();
+
+        return invitations;
+    }
+
+    void acceptInvitation(int idCompany, int idInvitation) {
+        User user = userRepository.findById(idCompany).orElseThrow();
+        List<InvitationModel> invitations = user.getInvitations();
+
+        boolean isPresent = false;
+        int index = -1;
+
+        for(int i = 0; i < invitations.size(); i++) {
+            if (invitations.get(i).getIdInvitation() == idInvitation) {
+                isPresent = true;
+                index = i;
+            }
+        }
+
+        if (isPresent) {
+            invitations.get(index).setAccepted(true);;
+            user.setInvitations(invitations);
         }
         userRepository.save(user);
     }
 
-    public List<User> getUsers(int id, int page, int size) {
+    public Page<User> getUsers(int id, int page, int size) {
         
         User user = userRepository.findById(id).orElseThrow();
 
-        PageRequest pageable = PageRequest.of(page-1, 3);
-        Page<User> pu = userRepository.findByRole("Candidate", pageable);
-
         List<User> newUsers = new ArrayList<>();
-        List<User> lu = pu.getContent();
-        boolean isSended = false;
+        List<Integer> ids = new ArrayList<>();
+        List<User> candidates = userRepository.findByRole("Candidate");
 
-        for(User u : lu) {
+        if (!user.getInvitations().isEmpty()) {
             for(InvitationModel i : user.getInvitations()) {
-                isSended = i.getIdTo() == u.getId();
+                ids.add(i.getIdTo());
             }
-
-            if (!isSended) newUsers.add(u);
         }
 
-        for(User u1 : newUsers) {
-            System.out.println("fzlaallalalalal    :   "+u1.getFullName());
-
+        for(User candidat : candidates) {
+            if (!ids.contains(candidat.getId())) {
+                newUsers.add(candidat);
+            }
         }
 
+        PageRequest pageable = PageRequest.of(page-1, 3);
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), newUsers.size());
+        final Page<User> finalUsers = new PageImpl<>(newUsers.subList(start, end), pageable, newUsers.size());
         
-        return newUsers;
+        return finalUsers;
     }
 
     public Page<Experience> getPaginatedExperiences(int id, int page, int size) {

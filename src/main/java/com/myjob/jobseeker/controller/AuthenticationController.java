@@ -28,6 +28,7 @@ import com.myjob.jobseeker.model.Education;
 import com.myjob.jobseeker.model.Experience;
 import com.myjob.jobseeker.model.FavoriteModel;
 import com.myjob.jobseeker.model.FileExistingResponse;
+import com.myjob.jobseeker.model.InvitationModel;
 import com.myjob.jobseeker.model.LoginResponse;
 import com.myjob.jobseeker.model.User;
 import com.myjob.jobseeker.services.AuthenticationService;
@@ -224,7 +225,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/getAllJobs")
-    public ResponseEntity<List<User>> getJobsPages1(
+    public ResponseEntity<Page<User>> getJobsPages1(
         @RequestParam int page,
         @RequestParam int size) {  
 
@@ -302,6 +303,17 @@ public class AuthenticationController {
         @RequestParam int size) {  
             
             Page<FavoriteModel> experiences = authenticationService.getPaginatedFavorites(id, page, size);
+
+        return ResponseEntity.ok(experiences);
+    }
+
+    @GetMapping("/getInvitations")
+    public ResponseEntity<Page<InvitationModel>> getInvitationsPages(
+        @RequestParam int id,
+        @RequestParam int page,
+        @RequestParam int size) {  
+            
+            Page<InvitationModel> experiences = authenticationService.getPaginatedInvitations(id, page, size);
 
         return ResponseEntity.ok(experiences);
     }
