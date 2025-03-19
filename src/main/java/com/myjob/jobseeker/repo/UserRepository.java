@@ -11,6 +11,5 @@ import com.myjob.jobseeker.model.User;
 @Repository
 public interface UserRepository extends MongoRepository<User, Integer>, ExperienceRepository, EducationRepository, FavoritesRepository, InvitationRepository {
     Optional<User> findByEmail(String email);
-    //Page<User> findByRole(String role, Pageable pageable);
     List<User> findByRole(String role);
 }

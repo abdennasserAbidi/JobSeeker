@@ -60,6 +60,18 @@ public class User implements UserDetails {
 
     private boolean isFavorite;
 
+    private String phoneCompany;
+
+    private String faxCompany;
+    
+    private String linkLinkedIn;
+    
+    private String companyActivitySector;
+    
+    private String companyDescription;
+
+    private String companyAddress;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Experience> experiences = new ArrayList<>();
 

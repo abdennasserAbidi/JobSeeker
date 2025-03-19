@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.myjob.jobseeker.dtos.CompanyInfoDto;
 import com.myjob.jobseeker.dtos.EducationDto;
 import com.myjob.jobseeker.dtos.EmailResponse;
 import com.myjob.jobseeker.dtos.ExperienceDto;
@@ -275,6 +276,19 @@ public class AuthenticationController {
         System.err.println("gjkrgjrnzgrzgnzrlgnzrl   "+personalInfoDto.getAvailability());
 
         authenticationService.savePersonal(personalInfoDto);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/updatecompany")
+    public ResponseEntity<ExperienceResponse> updateCompany(@RequestBody CompanyInfoDto companyInfoDto) {
+
+
+        authenticationService.saveCompanyInfo(companyInfoDto);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);

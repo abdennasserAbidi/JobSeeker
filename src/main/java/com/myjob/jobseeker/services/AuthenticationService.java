@@ -9,6 +9,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.myjob.jobseeker.dtos.CompanyInfoDto;
 import com.myjob.jobseeker.dtos.EducationDto;
 import com.myjob.jobseeker.dtos.ExperienceDto;
 import com.myjob.jobseeker.dtos.LoginUserDto;
@@ -53,6 +55,7 @@ public class AuthenticationService {
         FavoriteModel f = new FavoriteModel();
     
         User candidate = userRepository.findById(id).orElseThrow();
+        candidate.setFavorite(true);
 
         f.setId(candidate.getId());
         f.setEmail(candidate.getEmail());
@@ -84,6 +87,21 @@ public class AuthenticationService {
         user.setAvailability(input.getAvailability());
         user.setPreferredActivitySector(input.getPreferredActivitySector());
         user.setPhone(input.getPhone());
+
+        userRepository.save(user);
+    }
+
+    public void saveCompanyInfo(CompanyInfoDto input) {
+        User user = userRepository.findById(input.getId()).orElseThrow();
+        
+        user.setCompanyName(input.getCompanyName());
+        user.setCompanyActivitySector(input.getCompanyActivitySector());
+        user.setCompanyDescription(input.getCompanyDescription());
+        user.setLinkLinkedIn(input.getLinkLinkedIn());
+        user.setFaxCompany(input.getFaxCompany());
+        user.setPhoneCompany(input.getPhoneCompany());
+        user.setCompanyAddress(input.getCompanyAddress());
+   
 
         userRepository.save(user);
     }
