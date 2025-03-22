@@ -233,6 +233,17 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.getUsers(10, page, size));
     }
 
+    
+    @GetMapping("/getAllFavoritesCandidates")
+    public ResponseEntity<Page<User>> getUsersFavorites(
+        @RequestParam int id,
+        @RequestParam int page,
+        @RequestParam int size) {  
+
+        return ResponseEntity.ok(authenticationService.getUsersFavorites(id, page, size));
+    }
+
+
     @GetMapping("/getAllEducation")
     public ResponseEntity<Page<Education>> getAllEducations(
         @RequestParam int id,

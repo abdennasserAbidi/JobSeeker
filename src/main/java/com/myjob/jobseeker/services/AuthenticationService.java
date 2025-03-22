@@ -341,6 +341,27 @@ public class AuthenticationService {
         return finalUsers;
     }
 
+    public Page<User> getUsersFavorites(int id, int page, int size) {
+        
+        User user = userRepository.findById(id).orElseThrow();
+
+        List<User> newUsers = new ArrayList<>();
+
+        if (!user.getFavorites().isEmpty()) {
+            for(FavoriteModel i : user.getFavorites()) {
+                User favoriteUser = userRepository.findById(i.getId()).orElseThrow();
+                newUsers.add(favoriteUser);
+            }
+        }
+
+        PageRequest pageable = PageRequest.of(page-1, 3);
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), newUsers.size());
+        final Page<User> finalUsers = new PageImpl<>(newUsers.subList(start, end), pageable, newUsers.size());
+        
+        return finalUsers;
+    }
+
     public Page<Experience> getPaginatedExperiences(int id, int page, int size) {
         return userRepository.findPaginatedExperiences(id, page, size);
     }
