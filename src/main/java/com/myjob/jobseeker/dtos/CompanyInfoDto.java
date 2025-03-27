@@ -10,6 +10,24 @@ public class CompanyInfoDto {
     private String companyActivitySector;
     private String companyDescription;
     private String companyAddress;
+    private String companySecondAddress;
+    private String secondPhoneCompany;
+
+    public int getCompanySecondAddress() {
+        return companySecondAddress;
+    }
+
+    public void setCompanySecondAddress(String companySecondAddress) {
+        this.companySecondAddress = companySecondAddress;
+    }
+
+    public int getSecondPhoneCompany() {
+        return secondPhoneCompany;
+    }
+
+    public void setSecondPhoneCompany(String secondPhoneCompany) {
+        this.secondPhoneCompany = secondPhoneCompany;
+    }
 
     public int getId() {
         return id;

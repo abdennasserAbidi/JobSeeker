@@ -101,7 +101,8 @@ public class AuthenticationService {
         user.setFaxCompany(input.getFaxCompany());
         user.setPhoneCompany(input.getPhoneCompany());
         user.setCompanyAddress(input.getCompanyAddress());
-   
+        user.setSecondPhoneCompany(input.getSecondPhoneCompany());
+        user.setCompanySecondAddress(input.getCompanySecondAddress());
 
         userRepository.save(user);
     }

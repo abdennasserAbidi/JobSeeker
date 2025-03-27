@@ -72,6 +72,10 @@ public class User implements UserDetails {
 
     private String companyAddress;
 
+    private String companySecondAddress;
+    
+    private String secondPhoneCompany;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Experience> experiences = new ArrayList<>();
 
