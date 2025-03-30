@@ -265,6 +265,14 @@ public class AuthenticationController {
         return ResponseEntity.ok(educations);
     }
 
+    @GetMapping("/searchCandidate")
+    public ResponseEntity<List<User>> searchCandidate(@RequestParam String word) {
+
+        List<User> users = authenticationService.searchCandidate(word);
+
+        return ResponseEntity.ok(users);
+    }
+
 
     @PostMapping("/addEducation")
     public ResponseEntity<ExperienceResponse> saveEducation(@RequestBody EducationDto educationDto) {

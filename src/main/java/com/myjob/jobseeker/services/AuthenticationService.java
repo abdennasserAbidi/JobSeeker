@@ -314,6 +314,19 @@ public class AuthenticationService {
         userRepository.save(user);
     }
 
+    public List<User> searchCandidate(String word) {
+        List<User> candidates = userRepository.findByRole("Candidate");
+        List<User> newUsers = new ArrayList<>();
+        for(User c : candidates) {
+            if (c.getFullName().toLowerCase().contains(word)) {
+                newUsers.add(c);
+            }
+        }
+        if(word.isEmpty())
+            return candidates;
+        else return newUsers; 
+    }
+
     public Page<User> getUsers(int id, int page, int size) {
         
         User user = userRepository.findById(id).orElseThrow();

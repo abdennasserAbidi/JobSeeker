@@ -13,7 +13,7 @@ public class CompanyInfoDto {
     private String companySecondAddress;
     private String secondPhoneCompany;
 
-    public int getCompanySecondAddress() {
+    public String getCompanySecondAddress() {
         return companySecondAddress;
     }
 
@@ -21,7 +21,7 @@ public class CompanyInfoDto {
         this.companySecondAddress = companySecondAddress;
     }
 
-    public int getSecondPhoneCompany() {
+    public String getSecondPhoneCompany() {
         return secondPhoneCompany;
     }
 
