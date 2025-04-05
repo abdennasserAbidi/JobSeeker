@@ -36,6 +36,8 @@ public class User implements UserDetails {
     private Date updatedAt;
     private boolean isResetPasswordTokenValid;
 
+    private String userExperience;
+
     private String nationality;
 
     private String address;

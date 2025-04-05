@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.myjob.jobseeker.dtos.CompanyInfoDto;
+import com.myjob.jobseeker.dtos.Criteria;
 import com.myjob.jobseeker.dtos.EducationDto;
 import com.myjob.jobseeker.dtos.EmailResponse;
 import com.myjob.jobseeker.dtos.ExperienceDto;
@@ -190,6 +191,14 @@ public class AuthenticationController {
     public ResponseEntity<List<Experience>> getExperiences(@RequestParam int id) {
 
         List<Experience> experience = authenticationService.getAllExperience(id);
+
+        return ResponseEntity.ok(experience);
+    }
+
+    @GetMapping("/getByCriteria")
+    public ResponseEntity<List<User>> getByCriteria(@RequestBody Criteria criteria) {
+
+        List<User> experience = authenticationService.getByCriteria(criteria);
 
         return ResponseEntity.ok(experience);
     }

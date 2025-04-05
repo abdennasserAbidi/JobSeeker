@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.myjob.jobseeker.dtos.CompanyInfoDto;
+import com.myjob.jobseeker.dtos.Criteria;
 import com.myjob.jobseeker.dtos.EducationDto;
 import com.myjob.jobseeker.dtos.ExperienceDto;
 import com.myjob.jobseeker.dtos.LoginUserDto;
@@ -183,14 +184,31 @@ public class AuthenticationService {
         User user = userRepository.findById(input.getIdUser()).orElseThrow();
         List<Experience> list = user.getExperiences();
 
+        String userExperience = "";
+        int size = list.size();
+
+        if (size >= 0 && size <= 2) {
+            userExperience = "Premier emploi";
+        } else if (size >= 2 && size <= 5) {
+            userExperience = "Confirmé";
+        } else if (size >= 6 && size <= 8) {
+            userExperience = "Cadre";
+        } else if (size >= 8 && size <= 10) {
+            userExperience = "Directeur";
+        } else if (size > 10) {
+            userExperience = "Cadre supérieur";
+        } else {
+            userExperience = "Inconnu";
+        }
+
+        user.setUserExperience(userExperience);
+
         for(int i = 0; i < list.size(); i++) {
             if (list.get(i).getId() == input.getId()) {
                 isPresent = true;
                 index = i;
             }
         }
-
-        System.err.println("isPresent   "+input.getId());
 
         if (isPresent) {
             list.set(index, experience);
@@ -472,4 +490,7 @@ public class AuthenticationService {
 		return expiryDateTime.isAfter(currentDateTime);
 	}
 
+    public List<User> getByCriteria(Criteria criteria) {
+         return userRepository.searchUsers(criteria);
+    }
 }
