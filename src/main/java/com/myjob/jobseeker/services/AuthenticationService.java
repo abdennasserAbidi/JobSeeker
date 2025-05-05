@@ -1,5 +1,8 @@
 package com.myjob.jobseeker.services;
 
+import com.myjob.jobseeker.dtos.*;
+import com.myjob.jobseeker.model.*;
+import com.myjob.jobseeker.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -10,39 +13,27 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.myjob.jobseeker.dtos.CompanyInfoDto;
-import com.myjob.jobseeker.dtos.Criteria;
-import com.myjob.jobseeker.dtos.EducationDto;
-import com.myjob.jobseeker.dtos.ExperienceDto;
-import com.myjob.jobseeker.dtos.LoginUserDto;
-import com.myjob.jobseeker.dtos.PersonalInfoDto;
-import com.myjob.jobseeker.dtos.RegisterUserDto;
-import com.myjob.jobseeker.dtos.UserResponse;
-import com.myjob.jobseeker.model.Education;
-import com.myjob.jobseeker.model.Experience;
-import com.myjob.jobseeker.model.FavoriteModel;
-import com.myjob.jobseeker.model.InvitationModel;
-import com.myjob.jobseeker.model.User;
-import com.myjob.jobseeker.repo.UserRepository;
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class AuthenticationService {
     private final UserRepository userRepository;
-    
+
     private final PasswordEncoder passwordEncoder;
-    
+
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-	JavaMailSender javaMailSender;
+    JavaMailSender javaMailSender;
 
     public AuthenticationService(
-        UserRepository userRepository,
-        AuthenticationManager authenticationManager,
-        PasswordEncoder passwordEncoder
+            UserRepository userRepository,
+            AuthenticationManager authenticationManager,
+            PasswordEncoder passwordEncoder
     ) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
@@ -51,10 +42,10 @@ public class AuthenticationService {
 
     public void updateFavorite(int idConnected, int id) {
         User user = userRepository.findById(idConnected).orElseThrow();
-        
+
         List<FavoriteModel> l = user.getFavorites();
         FavoriteModel f = new FavoriteModel();
-    
+
         User candidate = userRepository.findById(id).orElseThrow();
         candidate.setFavorite(true);
 
@@ -76,7 +67,7 @@ public class AuthenticationService {
 
     public void savePersonal(PersonalInfoDto input) {
         User user = userRepository.findById(input.getId()).orElseThrow();
-        
+
         user.setFullName(input.getFullName());
         user.setNationality(input.getNationality());
         user.setActivitySector(input.getActivitySector());
@@ -94,7 +85,7 @@ public class AuthenticationService {
 
     public void saveCompanyInfo(CompanyInfoDto input) {
         User user = userRepository.findById(input.getId()).orElseThrow();
-        
+
         user.setCompanyName(input.getCompanyName());
         user.setCompanyActivitySector(input.getCompanyActivitySector());
         user.setCompanyDescription(input.getCompanyDescription());
@@ -135,7 +126,7 @@ public class AuthenticationService {
         User user = userRepository.findById(input.getIdUser()).orElseThrow();
         List<Education> list = user.getEducation();
 
-        for(int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getId() == input.getId()) {
                 isPresent = true;
                 index = i;
@@ -203,7 +194,7 @@ public class AuthenticationService {
 
         user.setUserExperience(userExperience);
 
-        for(int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getId() == input.getId()) {
                 isPresent = true;
                 index = i;
@@ -231,7 +222,7 @@ public class AuthenticationService {
         User user = userRepository.findById(idUser).orElseThrow();
         List<InvitationModel> list = user.getInvitations();
 
-        for(int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getIdInvitation() == input.getIdInvitation()) {
                 isPresent = true;
                 index = i;
@@ -246,6 +237,33 @@ public class AuthenticationService {
         }
 
         userRepository.save(user);
+    }
+
+    public void saveSearchHistory(int idUserConnected, SearchHistory searchHistory) {
+
+        boolean isPresent = false;
+
+        User user = userRepository.findById(idUserConnected).orElseThrow();
+        List<SearchHistory> list = user.getSearchHistories();
+
+        for (SearchHistory search : list) {
+            if (search.getIdUser() == searchHistory.getIdUser()) {
+                isPresent = true;
+                break;
+            }
+        }
+
+        if (!isPresent) {
+            list.add(searchHistory);
+            System.out.println(list);
+            user.setSearchHistories(list);
+        }
+
+        userRepository.save(user);
+    }
+
+    public Page<SearchHistory> getPaginatedSearches(int id, int page, int size) {
+        return userRepository.findPaginatedSearches(id, page, size);
     }
 
     public void saveCompanyInvitation(int id, InvitationModel input) {
@@ -278,8 +296,8 @@ public class AuthenticationService {
 
     public void sendInvitaion(int id, InvitationModel input) {
 
-        System.out.println("post name   :   "+input.getMessage());
-        System.out.println("description   :   "+input.getDescription());
+        System.out.println("post name   :   " + input.getMessage());
+        System.out.println("description   :   " + input.getDescription());
 
         //company
 
@@ -321,7 +339,7 @@ public class AuthenticationService {
         boolean isPresent = false;
         int index = -1;
 
-        for(int i = 0; i < invitations.size(); i++) {
+        for (int i = 0; i < invitations.size(); i++) {
             if (invitations.get(i).getIdInvitation() == idInvitation) {
                 isPresent = true;
                 index = i;
@@ -329,27 +347,68 @@ public class AuthenticationService {
         }
 
         if (isPresent) {
-            invitations.get(index).setAccepted(true);;
+            invitations.get(index).setAccepted(true);
+            ;
             user.setInvitations(invitations);
         }
         userRepository.save(user);
     }
 
-    public List<User> searchCandidate(String word) {
-        List<User> candidates = userRepository.findByRole("Candidate");
+    public Page<SearchHistory> searchCandidate(String word, int id, int page, int size) {
+
+        List<User> candidates = userRepository.findAll();
+
         List<User> newUsers = new ArrayList<>();
-        for(User c : candidates) {
-            if (c.getFullName().toLowerCase().contains(word)) {
+        for (User c : candidates) {
+            if (c.getRole().equals("Candidate") && c.getFullName().toLowerCase().contains(word)) {
                 newUsers.add(c);
             }
         }
-        if(word.isEmpty())
-            return candidates;
-        else return newUsers; 
+
+        List<User> combined;
+
+        if (word.isEmpty()) combined = candidates;
+        else combined = newUsers;
+
+        List<SearchHistory> list = new ArrayList<>();
+        for (User c : combined) {
+            SearchHistory searchHistory = new SearchHistory();
+            searchHistory.setIdUser(c.getId());
+            searchHistory.setGender(c.getSexe());
+            searchHistory.setFullName(c.getFullName());
+
+            List<Experience> exp = c.getExperiences();
+            if (!exp.isEmpty()) {
+                String date = exp.get(0).getDateStart();
+                System.out.println("fjeakbfjbfbjkeajf   date  "+date);
+                if (date.contains(",")) {
+                    String[] dates = date.split(", ");
+                    if (dates.length > 0) {
+                        int year = Integer.parseInt(dates[2]);
+                        int currentYear = Year.now().getValue();
+
+                        int diff = currentYear - year;
+                        if (diff > 0) {
+                            searchHistory.setExperience(diff+" years experiences");
+                        }
+                    }
+                }
+
+            }
+
+            list.add(searchHistory);
+        }
+
+
+        PageRequest pageable = PageRequest.of(page - 1, 3);
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), newUsers.size());
+
+        return new PageImpl<>(list.subList(start, end), pageable, list.size());
     }
 
     public Page<User> getUsers(int id, int page, int size) {
-        
+
         User user = userRepository.findById(id).orElseThrow();
 
         List<User> newUsers = new ArrayList<>();
@@ -357,43 +416,43 @@ public class AuthenticationService {
         List<User> candidates = userRepository.findByRole("Candidate");
 
         if (!user.getInvitations().isEmpty()) {
-            for(InvitationModel i : user.getInvitations()) {
+            for (InvitationModel i : user.getInvitations()) {
                 ids.add(i.getIdTo());
             }
         }
 
-        for(User candidat : candidates) {
+        for (User candidat : candidates) {
             if (!ids.contains(candidat.getId())) {
                 newUsers.add(candidat);
             }
         }
 
-        PageRequest pageable = PageRequest.of(page-1, 3);
-        final int start = (int)pageable.getOffset();
+        PageRequest pageable = PageRequest.of(page - 1, 3);
+        final int start = (int) pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), newUsers.size());
         final Page<User> finalUsers = new PageImpl<>(newUsers.subList(start, end), pageable, newUsers.size());
-        
+
         return finalUsers;
     }
 
     public Page<User> getUsersFavorites(int id, int page, int size) {
-        
+
         User user = userRepository.findById(id).orElseThrow();
 
         List<User> newUsers = new ArrayList<>();
 
         if (!user.getFavorites().isEmpty()) {
-            for(FavoriteModel i : user.getFavorites()) {
+            for (FavoriteModel i : user.getFavorites()) {
                 User favoriteUser = userRepository.findById(i.getId()).orElseThrow();
                 newUsers.add(favoriteUser);
             }
         }
 
-        PageRequest pageable = PageRequest.of(page-1, 3);
-        final int start = (int)pageable.getOffset();
+        PageRequest pageable = PageRequest.of(page - 1, 3);
+        final int start = (int) pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), newUsers.size());
         final Page<User> finalUsers = new PageImpl<>(newUsers.subList(start, end), pageable, newUsers.size());
-        
+
         return finalUsers;
     }
 
@@ -417,7 +476,7 @@ public class AuthenticationService {
         boolean isPresent = false;
         int index = -1;
 
-        for(int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getId() == idExperience) {
                 isPresent = true;
                 index = i;
@@ -439,7 +498,7 @@ public class AuthenticationService {
         boolean isPresent = false;
         int index = -1;
 
-        for(int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getId() == idEducation) {
                 isPresent = true;
                 index = i;
@@ -469,7 +528,7 @@ public class AuthenticationService {
         if (existingUser) {
             userResponse.setMessage("User already exist");
         } else userResponse.setUser(userRepository.save(user));
-        
+
         return userResponse;
     }
 
@@ -484,16 +543,16 @@ public class AuthenticationService {
         return userRepository.findByEmail(input.getEmail()).orElseThrow();
     }
 
-	public User authenticateByEmail(String email) {
+    public User authenticateByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow();
     }
 
-	public boolean hasExipred(LocalDateTime expiryDateTime) {
-		LocalDateTime currentDateTime = LocalDateTime.now();
-		return expiryDateTime.isAfter(currentDateTime);
-	}
+    public boolean hasExipred(LocalDateTime expiryDateTime) {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        return expiryDateTime.isAfter(currentDateTime);
+    }
 
     public List<User> getByCriteria(Criteria criteria) {
-         return userRepository.searchUsers(criteria);
+        return userRepository.searchUsers(criteria);
     }
 }

@@ -1,43 +1,14 @@
 package com.myjob.jobseeker.controller;
 
+import com.myjob.jobseeker.dtos.*;
+import com.myjob.jobseeker.model.*;
+import com.myjob.jobseeker.services.*;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.myjob.jobseeker.dtos.CompanyInfoDto;
-import com.myjob.jobseeker.dtos.Criteria;
-import com.myjob.jobseeker.dtos.EducationDto;
-import com.myjob.jobseeker.dtos.EmailResponse;
-import com.myjob.jobseeker.dtos.ExperienceDto;
-import com.myjob.jobseeker.dtos.ExperienceResponse;
-import com.myjob.jobseeker.dtos.InvitationDto;
-import com.myjob.jobseeker.dtos.LoginUserDto;
-import com.myjob.jobseeker.dtos.PasswordResponse;
-import com.myjob.jobseeker.dtos.PersonalInfoDto;
-import com.myjob.jobseeker.dtos.RegisterUserDto;
-import com.myjob.jobseeker.dtos.RegistrationResponse;
-import com.myjob.jobseeker.dtos.UserResponse;
-import com.myjob.jobseeker.model.Education;
-import com.myjob.jobseeker.model.Experience;
-import com.myjob.jobseeker.model.FavoriteModel;
-import com.myjob.jobseeker.model.FileExistingResponse;
-import com.myjob.jobseeker.model.InvitationModel;
-import com.myjob.jobseeker.model.LoginResponse;
-import com.myjob.jobseeker.model.User;
-import com.myjob.jobseeker.services.AuthenticationService;
-import com.myjob.jobseeker.services.EmailService;
-import com.myjob.jobseeker.services.FileStorageService;
-import com.myjob.jobseeker.services.JwtService;
-import com.myjob.jobseeker.services.PasswordResetService;
 
 import java.io.File;
 import java.util.List;
@@ -52,10 +23,10 @@ public class AuthenticationController {
     private final PasswordResetService passwordResetService;
     private final AuthenticationService authenticationService;
     private final FileStorageService fileStorageService;
-    
-    public AuthenticationController(JwtService jwtService, 
-    AuthenticationService authenticationService, EmailService emailService, PasswordResetService passwordResetService,
-    FileStorageService fileStorageService) {
+
+    public AuthenticationController(JwtService jwtService,
+                                    AuthenticationService authenticationService, EmailService emailService, PasswordResetService passwordResetService,
+                                    FileStorageService fileStorageService) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
         this.passwordResetService = passwordResetService;
@@ -74,7 +45,7 @@ public class AuthenticationController {
         if (registeredUser.getMessage() != null && !registeredUser.getMessage().isEmpty()) {
 
             registrationResponse.setMessageError(registeredUser.getMessage());
-            
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(registrationResponse);
         } else {
 
@@ -89,13 +60,13 @@ public class AuthenticationController {
 
     @PostMapping("/verification")
     public ResponseEntity<LoginResponse> verification(@RequestParam String email) {
-        
+
         String error = "";
         try {
-		    authenticationService.authenticateByEmail(email);
-		} catch(Exception exception) {
+            authenticationService.authenticateByEmail(email);
+        } catch (Exception exception) {
             error = exception.getMessage();
-		}
+        }
         LoginResponse loginResponse = new LoginResponse();
 
         if (error.equals("No value present")) {
@@ -112,12 +83,12 @@ public class AuthenticationController {
         User authenticatedUser;
         String error = "";
         try {
-		    authenticatedUser = authenticationService.authenticate(loginUserDto);
-            System.err.println("lzapzaoiazioazio   "+authenticatedUser);
-		} catch(Exception exception) {
+            authenticatedUser = authenticationService.authenticate(loginUserDto);
+            System.err.println("lzapzaoiazioazio   " + authenticatedUser);
+        } catch (Exception exception) {
             authenticatedUser = new User();
             error = exception.getMessage();
-		}
+        }
 
         String jwtToken = jwtService.generateToken(authenticatedUser);
 
@@ -148,7 +119,7 @@ public class AuthenticationController {
 
     @PostMapping("/validate-profile")
     public ResponseEntity<EmailResponse> validateProfile(@RequestParam String email) {
-        System.err.println("emaillll  "+email);
+        System.err.println("emaillll  " + email);
         emailService.sendTokenValidation(email);
         EmailResponse emailResponse = new EmailResponse();
         emailResponse.setId(1);
@@ -159,7 +130,7 @@ public class AuthenticationController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<PasswordResponse> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
-    
+
         String message = "";
         if (passwordResetService.validatePasswordResetToken(token)) {
             passwordResetService.updatePassword(token, newPassword);
@@ -176,7 +147,7 @@ public class AuthenticationController {
     @PostMapping("/add")
     public ResponseEntity<ExperienceResponse> register(@RequestBody ExperienceDto experienceDto) {
 
-        System.err.println("grfzgetetexperienceDto   "+experienceDto.toString());
+        System.err.println("grfzgetetexperienceDto   " + experienceDto.toString());
 
         authenticationService.saveExperience(experienceDto);
 
@@ -198,43 +169,67 @@ public class AuthenticationController {
     @PostMapping("/getByCriteria")
     public ResponseEntity<List<User>> getByCriteria(@RequestBody Criteria criteria) {
 
-        System.out.println("fffffffffffffffffffff    "+criteria);
+        System.out.println("fffffffffffffffffffff    " + criteria);
 
         List<User> experience = authenticationService.getByCriteria(criteria);
 
-        System.out.println("fffffffffffffffffffff    "+experience.size());
+        System.out.println("fffffffffffffffffffff    " + experience.size());
 
         return ResponseEntity.ok(experience);
     }
 
     @GetMapping("/getAllExperience")
     public ResponseEntity<Page<Experience>> getExperiencesPages(
-        @RequestParam int id,
-        @RequestParam int page,
-        @RequestParam int size) {  
-            
-            Page<Experience> experiences = authenticationService.getPaginatedExperiences(id, page, size);
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<Experience> experiences = authenticationService.getPaginatedExperiences(id, page, size);
 
         return ResponseEntity.ok(experiences);
     }
 
     @GetMapping("/getCompanyInvitations")
     public ResponseEntity<Page<InvitationModel>> getCompanyInvitations(
-        @RequestParam int id,
-        @RequestParam int page,
-        @RequestParam int size) {  
-            
-            Page<InvitationModel> invitation = authenticationService.getPaginatedInvitations(id, page, size);
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<InvitationModel> invitation = authenticationService.getPaginatedInvitations(id, page, size);
 
         return ResponseEntity.ok(invitation);
     }
 
     @GetMapping("/getAllJobs1")
     public ResponseEntity<Page<User>> getJobsPages(
-        @RequestParam int page,
-        @RequestParam int size) {  
+            @RequestParam int page,
+            @RequestParam int size) {
 
         return ResponseEntity.ok(authenticationService.getUsers1(page, size));
+    }
+
+    @PostMapping("/saveSearchHistory")
+    public ResponseEntity<ExperienceResponse> saveSearchHistory(
+            @RequestParam int idUserConnected,
+            @RequestBody SearchHistory searchHistory
+    ) {
+
+        authenticationService.saveSearchHistory(idUserConnected, searchHistory);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @GetMapping("/getAllSearchHistory")
+    public ResponseEntity<Page<SearchHistory>> getAllSearch(
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        return ResponseEntity.ok(authenticationService.getPaginatedSearches(id, page, size));
     }
 
     @PostMapping("/sendInvitation")
@@ -251,18 +246,18 @@ public class AuthenticationController {
 
     @GetMapping("/getAllJobs")
     public ResponseEntity<Page<User>> getJobsPages1(
-        @RequestParam int page,
-        @RequestParam int size) {  
+            @RequestParam int page,
+            @RequestParam int size) {
 
         return ResponseEntity.ok(authenticationService.getUsers(10, page, size));
     }
 
-    
+
     @GetMapping("/getAllFavoritesCandidates")
     public ResponseEntity<Page<User>> getUsersFavorites(
-        @RequestParam int id,
-        @RequestParam int page,
-        @RequestParam int size) {  
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
 
         return ResponseEntity.ok(authenticationService.getUsersFavorites(id, page, size));
     }
@@ -270,9 +265,9 @@ public class AuthenticationController {
 
     @GetMapping("/getAllEducation")
     public ResponseEntity<Page<Education>> getAllEducations(
-        @RequestParam int id,
-        @RequestParam int page,
-        @RequestParam int size
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size
     ) {
 
         Page<Education> educations = authenticationService.getPaginatedEducations(id, page, size);
@@ -290,9 +285,14 @@ public class AuthenticationController {
     }
 
     @GetMapping("/searchCandidate")
-    public ResponseEntity<List<User>> searchCandidate(@RequestParam String word) {
+    public ResponseEntity<Page<SearchHistory>> searchCandidate(
+            @RequestParam String word,
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
 
-        List<User> users = authenticationService.searchCandidate(word);
+        Page<SearchHistory> users = authenticationService.searchCandidate(word, id, page, size);
 
         return ResponseEntity.ok(users);
     }
@@ -301,7 +301,7 @@ public class AuthenticationController {
     @PostMapping("/addEducation")
     public ResponseEntity<ExperienceResponse> saveEducation(@RequestBody EducationDto educationDto) {
 
-        System.err.println("grfzgetetexperienceDto   "+educationDto);
+        System.err.println("grfzgetetexperienceDto   " + educationDto);
 
         authenticationService.saveEducation(educationDto);
 
@@ -316,7 +316,7 @@ public class AuthenticationController {
     public ResponseEntity<ExperienceResponse> updateUser(@RequestBody PersonalInfoDto personalInfoDto) {
 
 
-        System.err.println("gjkrgjrnzgrzgnzrlgnzrl   "+personalInfoDto.getAvailability());
+        System.err.println("gjkrgjrnzgrzgnzrlgnzrl   " + personalInfoDto.getAvailability());
 
         authenticationService.savePersonal(personalInfoDto);
 
@@ -355,22 +355,22 @@ public class AuthenticationController {
 
     @GetMapping("/getFavorites")
     public ResponseEntity<Page<FavoriteModel>> getFavoritesPages(
-        @RequestParam int id,
-        @RequestParam int page,
-        @RequestParam int size) {  
-            
-            Page<FavoriteModel> experiences = authenticationService.getPaginatedFavorites(id, page, size);
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<FavoriteModel> experiences = authenticationService.getPaginatedFavorites(id, page, size);
 
         return ResponseEntity.ok(experiences);
     }
 
     @GetMapping("/getInvitations")
     public ResponseEntity<Page<InvitationModel>> getInvitationsPages(
-        @RequestParam int id,
-        @RequestParam int page,
-        @RequestParam int size) {  
-            
-            Page<InvitationModel> experiences = authenticationService.getPaginatedInvitations(id, page, size);
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<InvitationModel> experiences = authenticationService.getPaginatedInvitations(id, page, size);
 
         return ResponseEntity.ok(experiences);
     }
@@ -417,7 +417,7 @@ public class AuthenticationController {
             // Save the file locally
             String filePath = fileStorageService.storeFile(file);
             file.transferTo(new File(filePath));
-            experienceResponse.setMessage(file.getOriginalFilename());    
+            experienceResponse.setMessage(file.getOriginalFilename());
         } catch (Exception e) {
             experienceResponse.setMessage("File upload failed: " + e.getMessage());
         }
@@ -431,7 +431,7 @@ public class AuthenticationController {
         experienceResponse.setId(1);
 
         boolean filePath = fileStorageService.isExisted(fileName);
-        System.err.println("fjenafkeanfea   "+filePath);
+        System.err.println("fjenafkeanfea   " + filePath);
         experienceResponse.setExisted(filePath);
 
         return ResponseEntity.ok(experienceResponse);
@@ -439,6 +439,6 @@ public class AuthenticationController {
 
     @GetMapping("/download")
     public ResponseEntity<Resource> retrieveFile(@RequestParam String fileName) {
-       return fileStorageService.retrieveFile(fileName);
+        return fileStorageService.retrieveFile(fileName);
     }
 }
