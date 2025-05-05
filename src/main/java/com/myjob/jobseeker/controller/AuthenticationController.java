@@ -195,10 +195,14 @@ public class AuthenticationController {
         return ResponseEntity.ok(experience);
     }
 
-    @GetMapping("/getByCriteria")
+    @PostMapping("/getByCriteria")
     public ResponseEntity<List<User>> getByCriteria(@RequestBody Criteria criteria) {
 
+        System.out.println("fffffffffffffffffffff    "+criteria);
+
         List<User> experience = authenticationService.getByCriteria(criteria);
+
+        System.out.println("fffffffffffffffffffff    "+experience.size());
 
         return ResponseEntity.ok(experience);
     }
@@ -212,6 +216,17 @@ public class AuthenticationController {
             Page<Experience> experiences = authenticationService.getPaginatedExperiences(id, page, size);
 
         return ResponseEntity.ok(experiences);
+    }
+
+    @GetMapping("/getCompanyInvitations")
+    public ResponseEntity<Page<InvitationModel>> getCompanyInvitations(
+        @RequestParam int id,
+        @RequestParam int page,
+        @RequestParam int size) {  
+            
+            Page<InvitationModel> invitation = authenticationService.getPaginatedInvitations(id, page, size);
+
+        return ResponseEntity.ok(invitation);
     }
 
     @GetMapping("/getAllJobs1")

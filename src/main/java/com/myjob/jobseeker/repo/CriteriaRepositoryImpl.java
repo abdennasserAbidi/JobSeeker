@@ -23,27 +23,58 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
             query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("experiences").is(request.getExperiences()));
         }
 
-        if (!request.getActivitySectors().isEmpty()) {
-            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("activitySectors").is(request.getActivitySectors()));
+        if (!request.getPreferredActivitySector().isEmpty()) {
+            
+            List<String> asector = request.getPreferredActivitySector();
+            addCriterias(asector, query, "preferredActivitySector");
+
         }
         
         if (!request.getCompanies().isEmpty()) {
-            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("companies").is(request.getCompanies()));
+
+            List<String> asector = request.getCompanies();
+            addCriterias(asector, query, "companies");
         }
 
         if (!request.getInstitutions().isEmpty()) {
-            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("institutions").is(request.getInstitutions()));
+
+            List<String> asector = request.getInstitutions();
+            addCriterias(asector, query, "institutions");
         }
 
         if (!request.getTypeContract().isEmpty()) {
-            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("typeContract").is(request.getTypeContract()));
+
+            List<String> asector = request.getTypeContract();
+            addCriterias(asector, query, "typeContract");
         }
 
         if (!request.getLocation().isEmpty()) {
-            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("location").is(request.getLocation()));
+            List<String> asector = request.getLocation();
+            addCriterias(asector, query, "address");
         }
-        
+
+        if (!request.getSituation().isEmpty()) {
+            List<String> asector = request.getSituation();
+            addCriterias(asector, query, "situation");
+        }
+
+        if (!request.getSex().isEmpty()) {
+            List<String> asector = request.getSex();
+            addCriterias(asector, query, "sexe");
+        }
+
+        if (!request.getDisponibility().isEmpty()) {
+            List<String> asector = request.getDisponibility();
+            addCriterias(asector, query, "availability");
+        }
+
         return mongoTemplate.find(query, User.class);
+    }
+
+    void addCriterias(List<String> crit, Query query, String tag) {
+        for(String x: crit) {
+            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where(tag).is(x));
+        }
     }
 
 }

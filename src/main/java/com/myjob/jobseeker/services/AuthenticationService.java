@@ -256,7 +256,10 @@ public class AuthenticationService {
         User user = userRepository.findById(id).orElseThrow();
         List<InvitationModel> list = user.getInvitations();
 
-        for(int i = 0; i < list.size(); i++) {
+        list.add(input);
+        user.setInvitations(list);
+
+        /*for(int i = 0; i < list.size(); i++) {
             if (list.get(i).getIdInvitation() == input.getIdInvitation()) {
                 isPresent = true;
                 index = i;
@@ -268,7 +271,7 @@ public class AuthenticationService {
         } else {
             list.add(input);
             user.setInvitations(list);
-        }
+        }*/
 
         userRepository.save(user);
     }
