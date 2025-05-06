@@ -167,13 +167,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/getByCriteria")
-    public ResponseEntity<List<User>> getByCriteria(@RequestBody Criteria criteria) {
+    public ResponseEntity<Page<User>> getByCriteria(
+            @RequestBody Criteria criteria,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
 
-        System.out.println("fffffffffffffffffffff    " + criteria);
-
-        List<User> experience = authenticationService.getByCriteria(criteria);
-
-        System.out.println("fffffffffffffffffffff    " + experience.size());
+        Page<User> experience = authenticationService.getByCriteria(criteria, page, size);
 
         return ResponseEntity.ok(experience);
     }
@@ -380,6 +380,21 @@ public class AuthenticationController {
 
 
         authenticationService.removeExperience(id, experienceId);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("removed successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/removeSearchHistory")
+    public ResponseEntity<ExperienceResponse> removeSearchHistory(
+            @RequestParam int idUserConnected, @RequestParam int idUserToDelete
+    ) {
+
+
+        authenticationService.removeSearchHistory(idUserConnected, idUserToDelete);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);

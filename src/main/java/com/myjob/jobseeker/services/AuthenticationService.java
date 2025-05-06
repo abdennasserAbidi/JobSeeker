@@ -380,7 +380,6 @@ public class AuthenticationService {
             List<Experience> exp = c.getExperiences();
             if (!exp.isEmpty()) {
                 String date = exp.get(0).getDateStart();
-                System.out.println("fjeakbfjbfbjkeajf   date  "+date);
                 if (date.contains(",")) {
                     String[] dates = date.split(", ");
                     if (dates.length > 0) {
@@ -427,10 +426,12 @@ public class AuthenticationService {
             }
         }
 
-        PageRequest pageable = PageRequest.of(page - 1, 3);
+        int s = Math.min(size, newUsers.size());
+
+        PageRequest pageable = PageRequest.of(page - 1, s);
         final int start = (int) pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), newUsers.size());
-        final Page<User> finalUsers = new PageImpl<>(newUsers.subList(start, end), pageable, newUsers.size());
+        final int end = Math.min((start + pageable.getPageSize()), s);
+        final Page<User> finalUsers = new PageImpl<>(newUsers.subList(start, end), pageable, s);
 
         return finalUsers;
     }
@@ -451,9 +452,19 @@ public class AuthenticationService {
         PageRequest pageable = PageRequest.of(page - 1, 3);
         final int start = (int) pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), newUsers.size());
-        final Page<User> finalUsers = new PageImpl<>(newUsers.subList(start, end), pageable, newUsers.size());
 
-        return finalUsers;
+        return new PageImpl<>(newUsers.subList(start, end), pageable, newUsers.size());
+
+    }
+
+    public Page<User> getByCriteria(Criteria criteria, int page, int size) {
+        List<User> users = userRepository.searchUsers(criteria);
+
+        PageRequest pageable = PageRequest.of(page - 1, 3);
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), users.size());
+
+        return new PageImpl<>(users.subList(start, end), pageable, users.size());
     }
 
     public Page<Experience> getPaginatedExperiences(int id, int page, int size) {
@@ -467,6 +478,27 @@ public class AuthenticationService {
     public List<Experience> getAllExperience(int id) {
         User user = userRepository.findById(id).orElseThrow();
         return user.getExperiences();
+    }
+
+    public void removeSearchHistory(int idUserConnected, int idUserToDelete) {
+        User user = userRepository.findById(idUserConnected).orElseThrow();
+        List<SearchHistory> list = user.getSearchHistories();
+
+        boolean isPresent = false;
+        int index = -1;
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getIdUser() == idUserToDelete) {
+                isPresent = true;
+                index = i;
+            }
+        }
+
+        if (isPresent) {
+            list.remove(index);
+            user.setSearchHistories(list);
+        }
+        userRepository.save(user);
     }
 
     public void removeExperience(int idUser, int idExperience) {
@@ -550,9 +582,5 @@ public class AuthenticationService {
     public boolean hasExipred(LocalDateTime expiryDateTime) {
         LocalDateTime currentDateTime = LocalDateTime.now();
         return expiryDateTime.isAfter(currentDateTime);
-    }
-
-    public List<User> getByCriteria(Criteria criteria) {
-        return userRepository.searchUsers(criteria);
     }
 }
