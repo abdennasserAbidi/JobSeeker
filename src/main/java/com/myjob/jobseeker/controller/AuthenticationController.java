@@ -232,10 +232,48 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.getPaginatedSearches(id, page, size));
     }
 
-    @PostMapping("/sendInvitation")
-    public ResponseEntity<ExperienceResponse> sendInvi(@RequestBody InvitationDto invitationDto) {
+    @PostMapping("/makeAnnouncement")
+    public ResponseEntity<ExperienceResponse> makeAnnouncement(
+            @RequestParam int idUserConnected,
+            @RequestBody AnnounceModel announceModel) {
 
-        authenticationService.sendInvitaion(invitationDto.getIdConnected(), invitationDto.getInvitationModel());
+        authenticationService.makeAnnouncement(idUserConnected, announceModel);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @GetMapping("/getCompanyAnnouncements")
+    public ResponseEntity<Page<AnnounceModel>> getCompanyAnnouncements(
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<AnnounceModel> invitation = authenticationService.getPaginatedAnnouncement(id, page, size);
+
+
+        return ResponseEntity.ok(invitation);
+    }
+
+    @GetMapping("/getCompanyNotifications")
+    public ResponseEntity<Page<NotificationModel>> getCompanyNotifications(
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<NotificationModel> invitation = authenticationService.getPaginatedNotification(id, page, size);
+
+
+        return ResponseEntity.ok(invitation);
+    }
+
+    @PostMapping("/sendInvitation")
+    public ResponseEntity<ExperienceResponse> sendInvitation(@RequestBody InvitationDto invitationDto) {
+
+        authenticationService.sendInvitation(invitationDto.getIdConnected(), invitationDto.getInvitationModel());
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);

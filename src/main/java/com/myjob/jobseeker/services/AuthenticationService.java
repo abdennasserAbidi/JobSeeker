@@ -294,10 +294,7 @@ public class AuthenticationService {
         userRepository.save(user);
     }
 
-    public void sendInvitaion(int id, InvitationModel input) {
-
-        System.out.println("post name   :   " + input.getMessage());
-        System.out.println("description   :   " + input.getDescription());
+    public void sendInvitation(int id, InvitationModel input) {
 
         //company
 
@@ -309,16 +306,34 @@ public class AuthenticationService {
         experience.setMessage(input.getMessage());
         experience.setDescription(input.getDescription());
         experience.setTypeContract(input.getTypeContract());
-
+        experience.setDate(input.getDate());
+        experience.setFullName(input.getFullName());
+        experience.setGender(input.getGender());
 
         saveCompanyInvitation(id, experience);
 
-
         //user
-
         saveUserInvitation(input.getIdTo(), experience);
     }
 
+    public void makeAnnouncement(int id, AnnounceModel input) {
+
+        User user = userRepository.findById(id).orElseThrow();
+        List<AnnounceModel> list = user.getAnnounces();
+
+        list.add(input);
+        user.setAnnounces(list);
+
+        userRepository.save(user);
+    }
+
+    public Page<AnnounceModel> getPaginatedAnnouncement(int id, int page, int size) {
+        return userRepository.findPaginatedAnnouncement(id, page, size);
+    }
+
+    public Page<NotificationModel> getPaginatedNotification(int id, int page, int size) {
+        return userRepository.findPaginatedNotification(id, page, size);
+    }
 
     public Page<InvitationModel> getPaginatedInvitations(int id, int page, int size) {
         return userRepository.findPaginatedInvitations(id, page, size);
@@ -431,9 +446,7 @@ public class AuthenticationService {
         PageRequest pageable = PageRequest.of(page - 1, s);
         final int start = (int) pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), s);
-        final Page<User> finalUsers = new PageImpl<>(newUsers.subList(start, end), pageable, s);
-
-        return finalUsers;
+        return new PageImpl<>(newUsers.subList(start, end), pageable, s);
     }
 
     public Page<User> getUsersFavorites(int id, int page, int size) {

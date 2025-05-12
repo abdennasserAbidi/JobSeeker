@@ -18,6 +18,10 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
     public List<User> searchUsers(Criteria request) {
 
         Query query = new Query();
+
+        if (!request.getCategories().isEmpty()) {
+            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("categories").is(request.getCategories()));
+        }
         
         if (!request.getExperiences().isEmpty()) {
             query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("experiences").is(request.getExperiences()));
