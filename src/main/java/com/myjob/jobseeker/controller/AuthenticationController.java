@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 @RequestMapping("/auth")
 @RestController
@@ -37,6 +38,7 @@ public class AuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<RegistrationResponse> register(@RequestBody RegisterUserDto registerUserDto) {
 
+        System.out.println("egjrkzhgzr" + registerUserDto.getRole());
 
         UserResponse registeredUser = authenticationService.signup(registerUserDto);
 
@@ -94,7 +96,7 @@ public class AuthenticationController {
 
         LoginResponse loginResponse = new LoginResponse();
 
-        if (error != "") {
+        if (!Objects.equals(error, "")) {
             loginResponse.setMessageError(error);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(loginResponse);
         } else {

@@ -65,6 +65,34 @@ public class AuthenticationService {
         return userRepository.findPaginatedFavorites(id, page, size);
     }
 
+    public Page<User> getUsers(int id, int page, int size) {
+
+        User user = userRepository.findById(id).orElseThrow();
+
+        List<User> newUsers = new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
+        List<User> candidates = userRepository.findByRole("Candidate");
+
+        if (!user.getInvitations().isEmpty()) {
+            for (InvitationModel i : user.getInvitations()) {
+                ids.add(i.getIdTo());
+            }
+        }
+
+        for (User candidat : candidates) {
+            if (!ids.contains(candidat.getId())) {
+                newUsers.add(candidat);
+            }
+        }
+
+        int s = Math.min(size, newUsers.size());
+
+        PageRequest pageable = PageRequest.of(page - 1, s);
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), s);
+        return new PageImpl<>(newUsers.subList(start, end), pageable, s);
+    }
+
     public void savePersonal(PersonalInfoDto input) {
         User user = userRepository.findById(input.getId()).orElseThrow();
 
@@ -73,10 +101,24 @@ public class AuthenticationService {
         user.setActivitySector(input.getActivitySector());
         user.setAddress(input.getAddress());
         user.setBirthDate(input.getBirthDate());
-        user.setSexe(input.getSexe());
-        user.setSituation(input.getSituation());
+
+        if (input.getSexe().equals("Homme") || input.getSexe().equals("Male")) user.setSexe("Male");
+        else user.setSexe("Female");
+
+        switch (input.getSituation()) {
+            case "Single", "Célibataire" -> user.setSituation("Single");
+            case "Engaged", "Engagé" -> user.setSituation("Engaged");
+            case "Married", "Marrié" -> user.setSituation("Married");
+        }
+
+        switch (input.getAvailability()) {
+            case "Now", "Maintenant" -> user.setAvailability("Now");
+            case "Less than 3 months", "Avant 3 mois" -> user.setAvailability("Less than 3 months");
+            case "In 3 months", "Dans 3 mois" -> user.setAvailability("In 3 months");
+            case "More than 3 months", "Après 3 mois" -> user.setAvailability("More than 3 months");
+        }
+
         user.setRangeSalary(input.getRangeSalary());
-        user.setAvailability(input.getAvailability());
         user.setPreferredActivitySector(input.getPreferredActivitySector());
         user.setPhone(input.getPhone());
 
@@ -100,8 +142,7 @@ public class AuthenticationService {
     }
 
     public User getUser(int id) {
-        User user = userRepository.findById(id).orElseThrow();
-        return user;
+        return userRepository.findById(id).orElseThrow();
     }
 
     public void saveEducation(EducationDto input) {
@@ -140,10 +181,6 @@ public class AuthenticationService {
             user.setEducation(list);
         }
         userRepository.save(user);
-    }
-
-    public List<User> getAllUser() {
-        return userRepository.findAll();
     }
 
     public List<Education> getAllEducations(int id) {
@@ -403,7 +440,7 @@ public class AuthenticationService {
 
                         int diff = currentYear - year;
                         if (diff > 0) {
-                            searchHistory.setExperience(diff+" years experiences");
+                            searchHistory.setExperience(diff + " years experiences");
                         }
                     }
                 }
@@ -419,34 +456,6 @@ public class AuthenticationService {
         final int end = Math.min((start + pageable.getPageSize()), newUsers.size());
 
         return new PageImpl<>(list.subList(start, end), pageable, list.size());
-    }
-
-    public Page<User> getUsers(int id, int page, int size) {
-
-        User user = userRepository.findById(id).orElseThrow();
-
-        List<User> newUsers = new ArrayList<>();
-        List<Integer> ids = new ArrayList<>();
-        List<User> candidates = userRepository.findByRole("Candidate");
-
-        if (!user.getInvitations().isEmpty()) {
-            for (InvitationModel i : user.getInvitations()) {
-                ids.add(i.getIdTo());
-            }
-        }
-
-        for (User candidat : candidates) {
-            if (!ids.contains(candidat.getId())) {
-                newUsers.add(candidat);
-            }
-        }
-
-        int s = Math.min(size, newUsers.size());
-
-        PageRequest pageable = PageRequest.of(page - 1, s);
-        final int start = (int) pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), s);
-        return new PageImpl<>(newUsers.subList(start, end), pageable, s);
     }
 
     public Page<User> getUsersFavorites(int id, int page, int size) {

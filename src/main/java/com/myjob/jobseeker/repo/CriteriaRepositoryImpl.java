@@ -20,11 +20,13 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
         Query query = new Query();
 
         if (!request.getCategories().isEmpty()) {
-            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("categories").is(request.getCategories()));
+            List<String> asector = request.getCategories();
+            addCriterias(asector, query, "categories");
         }
         
         if (!request.getExperiences().isEmpty()) {
-            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("experiences").is(request.getExperiences()));
+            List<String> asector = request.getExperiences();
+            addCriterias(asector, query, "experiences");
         }
 
         if (!request.getPreferredActivitySector().isEmpty()) {
@@ -76,9 +78,7 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
     }
 
     void addCriterias(List<String> crit, Query query, String tag) {
-        for(String x: crit) {
-            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where(tag).is(x));
-        }
+        query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where(tag).in(crit));
     }
 
 }
