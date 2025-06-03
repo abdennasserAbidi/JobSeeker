@@ -35,10 +35,31 @@ public class AuthenticationController {
         this.fileStorageService = fileStorageService;
     }
 
+    @PostMapping("/updatetoken")
+    public ResponseEntity<ExperienceResponse> updatetoken(@RequestParam int id, @RequestParam String token) {
+        System.out.println("lnlqnlfeqfefeq    update  "+token);
+        authenticationService.updateToken(id, token);
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/sendnotification")
+    public ResponseEntity<ExperienceResponse> sendNotification(@RequestBody NotificationMessage notificationMessage) {
+        System.out.println("lnlqnlfeqfefeq    send   "+notificationMessage.getRecipientToken());
+        String res = authenticationService.sendNotification(notificationMessage);
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage(res);
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+
     @PostMapping("/signup")
     public ResponseEntity<RegistrationResponse> register(@RequestBody RegisterUserDto registerUserDto) {
-
-        System.out.println("egjrkzhgzr" + registerUserDto.getRole());
 
         UserResponse registeredUser = authenticationService.signup(registerUserDto);
 
@@ -353,10 +374,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/updateuser")
-    public ResponseEntity<ExperienceResponse> updateUser(@RequestBody PersonalInfoDto personalInfoDto) {
+    public ResponseEntity<ExperienceResponse> updateUser(
+            @RequestParam String lang,
+            @RequestBody PersonalInfoDto personalInfoDto
+    ) {
 
 
-        System.err.println("gjkrgjrnzgrzgnzrlgnzrl   " + personalInfoDto.getAvailability());
+        System.err.println("gjkrgjrnzgrzgnzrlgnzrl   " + lang);
 
         authenticationService.savePersonal(personalInfoDto);
 

@@ -1,12 +1,17 @@
 package com.myjob.jobseeker.services;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import com.myjob.jobseeker.dtos.*;
 import com.myjob.jobseeker.model.*;
 import com.myjob.jobseeker.repo.UserRepository;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthenticationService {
@@ -30,6 +36,9 @@ public class AuthenticationService {
     @Autowired
     JavaMailSender javaMailSender;
 
+    @Autowired
+    FirebaseMessaging firebaseMessaging;
+
     public AuthenticationService(
             UserRepository userRepository,
             AuthenticationManager authenticationManager,
@@ -38,6 +47,37 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public String updateToken(int email, String token) {
+        Optional<User> user = userRepository.findById(email);
+        user.ifPresent(u -> {
+            u.setFcmToken(token);
+            userRepository.save(u);
+        });
+        return "";
+    }
+
+    public String sendNotification(NotificationMessage notificationMessage) {
+
+        Notification notification = Notification.builder()
+                .setTitle(notificationMessage.getTitle())
+                .setBody(notificationMessage.getBody())
+                .build();
+
+        Message message = Message.builder()
+                .setToken(notificationMessage.getRecipientToken())
+                .setNotification(notification)
+                .putAllData(notificationMessage.getData())
+                .build();
+
+        try {
+            firebaseMessaging.send(message);
+            return "Success sending notification";
+        } catch (Exception e) {
+            return "Error sending notification";
+        }
+
     }
 
     public void updateFavorite(int idConnected, int id) {
@@ -255,6 +295,8 @@ public class AuthenticationService {
 
         boolean isPresent = false;
         int index = -1;
+
+        System.out.println("fekzlgjrdugetge  "+idUser);
 
         User user = userRepository.findById(idUser).orElseThrow();
         List<InvitationModel> list = user.getInvitations();

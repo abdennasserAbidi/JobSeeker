@@ -31,6 +31,8 @@ public class User implements UserDetails {
     private String password;
     private String companyName;
 
+    private String fcmToken;
+
     private Date createdAt;
 
     private Date updatedAt;
