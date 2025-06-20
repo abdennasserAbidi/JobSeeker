@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @RequestMapping("/auth")
@@ -24,20 +25,31 @@ public class AuthenticationController {
     private final PasswordResetService passwordResetService;
     private final AuthenticationService authenticationService;
     private final FileStorageService fileStorageService;
+    private final SkillExtractorService skillExtractorService;
 
     public AuthenticationController(JwtService jwtService,
+                                    SkillExtractorService skillExtractorService,
                                     AuthenticationService authenticationService, EmailService emailService, PasswordResetService passwordResetService,
                                     FileStorageService fileStorageService) {
         this.jwtService = jwtService;
+        this.skillExtractorService = skillExtractorService;
         this.authenticationService = authenticationService;
         this.passwordResetService = passwordResetService;
         this.emailService = emailService;
         this.fileStorageService = fileStorageService;
     }
 
+    @PostMapping("/extract")
+    public Map<String, List<String>> extract(@RequestParam String description) {
+        System.out.println("elangeglblaegbklag" + skillExtractorService.extract(description));
+        return skillExtractorService.extract(description);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // NOTIFICATION
+    ///////////////////////////////////////////////////////////////////////////
     @PostMapping("/updatetoken")
-    public ResponseEntity<ExperienceResponse> updatetoken(@RequestParam int id, @RequestParam String token) {
-        System.out.println("lnlqnlfeqfefeq    update  "+token);
+    public ResponseEntity<ExperienceResponse> updateToken(@RequestParam int id, @RequestParam String token) {
         authenticationService.updateToken(id, token);
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -48,16 +60,31 @@ public class AuthenticationController {
 
     @PostMapping("/sendnotification")
     public ResponseEntity<ExperienceResponse> sendNotification(@RequestBody NotificationMessage notificationMessage) {
-        System.out.println("lnlqnlfeqfefeq    send   "+notificationMessage.getRecipientToken());
         String res = authenticationService.sendNotification(notificationMessage);
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
         experienceResponse.setMessage(res);
 
+
         return ResponseEntity.ok(experienceResponse);
     }
 
+    @GetMapping("/getCompanyNotifications")
+    public ResponseEntity<Page<NotificationModel>> getCompanyNotifications(
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
 
+        Page<NotificationModel> invitation = authenticationService.getPaginatedNotification(id, page, size);
+
+
+        return ResponseEntity.ok(invitation);
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    // SUBSCRIPTION
+    ///////////////////////////////////////////////////////////////////////////
     @PostMapping("/signup")
     public ResponseEntity<RegistrationResponse> register(@RequestBody RegisterUserDto registerUserDto) {
 
@@ -181,22 +208,13 @@ public class AuthenticationController {
         return ResponseEntity.ok(experienceResponse);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // EXPERIENCES
+    ///////////////////////////////////////////////////////////////////////////
     @GetMapping("/getAllExp")
     public ResponseEntity<List<Experience>> getExperiences(@RequestParam int id) {
 
         List<Experience> experience = authenticationService.getAllExperience(id);
-
-        return ResponseEntity.ok(experience);
-    }
-
-    @PostMapping("/getByCriteria")
-    public ResponseEntity<Page<User>> getByCriteria(
-            @RequestBody Criteria criteria,
-            @RequestParam int page,
-            @RequestParam int size
-    ) {
-
-        Page<User> experience = authenticationService.getByCriteria(criteria, page, size);
 
         return ResponseEntity.ok(experience);
     }
@@ -212,6 +230,20 @@ public class AuthenticationController {
         return ResponseEntity.ok(experiences);
     }
 
+    @PostMapping("/removeExperience")
+    public ResponseEntity<ExperienceResponse> removeExperience(@RequestParam int id, @RequestParam int experienceId) {
+        authenticationService.removeExperience(id, experienceId);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("removed successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // INVITATIONS
+    ///////////////////////////////////////////////////////////////////////////
     @GetMapping("/getCompanyInvitations")
     public ResponseEntity<Page<InvitationModel>> getCompanyInvitations(
             @RequestParam int id,
@@ -223,6 +255,56 @@ public class AuthenticationController {
         return ResponseEntity.ok(invitation);
     }
 
+    @PostMapping("/sendInvitation")
+    public ResponseEntity<ExperienceResponse> sendInvitation(@RequestBody InvitationDto invitationDto) {
+
+        authenticationService.sendInvitation(invitationDto.getIdConnected(), invitationDto.getInvitationModel());
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @GetMapping("/getInvitations")
+    public ResponseEntity<Page<InvitationModel>> getInvitationsPages(
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<InvitationModel> experiences = authenticationService.getPaginatedInvitations(id, page, size);
+
+        return ResponseEntity.ok(experiences);
+    }
+
+    @PostMapping("/acceptRejectInvitation")
+    public ResponseEntity<ExperienceResponse> acceptRejectInvitation(@RequestBody InvitationDto invitationDto) {
+
+        String status = authenticationService.acceptRejectInvitation(invitationDto);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage(status);
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // USER
+    ///////////////////////////////////////////////////////////////////////////
+    @PostMapping("/getByCriteria")
+    public ResponseEntity<Page<User>> getByCriteria(
+            @RequestBody Criteria criteria,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+
+        Page<User> experience = authenticationService.getByCriteria(criteria, page, size);
+
+        return ResponseEntity.ok(experience);
+    }
+
     @GetMapping("/getAllJobs1")
     public ResponseEntity<Page<User>> getJobsPages(
             @RequestParam int page,
@@ -231,6 +313,59 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.getUsers1(page, size));
     }
 
+    @GetMapping("/getAllJobs")
+    public ResponseEntity<Page<User>> getJobsPages1(
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        return ResponseEntity.ok(authenticationService.getUsers(10, page, size));
+    }
+
+    @GetMapping("/getAllFavoritesCandidates")
+    public ResponseEntity<Page<User>> getUsersFavorites(
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        return ResponseEntity.ok(authenticationService.getUsersFavorites(id, page, size));
+    }
+
+    @PostMapping("/updateuser")
+    public ResponseEntity<ExperienceResponse> updateUser(
+            @RequestParam String lang,
+            @RequestBody PersonalInfoDto personalInfoDto
+    ) {
+
+        authenticationService.savePersonal(personalInfoDto);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/updatecompany")
+    public ResponseEntity<ExperienceResponse> updateCompany(@RequestBody CompanyInfoDto companyInfoDto) {
+        authenticationService.saveCompanyInfo(companyInfoDto);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @GetMapping("/getUser")
+    public ResponseEntity<User> getUser(@RequestParam int id) {
+        User user = authenticationService.getUser(id);
+
+        return ResponseEntity.ok(user);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // SEARCH
+    ///////////////////////////////////////////////////////////////////////////
     @PostMapping("/saveSearchHistory")
     public ResponseEntity<ExperienceResponse> saveSearchHistory(
             @RequestParam int idUserConnected,
@@ -255,6 +390,37 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.getPaginatedSearches(id, page, size));
     }
 
+    @GetMapping("/searchCandidate")
+    public ResponseEntity<Page<SearchHistory>> searchCandidate(
+            @RequestParam String word,
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+
+        Page<SearchHistory> users = authenticationService.searchCandidate(word, id, page, size);
+
+        return ResponseEntity.ok(users);
+    }
+
+    @PostMapping("/removeSearchHistory")
+    public ResponseEntity<ExperienceResponse> removeSearchHistory(
+            @RequestParam int idUserConnected, @RequestParam int idUserToDelete
+    ) {
+
+
+        authenticationService.removeSearchHistory(idUserConnected, idUserToDelete);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("removed successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // ANNOUCEMEMNT
+    ///////////////////////////////////////////////////////////////////////////
     @PostMapping("/makeAnnouncement")
     public ResponseEntity<ExperienceResponse> makeAnnouncement(
             @RequestParam int idUserConnected,
@@ -281,49 +447,9 @@ public class AuthenticationController {
         return ResponseEntity.ok(invitation);
     }
 
-    @GetMapping("/getCompanyNotifications")
-    public ResponseEntity<Page<NotificationModel>> getCompanyNotifications(
-            @RequestParam int id,
-            @RequestParam int page,
-            @RequestParam int size) {
-
-        Page<NotificationModel> invitation = authenticationService.getPaginatedNotification(id, page, size);
-
-
-        return ResponseEntity.ok(invitation);
-    }
-
-    @PostMapping("/sendInvitation")
-    public ResponseEntity<ExperienceResponse> sendInvitation(@RequestBody InvitationDto invitationDto) {
-
-        authenticationService.sendInvitation(invitationDto.getIdConnected(), invitationDto.getInvitationModel());
-
-        ExperienceResponse experienceResponse = new ExperienceResponse();
-        experienceResponse.setId(1);
-        experienceResponse.setMessage("saved successfully");
-
-        return ResponseEntity.ok(experienceResponse);
-    }
-
-    @GetMapping("/getAllJobs")
-    public ResponseEntity<Page<User>> getJobsPages1(
-            @RequestParam int page,
-            @RequestParam int size) {
-
-        return ResponseEntity.ok(authenticationService.getUsers(10, page, size));
-    }
-
-
-    @GetMapping("/getAllFavoritesCandidates")
-    public ResponseEntity<Page<User>> getUsersFavorites(
-            @RequestParam int id,
-            @RequestParam int page,
-            @RequestParam int size) {
-
-        return ResponseEntity.ok(authenticationService.getUsersFavorites(id, page, size));
-    }
-
-
+    ///////////////////////////////////////////////////////////////////////////
+    // EDUCATION
+    ///////////////////////////////////////////////////////////////////////////
     @GetMapping("/getAllEducation")
     public ResponseEntity<Page<Education>> getAllEducations(
             @RequestParam int id,
@@ -345,20 +471,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(educations);
     }
 
-    @GetMapping("/searchCandidate")
-    public ResponseEntity<Page<SearchHistory>> searchCandidate(
-            @RequestParam String word,
-            @RequestParam int id,
-            @RequestParam int page,
-            @RequestParam int size
-    ) {
-
-        Page<SearchHistory> users = authenticationService.searchCandidate(word, id, page, size);
-
-        return ResponseEntity.ok(users);
-    }
-
-
     @PostMapping("/addEducation")
     public ResponseEntity<ExperienceResponse> saveEducation(@RequestBody EducationDto educationDto) {
 
@@ -373,37 +485,22 @@ public class AuthenticationController {
         return ResponseEntity.ok(experienceResponse);
     }
 
-    @PostMapping("/updateuser")
-    public ResponseEntity<ExperienceResponse> updateUser(
-            @RequestParam String lang,
-            @RequestBody PersonalInfoDto personalInfoDto
-    ) {
+    @PostMapping("/removeEducation")
+    public ResponseEntity<ExperienceResponse> removeEducation(@RequestParam int id, @RequestParam int educationId) {
 
 
-        System.err.println("gjkrgjrnzgrzgnzrlgnzrl   " + lang);
-
-        authenticationService.savePersonal(personalInfoDto);
+        authenticationService.removeEducation(id, educationId);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
-        experienceResponse.setMessage("saved successfully");
+        experienceResponse.setMessage("removed successfully");
 
         return ResponseEntity.ok(experienceResponse);
     }
 
-    @PostMapping("/updatecompany")
-    public ResponseEntity<ExperienceResponse> updateCompany(@RequestBody CompanyInfoDto companyInfoDto) {
-
-
-        authenticationService.saveCompanyInfo(companyInfoDto);
-
-        ExperienceResponse experienceResponse = new ExperienceResponse();
-        experienceResponse.setId(1);
-        experienceResponse.setMessage("saved successfully");
-
-        return ResponseEntity.ok(experienceResponse);
-    }
-
+    ///////////////////////////////////////////////////////////////////////////
+    // FAVORITES
+    ///////////////////////////////////////////////////////////////////////////
     @PostMapping("/updatefavorite")
     public ResponseEntity<ExperienceResponse> updateFavorite(@RequestParam int idUserConnected, @RequestParam int candidateId) {
 
@@ -428,65 +525,9 @@ public class AuthenticationController {
         return ResponseEntity.ok(experiences);
     }
 
-    @GetMapping("/getInvitations")
-    public ResponseEntity<Page<InvitationModel>> getInvitationsPages(
-            @RequestParam int id,
-            @RequestParam int page,
-            @RequestParam int size) {
-
-        Page<InvitationModel> experiences = authenticationService.getPaginatedInvitations(id, page, size);
-
-        return ResponseEntity.ok(experiences);
-    }
-
-    @PostMapping("/removeExperience")
-    public ResponseEntity<ExperienceResponse> removeExperience(@RequestParam int id, @RequestParam int experienceId) {
-
-
-        authenticationService.removeExperience(id, experienceId);
-
-        ExperienceResponse experienceResponse = new ExperienceResponse();
-        experienceResponse.setId(1);
-        experienceResponse.setMessage("removed successfully");
-
-        return ResponseEntity.ok(experienceResponse);
-    }
-
-    @PostMapping("/removeSearchHistory")
-    public ResponseEntity<ExperienceResponse> removeSearchHistory(
-            @RequestParam int idUserConnected, @RequestParam int idUserToDelete
-    ) {
-
-
-        authenticationService.removeSearchHistory(idUserConnected, idUserToDelete);
-
-        ExperienceResponse experienceResponse = new ExperienceResponse();
-        experienceResponse.setId(1);
-        experienceResponse.setMessage("removed successfully");
-
-        return ResponseEntity.ok(experienceResponse);
-    }
-
-    @PostMapping("/removeEducation")
-    public ResponseEntity<ExperienceResponse> removeEducation(@RequestParam int id, @RequestParam int educationId) {
-
-
-        authenticationService.removeEducation(id, educationId);
-
-        ExperienceResponse experienceResponse = new ExperienceResponse();
-        experienceResponse.setId(1);
-        experienceResponse.setMessage("removed successfully");
-
-        return ResponseEntity.ok(experienceResponse);
-    }
-
-    @GetMapping("/getUser")
-    public ResponseEntity<User> getUser(@RequestParam int id) {
-        User user = authenticationService.getUser(id);
-
-        return ResponseEntity.ok(user);
-    }
-
+    ///////////////////////////////////////////////////////////////////////////
+    // FILES
+    ///////////////////////////////////////////////////////////////////////////
     @PostMapping("/uploadCV")
     public ResponseEntity<ExperienceResponse> uploadFile(@RequestParam("file") MultipartFile file) {
         ExperienceResponse experienceResponse = new ExperienceResponse();

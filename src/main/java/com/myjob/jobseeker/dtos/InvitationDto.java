@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 public class InvitationDto {
 
+    //for the company
     private int idConnected;
     private InvitationModel invitationModel;
 

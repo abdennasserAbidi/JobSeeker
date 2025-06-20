@@ -60,6 +60,10 @@ public class User implements UserDetails {
 
     private String preferredActivitySector;
 
+    private String preferredEmploymentType;
+
+    private String country;
+
     private String phone;
 
     private boolean isFavorite;

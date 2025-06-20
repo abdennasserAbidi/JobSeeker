@@ -13,6 +13,7 @@ public class InvitationModel {
     private String typeContract;
     private int idCompany;
     private String companyName;
+    private String status;
     private boolean accepted = false;
     //candidate info
     private int idTo;

@@ -140,6 +140,7 @@ public class AuthenticationService {
         user.setNationality(input.getNationality());
         user.setActivitySector(input.getActivitySector());
         user.setAddress(input.getAddress());
+        user.setCountry(input.getCountry());
         user.setBirthDate(input.getBirthDate());
 
         if (input.getSexe().equals("Homme") || input.getSexe().equals("Male")) user.setSexe("Male");
@@ -149,6 +150,12 @@ public class AuthenticationService {
             case "Single", "Célibataire" -> user.setSituation("Single");
             case "Engaged", "Engagé" -> user.setSituation("Engaged");
             case "Married", "Marrié" -> user.setSituation("Married");
+        }
+
+        switch (input.getPreferredEmploymentType()) {
+            case "Contract", "Contrat" -> user.setPreferredEmploymentType("Contract");
+            case "Freelance" -> user.setPreferredEmploymentType("Freelance");
+            case "Both", "Les deux" -> user.setPreferredEmploymentType("Both");
         }
 
         switch (input.getAvailability()) {
@@ -347,30 +354,60 @@ public class AuthenticationService {
 
     public void saveCompanyInvitation(int id, InvitationModel input) {
 
-        boolean isPresent = false;
-        int index = -1;
-
         User user = userRepository.findById(id).orElseThrow();
         List<InvitationModel> list = user.getInvitations();
 
         list.add(input);
         user.setInvitations(list);
 
-        /*for(int i = 0; i < list.size(); i++) {
-            if (list.get(i).getIdInvitation() == input.getIdInvitation()) {
-                isPresent = true;
-                index = i;
+        userRepository.save(user);
+    }
+
+    public void updateStatus(int idCandidate, InvitationModel input) {
+        User candidate = userRepository.findById(idCandidate).orElseThrow();
+        List<InvitationModel> list = candidate.getInvitations();
+
+        InvitationModel i = null;
+        int index = -1;
+        for (int j = 0; j < list.size(); j++) {
+            InvitationModel invitationModel = list.get(j);
+            if (invitationModel.getIdInvitation() == input.getIdInvitation()) {
+                index = j;
+                i = invitationModel;
             }
         }
 
-        if (isPresent) {
-            list.set(index, input);
-        } else {
-            list.add(input);
-            user.setInvitations(list);
-        }*/
+        if (i != null) {
+            i.setIdInvitation(input.getIdInvitation());
+            i.setIdTo(input.getIdTo());
+            i.setStatus(input.getStatus());
+            i.setAccepted(input.isAccepted());
+            i.setIdCompany(input.getIdCompany());
+            i.setCompanyName(input.getCompanyName());
+            i.setMessage(input.getMessage());
+            i.setDescription(input.getDescription());
+            i.setTypeContract(input.getTypeContract());
+            i.setDate(input.getDate());
+            i.setFullName(input.getFullName());
+            i.setGender(input.getGender());
 
-        userRepository.save(user);
+            list.set(index, i);
+            candidate.setInvitations(list);
+
+            userRepository.save(candidate);
+        }
+    }
+
+    public String acceptRejectInvitation(InvitationDto invitationDto) {
+        InvitationModel input = invitationDto.getInvitationModel();
+
+        int idCandidate = input.getIdTo();
+        updateStatus(idCandidate, input);
+
+        int idCompany = invitationDto.getIdConnected();
+        updateStatus(idCompany, input);
+
+        return input.getStatus();
     }
 
     public void sendInvitation(int id, InvitationModel input) {
