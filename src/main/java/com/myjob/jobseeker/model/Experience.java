@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,13 +26,21 @@ public class Experience {
     private String dateEnd;
     private String place;
     private String type;
+    private boolean isFreelance;
+    private boolean isContract;
+    private boolean perHourPaymentMethod;
+    private boolean perDayPaymentMethod;
+    private boolean perProjectPaymentMethod;
+    private boolean current;
     private String typeContract;
     private int salary;
+    private int freelanceSalary;
     private String freelanceFee;
     private String anotherActivitySector;
     private int nbHours;
     private int nbDays;
     private int hourlyRate;
+    private List<String> listSkills;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

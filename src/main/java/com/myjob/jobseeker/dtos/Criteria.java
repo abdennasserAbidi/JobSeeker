@@ -16,6 +16,9 @@ public class Criteria {
     private List<String> situation = new ArrayList<>();
     @Setter
     @Getter
+    private List<String> status = new ArrayList<>();
+    @Setter
+    @Getter
     private List<String> disponibility = new ArrayList<>();
     @Setter
     @Getter
@@ -45,8 +48,19 @@ public class Criteria {
 
     @Override
     public String toString() {
-        return "Criteria [id=" + id + ", experiences=" + experiences + ", location=" + location + ", typeContract="
-                + typeContract + ", institutions=" + institutions + ", activitySectors=" + preferredActivitySector
-                + ", companies=" + companies + "]";
+        return "Criteria{" +
+                "situation=" + situation +
+                ", status=" + status +
+                ", disponibility=" + disponibility +
+                ", sex=" + sex +
+                ", experiences=" + experiences +
+                ", categories=" + categories +
+                ", location=" + location +
+                ", typeContract=" + typeContract +
+                ", institutions=" + institutions +
+                ", preferredActivitySector=" + preferredActivitySector +
+                ", companies=" + companies +
+                ", id=" + id +
+                '}';
     }
 }

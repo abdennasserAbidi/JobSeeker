@@ -30,22 +30,24 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String companyName;
+    private String bio;
 
     private String fcmToken;
 
     private Date createdAt;
 
     private Date updatedAt;
-    private boolean isResetPasswordTokenValid;
 
-    private String userExperience;
+    private boolean isResetPasswordTokenValid;
 
     private String nationality;
 
     private String address;
 
     private String role;
-    
+    private boolean candidate;
+    private boolean company;
+
     private String sexe;
     
     private String birthDate;
@@ -54,7 +56,7 @@ public class User implements UserDetails {
 
     private String situation;
 
-    private String availability;
+    private String status = "Available";
 
     private String rangeSalary;
 
@@ -66,7 +68,13 @@ public class User implements UserDetails {
 
     private String phone;
 
+    private boolean firstTime;
+    private boolean firstTimeUse = true;
+
     private boolean isFavorite;
+
+    private boolean isVerified = false;
+
 
     private String phoneCompany;
 
@@ -83,6 +91,13 @@ public class User implements UserDetails {
     private String companySecondAddress;
     
     private String secondPhoneCompany;
+
+    private ValidationStatus validationStatus;
+    private ProfessionalStatus professionalStatus;
+    private CandidateSkills candidateSkills;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ValidationStatus> validationStepStatus = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Experience> experiences = new ArrayList<>();
@@ -104,6 +119,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NotificationModel> notifications = new ArrayList<>();
+
+    private List<String> preferredWorkType = new ArrayList<>();
+    private List<String> workPreferences = new ArrayList<>();
 
     public void setIsResetPasswordTokenValid(boolean isResetPasswordTokenValid) {
         this.isResetPasswordTokenValid = isResetPasswordTokenValid;

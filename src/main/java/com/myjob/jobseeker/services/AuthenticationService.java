@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,8 +23,11 @@ import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthenticationService {
@@ -49,6 +53,14 @@ public class AuthenticationService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public void verifyAccountCompany(int id) {
+        Optional<User> user = userRepository.findById(id);
+        user.ifPresent(u -> {
+            u.setVerified(true);
+            userRepository.save(u);
+        });
+    }
+
     public String updateToken(int email, String token) {
         Optional<User> user = userRepository.findById(email);
         user.ifPresent(u -> {
@@ -67,7 +79,7 @@ public class AuthenticationService {
 
         Message message = Message.builder()
                 .setToken(notificationMessage.getRecipientToken())
-                .setNotification(notification)
+                //.setNotification(notification)
                 .putAllData(notificationMessage.getData())
                 .build();
 
@@ -105,7 +117,8 @@ public class AuthenticationService {
         return userRepository.findPaginatedFavorites(id, page, size);
     }
 
-    public Page<User> getUsers(int id, int page, int size) {
+    public Page<User> getUserFiltered(String word,
+                                      int id, int page, int size) {
 
         User user = userRepository.findById(id).orElseThrow();
 
@@ -120,8 +133,43 @@ public class AuthenticationService {
         }
 
         for (User candidat : candidates) {
-            if (!ids.contains(candidat.getId())) {
+            System.out.println("keznfrzkjfz   " + candidat.getFullName());
+            boolean nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(candidat.getFullName()).find();
+
+            if (!ids.contains(candidat.getId()) && nameContains) {
                 newUsers.add(candidat);
+            }
+        }
+
+        if (newUsers.isEmpty()) {
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
+
+        } else {
+            int s = Math.min(size, newUsers.size());
+
+            PageRequest pageable = PageRequest.of(page - 1, s);
+            final int start = (int) pageable.getOffset();
+            final int end = Math.min((start + pageable.getPageSize()), s);
+            return new PageImpl<>(newUsers.subList(start, end), pageable, s);
+        }
+    }
+
+    public Page<User> getNewCandidate(int id, int page, int size) {
+        User user = userRepository.findById(id).orElseThrow();
+
+        List<User> newUsers = new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
+        List<User> allUsers = userRepository.findAll();
+
+        if (!user.getInvitations().isEmpty()) {
+            for (InvitationModel i : user.getInvitations()) {
+                ids.add(i.getIdTo());
+            }
+        }
+
+        for (User candidate : allUsers) {
+            if (!ids.contains(candidate.getId()) && candidate.isCandidate()) {
+                newUsers.add(candidate);
             }
         }
 
@@ -133,10 +181,93 @@ public class AuthenticationService {
         return new PageImpl<>(newUsers.subList(start, end), pageable, s);
     }
 
+    public Page<User> getUsers(int id, int page, int size) {
+
+        User user = userRepository.findById(id).orElseThrow();
+
+        List<User> newUsers = new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
+        List<User> candidates = userRepository.findByRole("Candidat");
+        List<User> allUsers = userRepository.findAll();
+
+        System.out.println("jgrklznhkrnzh  " + candidates);
+
+        for (User candidat : allUsers) {
+            if (candidat.isCandidate()) {
+                newUsers.add(candidat);
+            }
+        }
+
+        /*if (!user.getInvitations().isEmpty()) {
+            for (InvitationModel i : user.getInvitations()) {
+                ids.add(i.getIdTo());
+            }
+        }
+
+
+        for (User candidat : candidates) {
+            if (!ids.contains(candidat.getId())) {
+                newUsers.add(candidat);
+            }
+        }*/
+
+        int s = Math.min(size, newUsers.size());
+
+        PageRequest pageable = PageRequest.of(page - 1, s);
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), s);
+        return new PageImpl<>(newUsers.subList(start, end), pageable, s);
+    }
+
+    public void saveProfessionalInfo(ProfessionalStatus professionalStatus) {
+        User user = userRepository.findById(professionalStatus.getId()).orElseThrow();
+        ProfessionalStatus.AvailabilityLabel availabilityLabel = new ProfessionalStatus.AvailabilityLabel();
+        if (professionalStatus.getLanguage().equals("en")) {
+            String toFr = switch (professionalStatus.getAvailability()) {
+                case "Entry Level (0–1 years)" -> "Débutant (0–1 an)";
+                case "Junior (1–3 years)" -> "Junior (1–3 ans)";
+                case "Mid–Level (3–5 years)" -> "Intermédiaire (3–5 ans)";
+                case "Senior (5–8 years)" -> "Sénior (5–8 ans)";
+                case "Lead/Principal (8+ years)" -> "Chef d’équipe / Principal (8+ ans)";
+                default -> "Cadre / Direction (10+ ans)";
+            };
+            availabilityLabel.setFr(toFr);
+        } else {
+            String toEn = switch (professionalStatus.getAvailability()) {
+                case "Débutant (0–1 an)" -> "Entry Level (0–1 years)";
+                case "Junior (1–3 ans)" -> "Junior (1–3 years)";
+                case "Intermédiaire (3–5 ans)" -> "Mid–Level (3–5 years)";
+                case "Sénior (5–8 ans)" -> "Senior (5–8 years)";
+                case "Chef d’équipe / Principal (8+ ans)" -> "Lead/Principal (8+ years)";
+                default -> "Executive (10+ years)";
+            };
+            availabilityLabel.setEn(toEn);
+        }
+
+        professionalStatus.setAvailabilityLabel(availabilityLabel);
+
+        user.setProfessionalStatus(professionalStatus);
+        userRepository.save(user);
+    }
+
+    public void saveSkillsInfo(CandidateSkills candidateSkills) {
+        User user = userRepository.findById(candidateSkills.getId()).orElseThrow();
+        user.setCandidateSkills(candidateSkills);
+        userRepository.save(user);
+    }
+
+    public void completeUpdated(int id) {
+        User user = userRepository.findById(id).orElseThrow();
+        user.setFirstTime(false);
+        user.setFirstTimeUse(false);
+        userRepository.save(user);
+    }
+
     public void savePersonal(PersonalInfoDto input) {
         User user = userRepository.findById(input.getId()).orElseThrow();
 
         user.setFullName(input.getFullName());
+        user.setBio(input.getBio());
         user.setNationality(input.getNationality());
         user.setActivitySector(input.getActivitySector());
         user.setAddress(input.getAddress());
@@ -158,12 +289,12 @@ public class AuthenticationService {
             case "Both", "Les deux" -> user.setPreferredEmploymentType("Both");
         }
 
-        switch (input.getAvailability()) {
+        /*switch (input.getAvailability()) {
             case "Now", "Maintenant" -> user.setAvailability("Now");
             case "Less than 3 months", "Avant 3 mois" -> user.setAvailability("Less than 3 months");
             case "In 3 months", "Dans 3 mois" -> user.setAvailability("In 3 months");
             case "More than 3 months", "Après 3 mois" -> user.setAvailability("More than 3 months");
-        }
+        }*/
 
         user.setRangeSalary(input.getRangeSalary());
         user.setPreferredActivitySector(input.getPreferredActivitySector());
@@ -189,6 +320,8 @@ public class AuthenticationService {
     }
 
     public User getUser(int id) {
+        System.out.println("fjkzbgjkbgzr  " + id);
+
         return userRepository.findById(id).orElseThrow();
     }
 
@@ -248,6 +381,9 @@ public class AuthenticationService {
         experience.setDateStart(input.getDateStart());
         experience.setDateEnd(input.getDateEnd());
         experience.setCompanyName(input.getCompanyName());
+        experience.setFreelance(input.isFreelance());
+        experience.setContract(input.isContract());
+        experience.setCompanyName(input.getCompanyName());
         experience.setPlace(input.getPlace());
         experience.setSalary(input.getSalary());
         experience.setFreelanceFee(input.getFreelanceFee());
@@ -255,6 +391,12 @@ public class AuthenticationService {
         experience.setHourlyRate(input.getHourlyRate());
         experience.setNbDays(input.getNbDays());
         experience.setNbHours(input.getNbHours());
+        experience.setFreelanceSalary(input.getFreelanceSalary());
+        experience.setPerHourPaymentMethod(input.isPerHourPaymentMethod());
+        experience.setPerDayPaymentMethod(input.isPerDayPaymentMethod());
+        experience.setPerProjectPaymentMethod(input.isPerProjectPaymentMethod());
+        experience.setCurrent(input.isCurrent());
+        experience.setListSkills(input.getListSkills());
 
         User user = userRepository.findById(input.getIdUser()).orElseThrow();
         List<Experience> list = user.getExperiences();
@@ -262,7 +404,7 @@ public class AuthenticationService {
         String userExperience = "";
         int size = list.size();
 
-        if (size >= 0 && size <= 2) {
+        if (size <= 2) {
             userExperience = "Premier emploi";
         } else if (size >= 2 && size <= 5) {
             userExperience = "Confirmé";
@@ -276,7 +418,7 @@ public class AuthenticationService {
             userExperience = "Inconnu";
         }
 
-        user.setUserExperience(userExperience);
+        //user.setUserExperience(userExperience);
 
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getId() == input.getId()) {
@@ -294,16 +436,12 @@ public class AuthenticationService {
         userRepository.save(user);
     }
 
-    public Page<User> getUsers1(int page, int size) {
-        return userRepository.findAll(PageRequest.of(page - 1, size));
-    }
-
     public void saveUserInvitation(int idUser, InvitationModel input) {
 
         boolean isPresent = false;
         int index = -1;
 
-        System.out.println("fekzlgjrdugetge  "+idUser);
+        System.out.println("fekzlgjrdugetge  " + idUser);
 
         User user = userRepository.findById(idUser).orElseThrow();
         List<InvitationModel> list = user.getInvitations();
@@ -412,24 +550,71 @@ public class AuthenticationService {
 
     public void sendInvitation(int id, InvitationModel input) {
 
-        //company
+        User user = userRepository.findById(id).orElseThrow();
+        List<InvitationModel> list = user.getInvitations();
+        List<InvitationModel> filteredList = list.stream().filter(invitation -> invitation.getIdTo() == input.getIdTo()).toList();
 
-        InvitationModel experience = new InvitationModel();
-        experience.setIdInvitation(input.getIdInvitation());
-        experience.setIdTo(input.getIdTo());
-        experience.setIdCompany(input.getIdCompany());
-        experience.setCompanyName(input.getCompanyName());
-        experience.setMessage(input.getMessage());
-        experience.setDescription(input.getDescription());
-        experience.setTypeContract(input.getTypeContract());
-        experience.setDate(input.getDate());
-        experience.setFullName(input.getFullName());
-        experience.setGender(input.getGender());
+        if (filteredList.isEmpty()) {
+            //company
+            InvitationModel experience = new InvitationModel();
+            experience.setIdInvitation(input.getIdInvitation());
+            experience.setIdTo(input.getIdTo());
+            experience.setIdCompany(input.getIdCompany());
+            experience.setCompanyName(input.getCompanyName());
+            experience.setMessage(input.getMessage());
+            experience.setStatus(input.getStatus());
+            experience.setDescription(input.getDescription());
+            experience.setTypeContract(input.getTypeContract());
+            experience.setDescriptionContract(input.getDescriptionContract());
+            experience.setDate(input.getDate());
+            experience.setFullName(input.getFullName());
+            experience.setGender(input.getGender());
+            experience.setNameContract(input.getNameContract());
+            experience.setDuration(input.getDuration());
 
-        saveCompanyInvitation(id, experience);
+            saveCompanyInvitation(id, experience);
+
+            //user
+            saveUserInvitation(input.getIdTo(), experience);
+        }
+    }
+
+    public void finishProcess(int id, InvitationModel input) {
+
+
+        User user = userRepository.findById(id).orElseThrow();
+        updateInvitation(user, input);
 
         //user
-        saveUserInvitation(input.getIdTo(), experience);
+        User candidate = userRepository.findById(input.getIdTo()).orElseThrow();
+        updateInvitation(candidate, input);
+
+    }
+
+    public void updateInvitation(User user, InvitationModel input) {
+        List<InvitationModel> list = user.getInvitations();
+        InvitationModel selectedInvitation = new InvitationModel();
+        int index = -1;
+
+        for (int i = 0; i < list.size(); i++) {
+            InvitationModel invitationModel = list.get(i);
+            if (invitationModel.getIdInvitation() == input.getIdInvitation()) {
+                index = i;
+                selectedInvitation = invitationModel;
+            }
+        }
+
+        if (index != -1) {
+            selectedInvitation.setStatus(input.getStatus());
+            selectedInvitation.setReason(input.getReason());
+            selectedInvitation.setDateEnd(input.getDateEnd());
+
+            list.set(index, selectedInvitation);
+
+            user.setInvitations(list);
+
+            userRepository.save(user);
+        }
     }
 
     public void makeAnnouncement(int id, AnnounceModel input) {
@@ -453,6 +638,40 @@ public class AuthenticationService {
 
     public Page<InvitationModel> getPaginatedInvitations(int id, int page, int size) {
         return userRepository.findPaginatedInvitations(id, page, size);
+    }
+
+    public Page<InvitationModel> getPaginatedInvitationsFiltered(FilterInvitationBody request, int page, int size) {
+        return userRepository.findPaginatedInvitationsByTag(request, page, size);
+    }
+
+    public Page<InvitationModel> getPaginatedInvitationsByContract(int id, int page, int size) {
+        return userRepository.findPaginatedInvitationsByContract(id, page, size);
+    }
+
+    public InvitationUser getInvitationDetail(int id, int idInvitation) {
+        User user = userRepository.findById(id).orElseThrow();
+        List<InvitationModel> invitations = user.getInvitations();
+
+        InvitationModel invitationModel = null;
+
+        for (InvitationModel invi : invitations) {
+            if (invi.getIdInvitation() == idInvitation) {
+                invitationModel = invi;
+                break;
+            }
+        }
+
+        InvitationUser invitationUser = new InvitationUser();
+        invitationUser.setInvitationModel(invitationModel);
+
+        if (invitationModel != null) {
+            User candidate = getUser(invitationModel.getIdTo());
+            invitationUser.setUser(candidate);
+        }
+
+        System.out.println("qlqlqlqlqlqlq   " + invitationUser);
+
+        return invitationUser;
     }
 
     List<InvitationModel> getAllInvitations(int idCompany) {
@@ -565,7 +784,13 @@ public class AuthenticationService {
         final int start = (int) pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), users.size());
 
-        return new PageImpl<>(users.subList(start, end), pageable, users.size());
+        Page<User> pager;
+
+        if (start < users.size() && start < end) {
+            pager = new PageImpl<>(users.subList(start, end), pageable, users.size());
+        } else pager = new PageImpl<>(Collections.emptyList(), pageable, users.size());
+
+        return pager;
     }
 
     public Page<Experience> getPaginatedExperiences(int id, int page, int size) {
@@ -623,6 +848,19 @@ public class AuthenticationService {
         userRepository.save(user);
     }
 
+    public List<String> getCompaniesValidated() {
+        List<User> users = userRepository.findAll();
+        List<String> companyNames = new ArrayList<>();
+        for (User user : users) {
+            if (user.getRole().equals("Company") || user.getRole().equals("Entreprise")) {
+                /*if (user.isVerified()) {
+                    companyNames.add(user.getCompanyName());
+                }*/
+                companyNames.add(user.getCompanyName());
+            }
+        }
+        return companyNames;
+    }
 
     public void removeEducation(int idUser, int idEducation) {
         User user = userRepository.findById(idUser).orElseThrow();
@@ -652,6 +890,10 @@ public class AuthenticationService {
         user.setFullName(input.getFullName());
         user.setCompanyName(input.getCompanyName());
         user.setRole(input.getRole());
+        user.setCandidate(input.isCandidate());
+        user.setCompany(input.isCompany());
+        user.setPreferredWorkType(input.getPreferredWorkType());
+        user.setWorkPreferences(input.getWorkPreferences());
         user.setPassword(passwordEncoder.encode(input.getPassword()));
 
         boolean existingUser = userRepository.findByEmail(input.getEmail()).isPresent();
@@ -683,5 +925,22 @@ public class AuthenticationService {
     public boolean hasExipred(LocalDateTime expiryDateTime) {
         LocalDateTime currentDateTime = LocalDateTime.now();
         return expiryDateTime.isAfter(currentDateTime);
+    }
+
+    public void saveCandidateStatus(ValidationStatus validationStatus) {
+        User user = userRepository.findById(validationStatus.getId()).orElseThrow();
+        user.setValidationStatus(validationStatus);
+        user.getValidationStepStatus().add(validationStatus);
+        userRepository.save(user);
+    }
+
+    public ValidationStatus getStatusCandidateValidation(int id) {
+        User user = userRepository.findById(id).orElseThrow();
+        return user.getValidationStatus();
+    }
+
+    public List<ValidationStatus> getListStatusCandidateValidation(int id) {
+        User user = userRepository.findById(id).orElseThrow();
+        return user.getValidationStepStatus();
     }
 }

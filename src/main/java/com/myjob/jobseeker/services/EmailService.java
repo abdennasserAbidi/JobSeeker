@@ -32,4 +32,16 @@ public class EmailService {
         mailMessage.setText("To validate your profile, click here : " + url );
         mailSender.send(mailMessage);
     }
+
+    public void sendLinkValidation(String email) {
+        System.out.println("jdzkgkrhrgrgrzgzrgzr   sendLinkValidation  :  "+email);
+
+        int token = ThreadLocalRandom.current().nextInt(1000, 10000);
+        String url = "http://192.168.110.209/";
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(email);
+        mailMessage.setSubject("Validate profile Request");
+        mailMessage.setText("To validate your profile, click here : " + url );
+        mailSender.send(mailMessage);
+    }
 }

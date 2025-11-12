@@ -19,6 +19,11 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
 
         Query query = new Query();
 
+        if (!request.getStatus().isEmpty()) {
+            List<String> asector = request.getStatus();
+            addCriterias(asector, query, "status");
+        }
+
         if (!request.getCategories().isEmpty()) {
             List<String> asector = request.getCategories();
             addCriterias(asector, query, "categories");
@@ -49,9 +54,8 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
         }
 
         if (!request.getTypeContract().isEmpty()) {
-
             List<String> asector = request.getTypeContract();
-            addCriterias(asector, query, "typeContract");
+            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("professionalStatus.workType").in(asector));
         }
 
         if (!request.getLocation().isEmpty()) {

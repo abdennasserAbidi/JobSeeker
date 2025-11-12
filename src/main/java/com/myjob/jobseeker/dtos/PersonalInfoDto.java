@@ -11,6 +11,8 @@ public class PersonalInfoDto {
 
     private String nationality;
 
+    private String bio;
+
     private String address;
 
     private String sexe;
@@ -24,8 +26,6 @@ public class PersonalInfoDto {
     private String activitySector;
 
     private String situation;
-
-    private String availability;
 
     private String rangeSalary;
 

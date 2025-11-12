@@ -7,10 +7,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,8 +44,58 @@ public class AuthenticationController {
 
     @PostMapping("/extract")
     public Map<String, List<String>> extract(@RequestParam String description) {
-        System.out.println("elangeglblaegbklag" + skillExtractorService.extract(description));
         return skillExtractorService.extract(description);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // VERIFICATION
+    ///////////////////////////////////////////////////////////////////////////
+    @PostMapping("/verifyAccountCompany")
+    public ResponseEntity<ExperienceResponse> verifyAccountCompany(@RequestParam int id) {
+        authenticationService.verifyAccountCompany(id);
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/validate-profile")
+    public ResponseEntity<EmailResponse> validateProfile(@RequestParam String email) {
+        emailService.sendTokenValidation(email);
+        EmailResponse emailResponse = new EmailResponse();
+        emailResponse.setId(1);
+        emailResponse.setMessage("Check your email to validate your account");
+
+        return ResponseEntity.ok(emailResponse);
+    }
+
+    @PostMapping("/validate-profile-candidate")
+    public ResponseEntity<EmailResponse> validateCandidateProfile(@RequestBody ValidationStatus validationStatus) {
+        authenticationService.saveCandidateStatus(validationStatus);
+
+        if (validationStatus.getTypeValidation().equals("interview")) {
+            emailService.sendLinkValidation(validationStatus.getEmail());
+        }
+
+        EmailResponse emailResponse = new EmailResponse();
+        emailResponse.setId(1);
+        emailResponse.setMessage("Check your email to validate your account");
+
+        return ResponseEntity.ok(emailResponse);
+    }
+
+
+    @GetMapping("/statusCandidateValidation")
+    public ResponseEntity<ValidationStatus> getListStatusCandidateValidation(@RequestParam int id) {
+        ValidationStatus validationStatus = authenticationService.getStatusCandidateValidation(id);
+        return ResponseEntity.ok(validationStatus);
+    }
+
+    @GetMapping("/statusListCandidateValidation")
+    public ResponseEntity<List<ValidationStatus>> getStatusCandidateValidation(@RequestParam int id) {
+        List<ValidationStatus> validationStatus = authenticationService.getListStatusCandidateValidation(id);
+        return ResponseEntity.ok(validationStatus);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -61,10 +114,10 @@ public class AuthenticationController {
     @PostMapping("/sendnotification")
     public ResponseEntity<ExperienceResponse> sendNotification(@RequestBody NotificationMessage notificationMessage) {
         String res = authenticationService.sendNotification(notificationMessage);
+
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
         experienceResponse.setMessage(res);
-
 
         return ResponseEntity.ok(experienceResponse);
     }
@@ -134,7 +187,6 @@ public class AuthenticationController {
         String error = "";
         try {
             authenticatedUser = authenticationService.authenticate(loginUserDto);
-            System.err.println("lzapzaoiazioazio   " + authenticatedUser);
         } catch (Exception exception) {
             authenticatedUser = new User();
             error = exception.getMessage();
@@ -167,17 +219,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(emailResponse);
     }
 
-    @PostMapping("/validate-profile")
-    public ResponseEntity<EmailResponse> validateProfile(@RequestParam String email) {
-        System.err.println("emaillll  " + email);
-        emailService.sendTokenValidation(email);
-        EmailResponse emailResponse = new EmailResponse();
-        emailResponse.setId(1);
-        emailResponse.setMessage("Check your email to validate your account");
-
-        return ResponseEntity.ok(emailResponse);
-    }
-
     @PostMapping("/reset-password")
     public ResponseEntity<PasswordResponse> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
 
@@ -194,10 +235,11 @@ public class AuthenticationController {
         return ResponseEntity.ok(passwordResponse);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // EXPERIENCES
+    ///////////////////////////////////////////////////////////////////////////
     @PostMapping("/add")
     public ResponseEntity<ExperienceResponse> register(@RequestBody ExperienceDto experienceDto) {
-
-        System.err.println("grfzgetetexperienceDto   " + experienceDto.toString());
 
         authenticationService.saveExperience(experienceDto);
 
@@ -207,10 +249,7 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(experienceResponse);
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // EXPERIENCES
-    ///////////////////////////////////////////////////////////////////////////
+    
     @GetMapping("/getAllExp")
     public ResponseEntity<List<Experience>> getExperiences(@RequestParam int id) {
 
@@ -255,16 +294,83 @@ public class AuthenticationController {
         return ResponseEntity.ok(invitation);
     }
 
+    @PostMapping("/getFilteredInvitation")
+    public ResponseEntity<Page<InvitationModel>> getFilteredInvitation(
+            @RequestBody FilterInvitationBody request,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        Page<InvitationModel> response = authenticationService.getPaginatedInvitationsFiltered(request, page, size);
+
+        return ResponseEntity.ok(response);
+    }
+
+    public void sendNotificationAfterSendInvitation(NotificationMessage notificationMessage) {
+        String res = authenticationService.sendNotification(notificationMessage);
+    }
+
     @PostMapping("/sendInvitation")
     public ResponseEntity<ExperienceResponse> sendInvitation(@RequestBody InvitationDto invitationDto) {
 
         authenticationService.sendInvitation(invitationDto.getIdConnected(), invitationDto.getInvitationModel());
+        int idInvitation = invitationDto.getInvitationModel().getIdInvitation();
+        int idConnected = invitationDto.getIdConnected();
+
+        User user = authenticationService.getUser(idConnected);
+
+        Map<String, String> data = new HashMap<>();
+        data.put("idInvitation", idInvitation+"");
+
+        NotificationMessage notificationMessage = new NotificationMessage();
+        notificationMessage.setRecipientToken(user.getFcmToken());
+        notificationMessage.setData(data);
+
+        sendNotificationAfterSendInvitation(notificationMessage);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
         experienceResponse.setMessage("saved successfully");
 
         return ResponseEntity.ok(experienceResponse);
+    }
+
+    @GetMapping("/getInvitationById")
+    public ResponseEntity<InvitationUser> getInvitationById(
+            @RequestParam int idUser,
+            @RequestParam int idInvitation) {
+
+        InvitationUser experiences = authenticationService.getInvitationDetail(idUser, idInvitation);
+
+        return ResponseEntity.ok(experiences);
+    }
+
+    @PostMapping("/finishProcess")
+    public ResponseEntity<InvitationDto> finishProcess(@RequestBody InvitationDto invitationDto) {
+        //getIdConnected() => company
+        authenticationService.finishProcess(invitationDto.getIdConnected(), invitationDto.getInvitationModel());
+
+        return ResponseEntity.ok(invitationDto);
+    }
+
+    @MessageMapping("/requestInvitations")
+    @SendTo("/topic/invitations")
+    public Page<InvitationModel> handleRequest(Map<String, Integer> request) {
+
+        int id = request.getOrDefault("id", 0);
+        int page = request.getOrDefault("page", 1);
+        int size = request.getOrDefault("size", 10);
+        return authenticationService.getPaginatedInvitations(id, page, size);
+    }
+
+    @GetMapping("/getInvitationDetail")
+    public ResponseEntity<InvitationUser> getInvitationDetail(
+            @RequestParam int id,
+            @RequestParam int idInvitation
+    ) {
+
+        InvitationUser invitation = authenticationService.getInvitationDetail(id, idInvitation);
+
+        return ResponseEntity.ok(invitation);
     }
 
     @GetMapping("/getInvitations")
@@ -275,6 +381,26 @@ public class AuthenticationController {
 
         Page<InvitationModel> experiences = authenticationService.getPaginatedInvitations(id, page, size);
 
+        return ResponseEntity.ok(experiences);
+    }
+
+    @GetMapping("/getInvitationsByTag")
+    public ResponseEntity<Page<InvitationModel>> getInvitationsByTag(
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<InvitationModel> experiences = authenticationService.getPaginatedInvitationsByContract(id, page, size);
+
+
+
+        return ResponseEntity.ok(experiences);
+    }
+
+    @GetMapping("/getCompaniesValidated")
+    public ResponseEntity<List<String>> getCompaniesValidated() {
+
+        List<String> experiences = authenticationService.getCompaniesValidated();
         return ResponseEntity.ok(experiences);
     }
 
@@ -299,26 +425,29 @@ public class AuthenticationController {
             @RequestParam int page,
             @RequestParam int size
     ) {
+        System.out.println("klhgkehgkmeaghemjgmeeaaeeaeaeaea  criteria   "+criteria);
 
         Page<User> experience = authenticationService.getByCriteria(criteria, page, size);
-
+        System.out.println("klhgkehgkmeaghemjgmeeaaeeaeaeaea  user   "+experience.getTotalElements());
         return ResponseEntity.ok(experience);
     }
 
-    @GetMapping("/getAllJobs1")
-    public ResponseEntity<Page<User>> getJobsPages(
+    @GetMapping("/getNewCandidate")
+    public ResponseEntity<Page<User>> getNewCandidate(
+            @RequestParam int id,
             @RequestParam int page,
             @RequestParam int size) {
 
-        return ResponseEntity.ok(authenticationService.getUsers1(page, size));
+        return ResponseEntity.ok(authenticationService.getNewCandidate(id, page, size));
     }
 
-    @GetMapping("/getAllJobs")
-    public ResponseEntity<Page<User>> getJobsPages1(
+    @GetMapping("/getAllCandidate")
+    public ResponseEntity<Page<User>> getAllCandidate(
+            @RequestParam int id,
             @RequestParam int page,
             @RequestParam int size) {
 
-        return ResponseEntity.ok(authenticationService.getUsers(10, page, size));
+        return ResponseEntity.ok(authenticationService.getUsers(id, page, size));
     }
 
     @GetMapping("/getAllFavoritesCandidates")
@@ -337,6 +466,46 @@ public class AuthenticationController {
     ) {
 
         authenticationService.savePersonal(personalInfoDto);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/updateCandidateProfessional")
+    public ResponseEntity<ExperienceResponse> updateCandidateProfessional(
+            @RequestBody ProfessionalStatus professionalStatus
+    ) {
+
+        authenticationService.saveProfessionalInfo(professionalStatus);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/updateCandidateSkills")
+    public ResponseEntity<ExperienceResponse> updateCandidateSkills(
+            @RequestBody CandidateSkills candidateSkills
+    ) {
+
+        authenticationService.saveSkillsInfo(candidateSkills);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/updateCandidateCompleted")
+    public ResponseEntity<ExperienceResponse> updateCompleted(@RequestParam int id) {
+
+        authenticationService.completeUpdated(id);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -366,6 +535,17 @@ public class AuthenticationController {
     ///////////////////////////////////////////////////////////////////////////
     // SEARCH
     ///////////////////////////////////////////////////////////////////////////
+    @GetMapping("/getUserFiltered")
+    public ResponseEntity<Page<User>> getUserFiltered(
+            @RequestParam String word,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        System.out.println("keznfrzkjfz   "+word);
+
+        return ResponseEntity.ok(authenticationService.getUserFiltered(word, 10, page, size));
+    }
+
     @PostMapping("/saveSearchHistory")
     public ResponseEntity<ExperienceResponse> saveSearchHistory(
             @RequestParam int idUserConnected,
@@ -535,6 +715,7 @@ public class AuthenticationController {
 
         try {
             // Save the file locally
+            System.out.println("file name rzghlrghlzr  "+file.getName());
             String filePath = fileStorageService.storeFile(file);
             file.transferTo(new File(filePath));
             experienceResponse.setMessage(file.getOriginalFilename());
@@ -551,7 +732,6 @@ public class AuthenticationController {
         experienceResponse.setId(1);
 
         boolean filePath = fileStorageService.isExisted(fileName);
-        System.err.println("fjenafkeanfea   " + filePath);
         experienceResponse.setExisted(filePath);
 
         return ResponseEntity.ok(experienceResponse);
@@ -561,4 +741,14 @@ public class AuthenticationController {
     public ResponseEntity<Resource> retrieveFile(@RequestParam String fileName) {
         return fileStorageService.retrieveFile(fileName);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // FILES
+    ///////////////////////////////////////////////////////////////////////////
+    /*@PostMapping("/uploadCV")
+    public ResponseEntity<ExperienceResponse> uploadFile(@RequestBody ) {
+
+
+    }*/
+
 }
