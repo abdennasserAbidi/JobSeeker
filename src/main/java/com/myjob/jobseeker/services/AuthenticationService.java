@@ -579,6 +579,41 @@ public class AuthenticationService {
         }
     }
 
+    public void deleteInvitation(int idInvitation, int idFrom) {
+        User user = userRepository.findById(idFrom).orElseThrow();
+
+        List<InvitationModel> newListInvitation = new ArrayList<>();
+
+        List<InvitationModel> listInvitations = user.getInvitations();
+
+        for (InvitationModel invitationModel : listInvitations) {
+            if (invitationModel.getIdInvitation() != idInvitation) {
+                newListInvitation.add(invitationModel);
+            }
+        }
+
+        user.setInvitations(newListInvitation);
+    }
+
+    public void deleteInvitationFromAll(int idInvitation) {
+        List<User> userList = userRepository.findAll();
+        for (User user : userList) {
+            List<InvitationModel> newListInvitation = new ArrayList<>();
+
+            List<InvitationModel> listInvitations = user.getInvitations();
+
+            for (InvitationModel invitationModel : listInvitations) {
+                if (invitationModel.getIdInvitation() != idInvitation) {
+                    newListInvitation.add(invitationModel);
+                }
+            }
+
+            user.setInvitations(newListInvitation);
+        }
+
+        userRepository.saveAll(userList);
+    }
+
     public void finishProcess(int id, InvitationModel input) {
 
 

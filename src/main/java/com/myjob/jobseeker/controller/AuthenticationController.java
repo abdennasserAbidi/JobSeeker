@@ -416,6 +416,18 @@ public class AuthenticationController {
         return ResponseEntity.ok(experienceResponse);
     }
 
+    @PostMapping("/deleteInvitation")
+    public ResponseEntity<ExperienceResponse> deleteInvitation(@RequestParam int idInvitation, @RequestParam int idInvitationFrom) {
+
+        authenticationService.deleteInvitation(idInvitation, idInvitationFrom);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("removed successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // USER
     ///////////////////////////////////////////////////////////////////////////
@@ -425,10 +437,7 @@ public class AuthenticationController {
             @RequestParam int page,
             @RequestParam int size
     ) {
-        System.out.println("klhgkehgkmeaghemjgmeeaaeeaeaeaea  criteria   "+criteria);
-
         Page<User> experience = authenticationService.getByCriteria(criteria, page, size);
-        System.out.println("klhgkehgkmeaghemjgmeeaaeeaeaeaea  user   "+experience.getTotalElements());
         return ResponseEntity.ok(experience);
     }
 
