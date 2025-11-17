@@ -15,7 +15,8 @@ public class EmailService {
     }
 
     public void sendResetToken(String email, String token) {
-        String url = "http://192.168.110.209/" + token;
+        String url = "https://192.168.1.13/reset-password/" + token;
+        //String url = "http://192.168.1.13/" + token;
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
         mailMessage.setSubject("Password Reset Request");
@@ -25,7 +26,7 @@ public class EmailService {
 
     public void sendTokenValidation(String email) {
         int token = ThreadLocalRandom.current().nextInt(1000, 10000);
-        String url = "http://192.168.110.209/" + token;
+        String url = "myApp://notification/" + token;
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
         mailMessage.setSubject("Validate profile Request");
@@ -34,10 +35,8 @@ public class EmailService {
     }
 
     public void sendLinkValidation(String email) {
-        System.out.println("jdzkgkrhrgrgrzgzrgzr   sendLinkValidation  :  "+email);
-
         int token = ThreadLocalRandom.current().nextInt(1000, 10000);
-        String url = "http://192.168.110.209/";
+        String url = "myApp://notification/";
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
         mailMessage.setSubject("Validate profile Request");

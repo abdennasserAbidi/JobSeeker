@@ -2,6 +2,8 @@ package com.myjob.jobseeker.controller;
 
 import com.myjob.jobseeker.dtos.*;
 import com.myjob.jobseeker.model.*;
+import com.myjob.jobseeker.model.post.CommentsPost;
+import com.myjob.jobseeker.model.post.LikesPost;
 import com.myjob.jobseeker.services.*;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -210,12 +212,12 @@ public class AuthenticationController {
 
     @PostMapping("/forgot-password")
     public ResponseEntity<EmailResponse> forgotPassword(@RequestParam String email) {
+
         String token = passwordResetService.createPasswordResetTokenForUser(email);
         emailService.sendResetToken(email, token);
         EmailResponse emailResponse = new EmailResponse();
         emailResponse.setId(1);
         emailResponse.setMessage("Password reset link sent to your email.");
-
         return ResponseEntity.ok(emailResponse);
     }
 
@@ -616,6 +618,48 @@ public class AuthenticationController {
             @RequestBody AnnounceModel announceModel) {
 
         authenticationService.makeAnnouncement(idUserConnected, announceModel);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/addComment")
+    public ResponseEntity<ExperienceResponse> addComment(
+            @RequestParam int idAnnounce,
+            @RequestBody CommentsPost commentsPost) {
+
+        authenticationService.addComment(idAnnounce, commentsPost);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/addLikes")
+    public ResponseEntity<ExperienceResponse> addLikes(
+            @RequestParam int idAnnounce,
+            @RequestBody LikesPost likesPost) {
+
+        authenticationService.addLike(idAnnounce, likesPost);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/removeLike")
+    public ResponseEntity<ExperienceResponse> removeLike(
+            @RequestParam int idAnnounce,
+            @RequestParam int idConnected) {
+
+        authenticationService.removeLike(idAnnounce, idConnected);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);

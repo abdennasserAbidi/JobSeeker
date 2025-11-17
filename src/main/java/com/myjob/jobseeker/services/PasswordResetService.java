@@ -9,6 +9,7 @@ import com.myjob.jobseeker.repo.PasswordResetTokenRepository;
 import com.myjob.jobseeker.repo.UserRepository;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -26,16 +27,18 @@ public class PasswordResetService {
 
     public String createPasswordResetTokenForUser(String userEmail) {
         System.err.println("haw l email : "+userEmail);
-        User user = userRepository.findByEmail(userEmail).orElseThrow();
-        if (user == null) {
+        Optional<User> user = userRepository.findByEmail(userEmail);
+        System.out.println("ktykjhkljkkkkkkkk  "+user);
+
+        if (user.isEmpty()) {
             throw new IllegalArgumentException("User not found with email: " + userEmail);
         }
 
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = new PasswordResetToken();
-        resetToken.setId(user.getId()+10);
+        resetToken.setId(user.get().getId()+10);
         resetToken.setToken(token);
-        resetToken.setUserId(user.getId());
+        resetToken.setUserId(user.get().getId());
         resetToken.setExpiryDate(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)); // 1 hour expiry
 
         tokenRepository.save(resetToken);
