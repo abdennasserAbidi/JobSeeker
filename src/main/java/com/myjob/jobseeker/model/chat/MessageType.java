@@ -1,4 +1,5 @@
 package com.myjob.jobseeker.model.chat;
 
-public class MessageType {
+public enum MessageType {
+    CHAT, JOIN, LEAVE, TYPING
 }

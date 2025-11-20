@@ -21,7 +21,7 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
 
         if (!request.getStatus().isEmpty()) {
             List<String> asector = request.getStatus();
-            addCriterias(asector, query, "status");
+            addCriterias(asector, query, "invitations.status");
         }
 
         if (!request.getCategories().isEmpty()) {
@@ -31,7 +31,7 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
         
         if (!request.getExperiences().isEmpty()) {
             List<String> asector = request.getExperiences();
-            addCriterias(asector, query, "experiences");
+            addCriterias(asector, query, "professionalStatus.userExperience");
         }
 
         if (!request.getPreferredActivitySector().isEmpty()) {
@@ -75,7 +75,7 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
 
         if (!request.getDisponibility().isEmpty()) {
             List<String> asector = request.getDisponibility();
-            addCriterias(asector, query, "availability");
+            addCriterias(asector, query, "professionalStatus.availability");
         }
 
         return mongoTemplate.find(query, User.class);

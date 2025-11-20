@@ -5,6 +5,7 @@ import com.myjob.jobseeker.model.*;
 import com.myjob.jobseeker.model.post.CommentsPost;
 import com.myjob.jobseeker.model.post.LikesPost;
 import com.myjob.jobseeker.services.*;
+import org.bson.types.ObjectId;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -549,12 +551,11 @@ public class AuthenticationController {
     @GetMapping("/getUserFiltered")
     public ResponseEntity<Page<User>> getUserFiltered(
             @RequestParam String word,
+            @RequestParam int id,
             @RequestParam int page,
             @RequestParam int size) {
 
-        System.out.println("keznfrzkjfz   "+word);
-
-        return ResponseEntity.ok(authenticationService.getUserFiltered(word, 10, page, size));
+        return ResponseEntity.ok(authenticationService.getUserFiltered(word, id, page, size));
     }
 
     @PostMapping("/saveSearchHistory")
@@ -798,10 +799,13 @@ public class AuthenticationController {
     ///////////////////////////////////////////////////////////////////////////
     // FILES
     ///////////////////////////////////////////////////////////////////////////
-    /*@PostMapping("/uploadCV")
-    public ResponseEntity<ExperienceResponse> uploadFile(@RequestBody ) {
-
-
-    }*/
+    @PostMapping("/upload")
+    public String uploadFiles(@RequestParam("file") MultipartFile file) throws IOException {
+        StoredFile storedFile = new StoredFile();
+        storedFile.setFilename(file.getOriginalFilename());
+        storedFile.setContentType(file.getContentType());
+        storedFile.setData(file.getBytes());
+        return "File uploaded successfully!";
+    }
 
 }

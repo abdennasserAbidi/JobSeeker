@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends MongoRepository<User, Integer>, CriteriaRepository, ExperienceRepository, EducationRepository, FavoritesRepository, InvitationRepository, SearchRepository, AnnouncementRepository, NotificationRepository {
+public interface UserRepository extends MongoRepository<User, Integer>, CriteriaRepository, ExperienceRepository, EducationRepository, FavoritesRepository, InvitationRepository, SearchRepository, AnnouncementRepository, NotificationRepository, StoredFileRepository {
     Optional<User> findByEmail(String email);
 
     List<User> findByRole(String role);

@@ -7,6 +7,7 @@ import com.myjob.jobseeker.dtos.*;
 import com.myjob.jobseeker.model.*;
 import com.myjob.jobseeker.model.post.CommentsPost;
 import com.myjob.jobseeker.model.post.LikesPost;
+import com.myjob.jobseeker.repo.StoredFileRepository;
 import com.myjob.jobseeker.repo.UserRepository;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class AuthenticationService {
 
     @Autowired
     JavaMailSender javaMailSender;
+
+    @Autowired
+    private StoredFileRepository repository;
 
     @Autowired
     FirebaseMessaging firebaseMessaging;
@@ -135,10 +139,9 @@ public class AuthenticationService {
         }
 
         for (User candidat : candidates) {
-            System.out.println("keznfrzkjfz   " + candidat.getFullName());
             boolean nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(candidat.getFullName()).find();
 
-            if (!ids.contains(candidat.getId()) && nameContains) {
+            if (nameContains) {
                 newUsers.add(candidat);
             }
         }
@@ -946,16 +949,24 @@ public class AuthenticationService {
 
     public Page<User> getByCriteria(Criteria criteria, int page, int size) {
         List<User> users = userRepository.searchUsers(criteria);
+        System.out.println("elkhlakgekage   users  "+users.size());
+        List<User> newUser = new ArrayList<>();
+        for (User user : users) {
+            if (user.getRole().equals("Candidate") || user.getRole().equals("Candidat")) {
+                newUser.add(user);
+            }
+        }
+        System.out.println("elkhlakgekage   newUser  "+newUser.size());
 
         PageRequest pageable = PageRequest.of(page - 1, 3);
         final int start = (int) pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), users.size());
+        final int end = Math.min((start + pageable.getPageSize()), newUser.size());
 
         Page<User> pager;
 
-        if (start < users.size() && start < end) {
-            pager = new PageImpl<>(users.subList(start, end), pageable, users.size());
-        } else pager = new PageImpl<>(Collections.emptyList(), pageable, users.size());
+        if (start < newUser.size() && start < end) {
+            pager = new PageImpl<>(newUser.subList(start, end), pageable, newUser.size());
+        } else pager = new PageImpl<>(Collections.emptyList(), pageable, newUser.size());
 
         return pager;
     }
