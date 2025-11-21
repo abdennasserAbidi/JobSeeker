@@ -446,8 +446,6 @@ public class AuthenticationService {
         boolean isPresent = false;
         int index = -1;
 
-        System.out.println("fekzlgjrdugetge  " + idUser);
-
         User user = userRepository.findById(idUser).orElseThrow();
         List<InvitationModel> list = user.getInvitations();
 
@@ -705,8 +703,6 @@ public class AuthenticationService {
             announceModel.getComments().add(commentsPost);
 
             user.getAnnounces().set(indexPost, announceModel);
-            //users.set(indexUser, user);
-            System.out.println("bgrlzjekjkezjkezjkezjk   "+announceModel);
 
             userRepository.save(user);
         }
@@ -796,6 +792,27 @@ public class AuthenticationService {
 
             userRepository.save(user);
         }
+    }
+
+    public Page<AnnounceModel> getPaginatedAnnouncementCandidate(int page, int size) {
+        List<User> userList = userRepository.findAll();
+        List<AnnounceModel> newList = new ArrayList<>();
+        for (User user: userList) {
+            List<AnnounceModel> announceModelList = user.getAnnounces();
+            newList.addAll(announceModelList);
+        }
+
+        PageRequest pageable = PageRequest.of(page - 1, 3);
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), newList.size());
+
+        Page<AnnounceModel> pager;
+
+        if (start < newList.size() && start < end) {
+            pager = new PageImpl<>(newList.subList(start, end), pageable, newList.size());
+        } else pager = new PageImpl<>(Collections.emptyList(), pageable, newList.size());
+
+        return pager;
     }
 
     public Page<AnnounceModel> getPaginatedAnnouncement(int id, int page, int size) {

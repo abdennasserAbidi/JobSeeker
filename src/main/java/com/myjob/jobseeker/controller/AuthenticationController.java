@@ -681,6 +681,17 @@ public class AuthenticationController {
         return ResponseEntity.ok(invitation);
     }
 
+    @GetMapping("/getAnnouncementsCandidate")
+    public ResponseEntity<Page<AnnounceModel>> getCompanyAnnouncementsCandidate(
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<AnnounceModel> invitation = authenticationService.getPaginatedAnnouncementCandidate(page, size);
+
+
+        return ResponseEntity.ok(invitation);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // EDUCATION
     ///////////////////////////////////////////////////////////////////////////
