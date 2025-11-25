@@ -750,6 +750,46 @@ public class AuthenticationService {
         }
     }
 
+    public Boolean getLiked(int idAnnounce, int idConnected) {
+        List<User> users = userRepository.findAll();
+        int idUser = -1;
+        int indexUser = -1;
+        int indexPost = -1;
+
+        int count = 0;
+        Boolean isThere = false;
+
+        for (int i = 0; i < users.size(); i++) {
+            User user = users.get(i);
+            List<AnnounceModel> announceModelList = user.getAnnounces();
+            for (int j = 0; j < announceModelList.size(); j++) {
+                AnnounceModel post = announceModelList.get(j);
+                if (post.getIdAnnounce() == idAnnounce) {
+                    idUser = user.getId();
+                    indexPost = j;
+                    indexUser = i;
+                }
+            }
+        }
+
+
+        if (indexPost != -1) {
+
+            User user = userRepository.findById(idUser).orElseThrow();
+            AnnounceModel announceModel = user.getAnnounces().get(indexPost);
+
+            for (int k = 0; k < announceModel.getLikes().size(); k++) {
+                LikesPost likesPost = announceModel.getLikes().get(k);
+                if (likesPost.getIdCandidate() == idConnected) {
+                    count += 1;
+                    isThere = true;
+                }
+            }
+        }
+
+        return isThere;
+    }
+
     public void removeLike(int idAnnounce, int idConnected) {
         List<User> users = userRepository.findAll();
         int idUser = -1;
