@@ -2,26 +2,25 @@ package com.myjob.jobseeker.controller;
 
 import com.myjob.jobseeker.dtos.NotificationMessage;
 import com.myjob.jobseeker.dtos.ExperienceResponse;
+import com.myjob.jobseeker.interfaces.INotificationService;
 import com.myjob.jobseeker.model.NotificationModel;
-import com.myjob.jobseeker.services.AuthenticationService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/auth")
 @RestController
+@AllArgsConstructor
 @CrossOrigin(origins = "*")
 public class NotificationController {
 
-    private final AuthenticationService authenticationService;
+    private final INotificationService notificationService;
 
-    public NotificationController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
 
     @PostMapping("/updatetoken")
     public ResponseEntity<ExperienceResponse> updateToken(@RequestParam int id, @RequestParam String token) {
-        authenticationService.updateToken(id, token);
+        notificationService.updateToken(id, token);
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
         experienceResponse.setMessage("saved successfully");
@@ -31,7 +30,7 @@ public class NotificationController {
 
     @PostMapping("/sendnotification")
     public ResponseEntity<ExperienceResponse> sendNotification(@RequestBody NotificationMessage notificationMessage) {
-        String res = authenticationService.sendNotification(notificationMessage);
+        String res = notificationService.sendNotification(notificationMessage);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -46,7 +45,7 @@ public class NotificationController {
             @RequestParam int page,
             @RequestParam int size) {
 
-        Page<NotificationModel> invitation = authenticationService.getPaginatedNotification(id, page, size);
+        Page<NotificationModel> invitation = notificationService.getPaginatedNotification(id, page, size);
 
         return ResponseEntity.ok(invitation);
     }

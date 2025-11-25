@@ -1,31 +1,30 @@
 package com.myjob.jobseeker.controller;
 
 import com.myjob.jobseeker.dtos.ExperienceResponse;
+import com.myjob.jobseeker.interfaces.IAnnouncementService;
 import com.myjob.jobseeker.model.AnnounceModel;
 import com.myjob.jobseeker.model.post.CommentsPost;
 import com.myjob.jobseeker.model.post.LikesPost;
-import com.myjob.jobseeker.services.AuthenticationService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/auth")
 @RestController
+@AllArgsConstructor
 @CrossOrigin(origins = "*")
 public class AnnouncementController {
 
-    private final AuthenticationService authenticationService;
+    private final IAnnouncementService announcementService;
 
-    public AnnouncementController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
 
     @PostMapping("/makeAnnouncement")
     public ResponseEntity<ExperienceResponse> makeAnnouncement(
             @RequestParam int idUserConnected,
             @RequestBody AnnounceModel announceModel) {
 
-        authenticationService.makeAnnouncement(idUserConnected, announceModel);
+        announcementService.makeAnnouncement(idUserConnected, announceModel);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -39,7 +38,7 @@ public class AnnouncementController {
             @RequestParam int idAnnounce,
             @RequestBody CommentsPost commentsPost) {
 
-        authenticationService.addComment(idAnnounce, commentsPost);
+        announcementService.addComment(idAnnounce, commentsPost);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -53,7 +52,7 @@ public class AnnouncementController {
             @RequestParam int idAnnounce,
             @RequestBody LikesPost likesPost) {
 
-        authenticationService.addLike(idAnnounce, likesPost);
+        announcementService.addLike(idAnnounce, likesPost);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -67,7 +66,7 @@ public class AnnouncementController {
             @RequestParam int idAnnounce,
             @RequestParam int idConnected) {
 
-        authenticationService.removeLike(idAnnounce, idConnected);
+        announcementService.removeLike(idAnnounce, idConnected);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -82,7 +81,7 @@ public class AnnouncementController {
             @RequestParam int page,
             @RequestParam int size) {
 
-        Page<AnnounceModel> invitation = authenticationService.getPaginatedAnnouncement(id, page, size);
+        Page<AnnounceModel> invitation = announcementService.getPaginatedAnnouncement(id, page, size);
 
         return ResponseEntity.ok(invitation);
     }

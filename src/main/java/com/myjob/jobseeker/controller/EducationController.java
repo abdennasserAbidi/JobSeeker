@@ -3,7 +3,8 @@ package com.myjob.jobseeker.controller;
 import com.myjob.jobseeker.dtos.EducationDto;
 import com.myjob.jobseeker.dtos.ExperienceResponse;
 import com.myjob.jobseeker.model.Education;
-import com.myjob.jobseeker.services.AuthenticationService;
+import com.myjob.jobseeker.services.EducationService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,14 +13,12 @@ import java.util.List;
 
 @RequestMapping("/auth")
 @RestController
+@AllArgsConstructor
 @CrossOrigin(origins = "*")
 public class EducationController {
 
-    private final AuthenticationService authenticationService;
+    private final EducationService educationService;
 
-    public EducationController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
 
     @GetMapping("/getAllEducation")
     public ResponseEntity<Page<Education>> getAllEducations(
@@ -28,7 +27,7 @@ public class EducationController {
             @RequestParam int size
     ) {
 
-        Page<Education> educations = authenticationService.getPaginatedEducations(id, page, size);
+        Page<Education> educations = educationService.getPaginatedEducations(id, page, size);
 
         return ResponseEntity.ok(educations);
     }
@@ -36,7 +35,7 @@ public class EducationController {
     @GetMapping("/getAllEduc")
     public ResponseEntity<List<Education>> getAllEduc(@RequestParam int id) {
 
-        List<Education> educations = authenticationService.getAllEducations(id);
+        List<Education> educations = educationService.getAllEducations(id);
 
         return ResponseEntity.ok(educations);
     }
@@ -46,7 +45,7 @@ public class EducationController {
 
         System.err.println("grfzgetetexperienceDto   " + educationDto);
 
-        authenticationService.saveEducation(educationDto);
+        educationService.saveEducation(educationDto);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -58,7 +57,7 @@ public class EducationController {
     @PostMapping("/removeEducation")
     public ResponseEntity<ExperienceResponse> removeEducation(@RequestParam int id, @RequestParam int educationId) {
 
-        authenticationService.removeEducation(id, educationId);
+        educationService.removeEducation(id, educationId);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);

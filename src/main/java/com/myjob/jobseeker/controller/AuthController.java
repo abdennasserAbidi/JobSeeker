@@ -3,6 +3,7 @@ package com.myjob.jobseeker.controller;
 import com.myjob.jobseeker.dtos.*;
 import com.myjob.jobseeker.model.*;
 import com.myjob.jobseeker.services.*;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,22 +12,14 @@ import java.util.Objects;
 
 @RequestMapping("/auth")
 @RestController
+@AllArgsConstructor
 @CrossOrigin(origins = "*")
 public class AuthController {
 
     private final JwtService jwtService;
     private final EmailService emailService;
     private final PasswordResetService passwordResetService;
-    private final AuthenticationService authenticationService;
-
-    public AuthController(JwtService jwtService,
-                          AuthenticationService authenticationService,
-                          EmailService emailService, PasswordResetService passwordResetService) {
-        this.jwtService = jwtService;
-        this.authenticationService = authenticationService;
-        this.passwordResetService = passwordResetService;
-        this.emailService = emailService;
-    }
+    private final AuthService authenticationService;
 
     ///////////////////////////////////////////////////////////////////////////
     // VERIFICATION

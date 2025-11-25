@@ -2,8 +2,9 @@ package com.myjob.jobseeker.controller;
 
 import com.myjob.jobseeker.dtos.ExperienceDto;
 import com.myjob.jobseeker.dtos.ExperienceResponse;
+import com.myjob.jobseeker.interfaces.IExperienceService;
 import com.myjob.jobseeker.model.Experience;
-import com.myjob.jobseeker.services.AuthenticationService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,19 +13,17 @@ import java.util.List;
 
 @RequestMapping("/auth")
 @RestController
+@AllArgsConstructor
 @CrossOrigin(origins = "*")
 public class ExperienceController {
 
-    private final AuthenticationService authenticationService;
+    private final IExperienceService experienceService;
 
-    public ExperienceController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
 
     @PostMapping("/add")
     public ResponseEntity<ExperienceResponse> register(@RequestBody ExperienceDto experienceDto) {
 
-        authenticationService.saveExperience(experienceDto);
+        experienceService.saveExperience(experienceDto);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -36,7 +35,7 @@ public class ExperienceController {
     @GetMapping("/getAllExp")
     public ResponseEntity<List<Experience>> getExperiences(@RequestParam int id) {
 
-        List<Experience> experience = authenticationService.getAllExperience(id);
+        List<Experience> experience = experienceService.getAllExperience(id);
 
         return ResponseEntity.ok(experience);
     }
@@ -47,14 +46,14 @@ public class ExperienceController {
             @RequestParam int page,
             @RequestParam int size) {
 
-        Page<Experience> experiences = authenticationService.getPaginatedExperiences(id, page, size);
+        Page<Experience> experiences = experienceService.getPaginatedExperiences(id, page, size);
 
         return ResponseEntity.ok(experiences);
     }
 
     @PostMapping("/removeExperience")
     public ResponseEntity<ExperienceResponse> removeExperience(@RequestParam int id, @RequestParam int experienceId) {
-        authenticationService.removeExperience(id, experienceId);
+        experienceService.removeExperience(id, experienceId);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);

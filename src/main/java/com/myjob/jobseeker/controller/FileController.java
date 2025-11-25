@@ -4,6 +4,7 @@ import com.myjob.jobseeker.dtos.ExperienceResponse;
 import com.myjob.jobseeker.model.FileExistingResponse;
 import com.myjob.jobseeker.model.StoredFile;
 import com.myjob.jobseeker.services.FileStorageService;
+import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +15,11 @@ import java.io.IOException;
 
 @RequestMapping("/auth")
 @RestController
+@AllArgsConstructor
 @CrossOrigin(origins = "*")
 public class FileController {
 
     private final FileStorageService fileStorageService;
-
-    public FileController(FileStorageService fileStorageService) {
-        this.fileStorageService = fileStorageService;
-    }
 
     @PostMapping("/uploadCV")
     public ResponseEntity<ExperienceResponse> uploadFile(@RequestParam("file") MultipartFile file) {

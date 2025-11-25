@@ -4,7 +4,8 @@ import com.myjob.jobseeker.dtos.*;
 import com.myjob.jobseeker.model.CandidateSkills;
 import com.myjob.jobseeker.model.ProfessionalStatus;
 import com.myjob.jobseeker.model.User;
-import com.myjob.jobseeker.services.AuthenticationService;
+import com.myjob.jobseeker.services.AuthService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,14 +13,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/auth")
 @RestController
+@AllArgsConstructor
 @CrossOrigin(origins = "*")
 public class UserController {
 
-    private final AuthenticationService authenticationService;
-
-    public UserController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
+    private final AuthService authenticationService;
 
     @PostMapping("/getByCriteria")
     public ResponseEntity<Page<User>> getByCriteria(
