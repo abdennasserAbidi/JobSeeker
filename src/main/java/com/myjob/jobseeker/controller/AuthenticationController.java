@@ -651,11 +651,21 @@ public class AuthenticationController {
         return ResponseEntity.ok(isThere);
     }
 
+
     @GetMapping("/checkUserLikeAllPost")
     public ResponseEntity<List<Boolean>> checkUserLikeAllPost(
             @RequestParam int idConnected) {
 
         List<Boolean> isAllThere = authenticationService.getLikedAllPost(idConnected);
+
+        return ResponseEntity.ok(isAllThere);
+    }
+
+    @GetMapping("/getNumberLikeAllPosts")
+    public ResponseEntity<List<Integer>> getNumberLikeAllPosts(
+            @RequestParam int idConnected) {
+
+        List<Integer> isAllThere = authenticationService.getNumberLikeAllPosts(idConnected);
 
         return ResponseEntity.ok(isAllThere);
     }

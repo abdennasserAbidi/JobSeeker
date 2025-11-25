@@ -812,6 +812,25 @@ public class AuthenticationService {
         return booleanList;
     }
 
+    public List<Integer> getNumberLikeAllPosts(int idConnected) {
+        List<User> users = userRepository.findAll();
+        List<Integer> booleanList = new ArrayList<>();
+
+        for (User value : users) {
+            List<AnnounceModel> announceModelList = value.getAnnounces();
+            for (AnnounceModel model : announceModelList) {
+                int isThere = 0;
+                for (int k = 0; k < model.getLikes().size(); k++) {
+                    LikesPost likesPost = model.getLikes().get(k);
+                    if (likesPost.getIdCandidate() == idConnected)
+                        isThere += 1;
+                }
+                booleanList.add(isThere);
+            }
+        }
+        return booleanList;
+    }
+
     public void removeLike(int idAnnounce, int idConnected) {
         List<User> users = userRepository.findAll();
         int idUser = -1;
