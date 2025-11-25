@@ -741,7 +741,11 @@ public class AuthenticationService {
                 likesPost.setUserName(userConnected.getCompanyName());
             }
 
-            announceModel.getLikes().add(likesPost);
+            List<LikesPost> list = announceModel.getLikes().stream().filter( likesPost1 ->
+                            likesPost1.getIdCandidate() == likesPost.getIdCandidate()
+                    ).toList();
+
+            if (list.isEmpty()) announceModel.getLikes().add(likesPost);
 
             user.getAnnounces().set(indexPost, announceModel);
             //users.set(indexUser, user);
