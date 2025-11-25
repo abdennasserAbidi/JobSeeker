@@ -1,39 +1,30 @@
 package com.myjob.jobseeker.controller;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.myjob.jobseeker.dtos.ExperienceDto;
 import com.myjob.jobseeker.dtos.ExperienceResponse;
 import com.myjob.jobseeker.model.Experience;
-import com.myjob.jobseeker.services.ExperienceService;
+import com.myjob.jobseeker.services.AuthenticationService;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
 
-
-@RequestMapping("/exp")
+@RequestMapping("/auth")
 @RestController
-@CrossOrigin(origins = "*")  // Allows requests from any domain (or specify your Android IP)
+@CrossOrigin(origins = "*")
 public class ExperienceController {
 
-    private final ExperienceService experienceService;
+    private final AuthenticationService authenticationService;
 
-    public ExperienceController(ExperienceService experienceService) {
-        this.experienceService = experienceService;
+    public ExperienceController(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
     @PostMapping("/add")
     public ResponseEntity<ExperienceResponse> register(@RequestBody ExperienceDto experienceDto) {
 
-        System.err.println("grfzgetetexperienceDto   "+experienceDto);
-
-        experienceService.saveExperience(experienceDto);
+        authenticationService.saveExperience(experienceDto);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -45,9 +36,30 @@ public class ExperienceController {
     @GetMapping("/getAllExp")
     public ResponseEntity<List<Experience>> getExperiences(@RequestParam int id) {
 
-        List<Experience> experience = experienceService.getAllExperience(id);
+        List<Experience> experience = authenticationService.getAllExperience(id);
 
         return ResponseEntity.ok(experience);
     }
 
+    @GetMapping("/getAllExperience")
+    public ResponseEntity<Page<Experience>> getExperiencesPages(
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<Experience> experiences = authenticationService.getPaginatedExperiences(id, page, size);
+
+        return ResponseEntity.ok(experiences);
+    }
+
+    @PostMapping("/removeExperience")
+    public ResponseEntity<ExperienceResponse> removeExperience(@RequestParam int id, @RequestParam int experienceId) {
+        authenticationService.removeExperience(id, experienceId);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("removed successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
 }
