@@ -22,7 +22,7 @@
 //import java.util.Map;
 //import java.util.Objects;
 //
-//@RequestMapping("/v1/auth")
+//@RequestMapping("/auth")
 //@RestController
 //@CrossOrigin(origins = "*")  // Allows requests from any domain (or specify your Android IP)
 //public class AuthenticationController {
