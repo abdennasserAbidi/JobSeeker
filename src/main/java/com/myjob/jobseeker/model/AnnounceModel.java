@@ -16,6 +16,7 @@ public class AnnounceModel {
     private String title;
     private String description;
     private String date;
+    private String postType;
     private int idCompany;
     private String companyName;
     private StatusPost status;
