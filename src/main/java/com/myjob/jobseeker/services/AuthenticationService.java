@@ -684,7 +684,7 @@ public class AuthenticationService {
             }
         }
 
-        System.out.println("bgrlzjekjkezjkezjkezjk   "+idAnnounce);
+        System.out.println("bgrlzjekjkezjkezjkezjk   " + idAnnounce);
 
         if (indexPost != -1) {
 
@@ -741,9 +741,9 @@ public class AuthenticationService {
                 likesPost.setUserName(userConnected.getCompanyName());
             }
 
-            List<LikesPost> list = announceModel.getLikes().stream().filter( likesPost1 ->
-                            likesPost1.getIdCandidate() == likesPost.getIdCandidate()
-                    ).toList();
+            List<LikesPost> list = announceModel.getLikes().stream().filter(likesPost1 ->
+                    likesPost1.getIdCandidate() == likesPost.getIdCandidate()
+            ).toList();
 
             if (list.isEmpty()) announceModel.getLikes().add(likesPost);
 
@@ -866,6 +866,20 @@ public class AuthenticationService {
         return booleanList;
     }
 
+    public List<CommentsPost> getCommentAllPostsCompany(int idAnnounce, int idConnected) {
+        User user = userRepository.findById(idConnected).orElseThrow();
+        List<CommentsPost> commentList = new ArrayList<>();
+
+
+        List<AnnounceModel> announceModelList = user.getAnnounces().stream().filter(announceModel ->
+                announceModel.getIdAnnounce() == idAnnounce
+        ).toList();
+        for (AnnounceModel model : announceModelList) {
+            commentList.addAll(model.getComments());
+        }
+        return commentList;
+    }
+
     public List<Integer> getNumberLikeAllPosts(int idConnected) {
         User user = userRepository.findById(idConnected).orElseThrow();
         List<Integer> booleanList = new ArrayList<>();
@@ -947,7 +961,7 @@ public class AuthenticationService {
     public Page<AnnounceModel> getPaginatedAnnouncementCandidate(int page, int size) {
         List<User> userList = userRepository.findAll();
         List<AnnounceModel> newList = new ArrayList<>();
-        for (User user: userList) {
+        for (User user : userList) {
             List<AnnounceModel> announceModelList = user.getAnnounces();
             newList.addAll(announceModelList);
         }
@@ -1116,14 +1130,14 @@ public class AuthenticationService {
 
     public Page<User> getByCriteria(Criteria criteria, int page, int size) {
         List<User> users = userRepository.searchUsers(criteria);
-        System.out.println("elkhlakgekage   users  "+users.size());
+        System.out.println("elkhlakgekage   users  " + users.size());
         List<User> newUser = new ArrayList<>();
         for (User user : users) {
             if (user.getRole().equals("Candidate") || user.getRole().equals("Candidat")) {
                 newUser.add(user);
             }
         }
-        System.out.println("elkhlakgekage   newUser  "+newUser.size());
+        System.out.println("elkhlakgekage   newUser  " + newUser.size());
 
         PageRequest pageable = PageRequest.of(page - 1, 3);
         final int start = (int) pageable.getOffset();

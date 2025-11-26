@@ -679,6 +679,16 @@ public class AuthenticationController {
         return ResponseEntity.ok(isAllThere);
     }
 
+    @GetMapping("/getCommentAllPostsCompany")
+    public ResponseEntity<List<CommentsPost>> getCommentAllPostsCompany(
+            @RequestParam int idAnnounce,
+            @RequestParam int idConnected) {
+
+        List<CommentsPost> isAllThere = authenticationService.getCommentAllPostsCompany(idAnnounce, idConnected);
+
+        return ResponseEntity.ok(isAllThere);
+    }
+
     //USER
 
     @GetMapping("/checkUserLikeAllPost")
