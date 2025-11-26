@@ -60,7 +60,7 @@ public class FileController {
         return fileStorageService.retrieveFile(fileName);
     }
 
-    @PostMapping("/upload")
+    @PostMapping("/uploadFiles")
     public String uploadFiles(@RequestParam("file") MultipartFile file) throws IOException {
         StoredFile storedFile = new StoredFile();
         storedFile.setFilename(file.getOriginalFilename());
