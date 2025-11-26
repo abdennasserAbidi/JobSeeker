@@ -812,21 +812,90 @@ public class AuthenticationService {
         return booleanList;
     }
 
-    public List<Integer> getNumberLikeAllPosts(int idConnected) {
+    public List<Boolean> getLikedAllPostCompany(int idConnected) {
         List<User> users = userRepository.findAll();
-        List<Integer> booleanList = new ArrayList<>();
+        List<Boolean> booleanList = new ArrayList<>();
 
         for (User value : users) {
             List<AnnounceModel> announceModelList = value.getAnnounces();
             for (AnnounceModel model : announceModelList) {
-                int isThere = 0;
-                for (int k = 0; k < model.getLikes().size(); k++) {
-                    LikesPost likesPost = model.getLikes().get(k);
-                    if (likesPost.getIdCandidate() == idConnected)
-                        isThere += 1;
+                if (model.getIdCompany() == idConnected) {
+                    boolean isThere = false;
+                    for (int k = 0; k < model.getLikes().size(); k++) {
+                        LikesPost likesPost = model.getLikes().get(k);
+                        isThere = likesPost.getIdCandidate() == idConnected;
+                    }
+                    booleanList.add(isThere);
                 }
-                booleanList.add(isThere);
             }
+        }
+        return booleanList;
+    }
+
+    public List<Integer> getNumberLikeAllPostsCompany(int idConnected) {
+        User user = userRepository.findById(idConnected).orElseThrow();
+        List<Integer> booleanList = new ArrayList<>();
+
+        List<AnnounceModel> announceModelList = user.getAnnounces();
+        for (AnnounceModel model : announceModelList) {
+            int isThere = 0;
+            for (int k = 0; k < model.getLikes().size(); k++) {
+                LikesPost likesPost = model.getLikes().get(k);
+                if (likesPost.getIdCandidate() == idConnected)
+                    isThere += 1;
+            }
+            booleanList.add(isThere);
+        }
+        return booleanList;
+    }
+
+    public List<Integer> getNumberCommentAllPostsCompany(int idConnected) {
+        User user = userRepository.findById(idConnected).orElseThrow();
+        List<Integer> booleanList = new ArrayList<>();
+
+        List<AnnounceModel> announceModelList = user.getAnnounces();
+        for (AnnounceModel model : announceModelList) {
+            int isThere = 0;
+            for (int k = 0; k < model.getComments().size(); k++) {
+                CommentsPost likesPost = model.getComments().get(k);
+                if (likesPost.getIdCandidate() == idConnected)
+                    isThere += 1;
+            }
+            booleanList.add(isThere);
+        }
+        return booleanList;
+    }
+
+    public List<Integer> getNumberLikeAllPosts(int idConnected) {
+        User user = userRepository.findById(idConnected).orElseThrow();
+        List<Integer> booleanList = new ArrayList<>();
+
+        List<AnnounceModel> announceModelList = user.getAnnounces();
+        for (AnnounceModel model : announceModelList) {
+            int isThere = 0;
+            for (int k = 0; k < model.getLikes().size(); k++) {
+                LikesPost likesPost = model.getLikes().get(k);
+                if (likesPost.getIdCandidate() == idConnected)
+                    isThere += 1;
+            }
+            booleanList.add(isThere);
+        }
+        return booleanList;
+    }
+
+    public List<Integer> getNumberCommentAllPosts(int idConnected) {
+        User user = userRepository.findById(idConnected).orElseThrow();
+        List<Integer> booleanList = new ArrayList<>();
+
+        List<AnnounceModel> announceModelList = user.getAnnounces();
+        for (AnnounceModel model : announceModelList) {
+            int isThere = 0;
+            for (int k = 0; k < model.getComments().size(); k++) {
+                CommentsPost likesPost = model.getComments().get(k);
+                if (likesPost.getIdCandidate() == idConnected)
+                    isThere += 1;
+            }
+            booleanList.add(isThere);
         }
         return booleanList;
     }

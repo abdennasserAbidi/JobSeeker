@@ -651,6 +651,34 @@ public class AuthenticationController {
         return ResponseEntity.ok(isThere);
     }
 
+    @GetMapping("/checkUserLikeAllPostCompany")
+    public ResponseEntity<List<Boolean>> getLikedAllPostCompany(
+            @RequestParam int idConnected) {
+
+        List<Boolean> isAllThere = authenticationService.getLikedAllPostCompany(idConnected);
+
+        return ResponseEntity.ok(isAllThere);
+    }
+
+    @GetMapping("/getNumberLikeAllPostsCompany")
+    public ResponseEntity<List<Integer>> getNumberLikeAllPostsCompany(
+            @RequestParam int idConnected) {
+
+        List<Integer> isAllThere = authenticationService.getNumberLikeAllPostsCompany(idConnected);
+
+        return ResponseEntity.ok(isAllThere);
+    }
+
+    @GetMapping("/getNumberCommentAllPostsCompany")
+    public ResponseEntity<List<Integer>> getNumberCommentAllPostsCompany(
+            @RequestParam int idConnected) {
+
+        List<Integer> isAllThere = authenticationService.getNumberCommentAllPostsCompany(idConnected);
+
+        return ResponseEntity.ok(isAllThere);
+    }
+
+    //USER
 
     @GetMapping("/checkUserLikeAllPost")
     public ResponseEntity<List<Boolean>> checkUserLikeAllPost(
@@ -666,6 +694,15 @@ public class AuthenticationController {
             @RequestParam int idConnected) {
 
         List<Integer> isAllThere = authenticationService.getNumberLikeAllPosts(idConnected);
+
+        return ResponseEntity.ok(isAllThere);
+    }
+
+    @GetMapping("/getNumberCommentAllPosts")
+    public ResponseEntity<List<Integer>> getNumberCommentAllPosts(
+            @RequestParam int idConnected) {
+
+        List<Integer> isAllThere = authenticationService.getNumberCommentAllPosts(idConnected);
 
         return ResponseEntity.ok(isAllThere);
     }
