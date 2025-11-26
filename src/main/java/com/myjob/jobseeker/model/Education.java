@@ -6,8 +6,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 @Data
 @NoArgsConstructor
@@ -27,8 +25,5 @@ public class Education {
     private String description;
     private String degree;
     private boolean stillStudying;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 }

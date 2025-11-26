@@ -1,10 +1,8 @@
 package com.myjob.jobseeker.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
-@Getter
+@Data
 public class SearchHistory {
 
     private int id;

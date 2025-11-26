@@ -8,23 +8,16 @@ import java.sql.Date;
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.OneToMany;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "User")
 public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String fullName;
     private String email;
@@ -96,28 +89,20 @@ public class User implements UserDetails {
     private ProfessionalStatus professionalStatus;
     private CandidateSkills candidateSkills;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ValidationStatus> validationStepStatus = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Experience> experiences = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Education> education = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FavoriteModel> favorites = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvitationModel> invitations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SearchHistory> searchHistories = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AnnounceModel> announces = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NotificationModel> notifications = new ArrayList<>();
 
     private List<String> preferredWorkType = new ArrayList<>();
@@ -126,19 +111,6 @@ public class User implements UserDetails {
     public void setIsResetPasswordTokenValid(boolean isResetPasswordTokenValid) {
         this.isResetPasswordTokenValid = isResetPasswordTokenValid;
     }
-
-    public boolean getIResetPasswordTokenValid() {
-        return isResetPasswordTokenValid;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -147,10 +119,6 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     @Override

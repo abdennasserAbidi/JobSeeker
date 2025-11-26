@@ -3,11 +3,8 @@ package com.myjob.jobseeker.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 import java.util.List;
 
@@ -17,7 +14,6 @@ import java.util.List;
 @Document(collection = "Experience")
 public class Experience {
 
-    @Id
     private int id;
 
     private String title;
@@ -41,9 +37,6 @@ public class Experience {
     private int nbDays;
     private int hourlyRate;
     private List<String> listSkills;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
 }

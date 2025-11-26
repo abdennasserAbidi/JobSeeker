@@ -1,5 +1,8 @@
 package com.myjob.jobseeker.model;
 
+import lombok.Data;
+
+@Data
 public class OllamaRequest {
     private String model;
     private String prompt;
@@ -11,7 +14,4 @@ public class OllamaRequest {
         this.stream = stream;
     }
 
-    public String getModel() { return model; }
-    public String getPrompt() { return prompt; }
-    public boolean isStream() { return stream; }
 }
