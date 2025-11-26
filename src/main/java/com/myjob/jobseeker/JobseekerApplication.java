@@ -28,7 +28,9 @@ public class JobseekerApplication {
 
 	public static void main(String[] args) {
 		// Load .env file
-		Dotenv dotenv = Dotenv.load();
+		Dotenv dotenv = Dotenv.configure()
+				.ignoreIfMissing()
+				.load();
 		// Set environment variables for Spring
 		System.setProperty("SERVER_PORT", dotenv.get("SERVER_PORT"));
 		System.setProperty("SOCKET_HOST", dotenv.get("SOCKET_HOST"));

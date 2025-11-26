@@ -1,10 +1,13 @@
 package com.myjob.jobseeker.controller;
 
 import com.myjob.jobseeker.dtos.ExperienceResponse;
+import com.myjob.jobseeker.interfaces.FileUpload;
 import com.myjob.jobseeker.model.FileExistingResponse;
 import com.myjob.jobseeker.model.StoredFile;
 import com.myjob.jobseeker.services.FileStorageService;
 import lombok.AllArgsConstructor;
+import org.cloudinary.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +24,16 @@ public class FileController {
 
     private final FileStorageService fileStorageService;
 
+    @Autowired
+    private final FileUpload fileUpload;
+
     @PostMapping("/uploadCV")
-    public ResponseEntity<ExperienceResponse> uploadFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ExperienceResponse> uploadFileCV(@RequestParam("file") MultipartFile file) {
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
 
         try {
             // Save the file locally
-            System.out.println("file name rzghlrghlzr  "+file.getName());
             String filePath = fileStorageService.storeFile(file);
             file.transferTo(new File(filePath));
             experienceResponse.setMessage(file.getOriginalFilename());
@@ -62,5 +67,17 @@ public class FileController {
         storedFile.setContentType(file.getContentType());
         storedFile.setData(file.getBytes());
         return "File uploaded successfully!";
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile multipartFile) {
+        try {
+            String imageURL = fileUpload.uploadFile(multipartFile);
+            JSONObject jsonResponse = new JSONObject();
+            jsonResponse.put("imageURL", imageURL);
+            return ResponseEntity.ok(jsonResponse.toString());
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Une erreur s'est produite lors du téléchargement de l'image.");
+        }
     }
 }
