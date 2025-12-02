@@ -125,7 +125,11 @@ public class AuthService implements IAuthService {
     @Override
     public ValidationStatus getStatusCandidateValidation(int id) {
         User user = userRepository.findById(id).orElseThrow();
-        return user.getValidationStatus();
+        ValidationStatus validationStatus;
+        if (user.getValidationStatus() == null) validationStatus = new ValidationStatus();
+        else validationStatus = user.getValidationStatus();
+
+        return validationStatus;
     }
 
     @Override
