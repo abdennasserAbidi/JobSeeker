@@ -72,6 +72,7 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile multipartFile) {
         try {
+            System.out.println("aaaaaaaaaaaaaaaaa   "+ multipartFile);
             String imageURL = fileUpload.uploadFile(multipartFile);
             JSONObject jsonResponse = new JSONObject();
             jsonResponse.put("imageURL", imageURL);
