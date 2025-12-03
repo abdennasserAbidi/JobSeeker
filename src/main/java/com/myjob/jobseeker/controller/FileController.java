@@ -75,8 +75,10 @@ public class FileController {
             String imageURL = fileUpload.uploadFile(multipartFile);
             JSONObject jsonResponse = new JSONObject();
             jsonResponse.put("imageURL", imageURL);
+            System.out.println("aaaaaaaaaaaaaaaaa   "+ jsonResponse);
             return ResponseEntity.ok(jsonResponse.toString());
         } catch (IOException e) {
+            System.out.println("aaaaaaaaaaaaaaaaa   error   "+ e.getMessage());
             return ResponseEntity.status(500).body("Une erreur s'est produite lors du téléchargement de l'image.");
         }
     }
