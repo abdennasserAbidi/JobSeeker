@@ -1,6 +1,7 @@
 package com.myjob.jobseeker.services;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.myjob.jobseeker.interfaces.FileUpload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,14 @@ public class FileUploadimpl implements FileUpload {
 
     @Override
     public String uploadFile(MultipartFile multipartFile) throws IOException {
+        //Map.of("public_id", UUID.randomUUID().toString())
         return cloudinary.uploader()
                 .upload(multipartFile.getBytes(),
-                        Map.of("public_id", UUID.randomUUID().toString()))
+                        ObjectUtils.asMap(
+                                "resource_type", "raw",
+                                "public_id", UUID.randomUUID().toString()
+                        )
+                )
                 .get("url")
                 .toString();
     }
