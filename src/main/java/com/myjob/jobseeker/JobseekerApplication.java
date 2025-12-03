@@ -45,9 +45,9 @@ public class JobseekerApplication {
 		System.setProperty("FILE_UPLOAD_DIR", dotenv.get("FILE_UPLOAD_DIR"));
 		System.setProperty("MAX_FILE_SIZE", dotenv.get("MAX_FILE_SIZE"));
 		System.setProperty("MAX_REQUEST_SIZE", dotenv.get("MAX_REQUEST_SIZE"));
-		/*System.setProperty("CLOUDINARY_API_SECRET", dotenv.get("CLOUDINARY_API_SECRET"));
+		System.setProperty("CLOUDINARY_API_SECRET", dotenv.get("CLOUDINARY_API_SECRET"));
 		System.setProperty("CLOUDINARY_API_KEY", dotenv.get("CLOUDINARY_API_KEY"));
-		System.setProperty("CLOUDINARY_CLOUD_NAME", dotenv.get("CLOUDINARY_CLOUD_NAME"));*/
+		System.setProperty("CLOUDINARY_CLOUD_NAME", dotenv.get("CLOUDINARY_CLOUD_NAME"));
 
 
 		SpringApplication.run(JobseekerApplication.class, args);
