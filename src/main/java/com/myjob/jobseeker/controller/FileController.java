@@ -93,7 +93,7 @@ public class FileController {
     public ResponseEntity<?> getFiles(@RequestParam("id") int id) {
         try {
             List<String> list = new ArrayList<>();
-            User user = authService.getUser(1);
+            User user = authService.getUser(id);
             List<Documents> documents = user.getValidationStatus().getDocuments();
             for (Documents doc : documents) {
                 list.add(fileUpload.getFile(doc));
