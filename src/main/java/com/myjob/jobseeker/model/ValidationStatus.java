@@ -14,4 +14,5 @@ public class ValidationStatus {
     String registrationNumber;
     String status = "NOT_STARTED";
     List<String> docs = new ArrayList<>();
+    List<Documents> documents = new ArrayList<>();
 }

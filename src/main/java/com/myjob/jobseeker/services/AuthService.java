@@ -228,10 +228,9 @@ public class AuthService implements IAuthService {
     }
     @Override
     public User getUser(int id) {
-        System.out.println("fjkzbgjkbgzr  " + id);
-
         return userRepository.findById(id).orElseThrow();
     }
+
     @Override
     public void saveCompanyInfo(CompanyInfoDto input) {
         User user = userRepository.findById(input.getId()).orElseThrow();

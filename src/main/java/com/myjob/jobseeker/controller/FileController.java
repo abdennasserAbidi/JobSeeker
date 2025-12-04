@@ -2,8 +2,11 @@ package com.myjob.jobseeker.controller;
 
 import com.myjob.jobseeker.dtos.ExperienceResponse;
 import com.myjob.jobseeker.interfaces.FileUpload;
+import com.myjob.jobseeker.model.Documents;
 import com.myjob.jobseeker.model.FileExistingResponse;
 import com.myjob.jobseeker.model.StoredFile;
+import com.myjob.jobseeker.model.User;
+import com.myjob.jobseeker.services.AuthService;
 import com.myjob.jobseeker.services.FileStorageService;
 import lombok.AllArgsConstructor;
 import org.cloudinary.json.JSONObject;
@@ -15,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequestMapping("/auth")
 @RestController
@@ -23,6 +28,9 @@ import java.io.IOException;
 public class FileController {
 
     private final FileStorageService fileStorageService;
+
+    @Autowired
+    private final AuthService authService;
 
     @Autowired
     private final FileUpload fileUpload;
@@ -72,14 +80,26 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile multipartFile) {
         try {
-            System.out.println("aaaaaaaaaaaaaaaaa   "+ multipartFile);
             String imageURL = fileUpload.uploadFile(multipartFile);
             JSONObject jsonResponse = new JSONObject();
             jsonResponse.put("imageURL", imageURL);
-            System.out.println("aaaaaaaaaaaaaaaaa   "+ jsonResponse);
             return ResponseEntity.ok(jsonResponse.toString());
         } catch (IOException e) {
-            System.out.println("aaaaaaaaaaaaaaaaa   error   "+ e.getMessage());
+            return ResponseEntity.status(500).body("Une erreur s'est produite lors du téléchargement de l'image.");
+        }
+    }
+
+    @GetMapping("/getFiles")
+    public ResponseEntity<?> getFiles(@RequestParam("id") int id) {
+        try {
+            List<String> list = new ArrayList<>();
+            User user = authService.getUser(1);
+            List<Documents> documents = user.getValidationStatus().getDocuments();
+            for (Documents doc : documents) {
+                list.add(fileUpload.getFile(doc));
+            }
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
             return ResponseEntity.status(500).body("Une erreur s'est produite lors du téléchargement de l'image.");
         }
     }
