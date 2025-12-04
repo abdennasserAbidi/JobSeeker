@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +22,7 @@ public class FileUploadimpl implements FileUpload {
                 .upload(multipartFile.getBytes(),
                         ObjectUtils.asMap(
                                 "resource_type", "raw",
-                                "public_id", UUID.randomUUID().toString()
+                                "public_id", multipartFile.getOriginalFilename()
                         )
                 )
                 .get("url")
@@ -38,11 +36,11 @@ public class FileUploadimpl implements FileUpload {
             documentUrl = cloudinary.url()
                     .resourceType("raw")
                     .format("pdf")
-                    .generate("myfile"); // myfile = public_id
+                    .generate("document "+documents.getId());
         } else {
             documentUrl = cloudinary.url()
                     .format(documents.getType())
-                    .generate("sample"); // sample = public_id
+                    .generate("document "+documents.getId());
         }
 
         return documentUrl;
