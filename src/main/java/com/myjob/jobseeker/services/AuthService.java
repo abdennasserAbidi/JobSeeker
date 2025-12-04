@@ -117,8 +117,25 @@ public class AuthService implements IAuthService {
     @Override
     public void saveCandidateStatus(ValidationStatus validationStatus) {
         User user = userRepository.findById(validationStatus.getId()).orElseThrow();
-        user.setValidationStatus(validationStatus);
-        user.getValidationStepStatus().add(validationStatus);
+
+        ValidationStatus v = user.getValidationStatus();
+
+        if (v != null) {
+            v.setId(validationStatus.getId());
+            v.setStatus(validationStatus.getStatus());
+            v.setDocs(validationStatus.getDocs());
+            v.setEmail(validationStatus.getEmail());
+            v.setLinkedin(validationStatus.getLinkedin());
+            v.setRegistrationNumber(validationStatus.getRegistrationNumber());
+            v.setTypeValidation(validationStatus.getTypeValidation());
+            v.setDocuments(validationStatus.getDocuments());
+            user.setValidationStatus(v);
+            user.getValidationStepStatus().add(v);
+        } else {
+            user.setValidationStatus(validationStatus);
+            user.getValidationStepStatus().add(validationStatus);
+        }
+
         userRepository.save(user);
     }
 

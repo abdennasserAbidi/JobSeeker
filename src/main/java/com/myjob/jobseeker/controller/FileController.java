@@ -2,10 +2,7 @@ package com.myjob.jobseeker.controller;
 
 import com.myjob.jobseeker.dtos.ExperienceResponse;
 import com.myjob.jobseeker.interfaces.FileUpload;
-import com.myjob.jobseeker.model.Documents;
-import com.myjob.jobseeker.model.FileExistingResponse;
-import com.myjob.jobseeker.model.StoredFile;
-import com.myjob.jobseeker.model.User;
+import com.myjob.jobseeker.model.*;
 import com.myjob.jobseeker.services.AuthService;
 import com.myjob.jobseeker.services.FileStorageService;
 import lombok.AllArgsConstructor;
@@ -98,7 +95,11 @@ public class FileController {
             for (Documents doc : documents) {
                 list.add(fileUpload.getFile(doc));
             }
-            return ResponseEntity.ok(list);
+
+            FileResponse fileResponse = new FileResponse();
+            fileResponse.setUrl(list);
+
+            return ResponseEntity.ok(fileResponse);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Une erreur s'est produite lors du téléchargement de l'image.");
         }
