@@ -34,11 +34,13 @@ public class FileUploadimpl implements FileUpload {
         String documentUrl;
         if (documents.getType().equals("pdf")) {
             documentUrl = cloudinary.url()
+                    .secure(true)
                     .resourceType("raw")
                     .format("pdf")
                     .generate("document "+documents.getId());
         } else {
             documentUrl = cloudinary.url()
+                    .secure(true)
                     .format(documents.getType())
                     .generate("document "+documents.getId());
         }
