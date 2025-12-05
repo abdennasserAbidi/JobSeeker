@@ -32,6 +32,7 @@ public class FileUploadimpl implements FileUpload {
 
     @Override
     public String getFile(Documents documents) {
+        System.out.println("vbfbfgdfdfdfch   "+documents.getId());
         String documentUrl;
         if (documents.getType().equals("pdf")) {
             documentUrl = cloudinary.url()
