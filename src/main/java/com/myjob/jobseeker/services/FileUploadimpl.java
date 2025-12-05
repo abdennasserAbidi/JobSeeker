@@ -18,7 +18,7 @@ public class FileUploadimpl implements FileUpload {
 
     @Override
     public String uploadFile(MultipartFile multipartFile) throws IOException {
-        multipartFile.getName();
+        System.out.println("dahgklehglehagjehja    "+multipartFile.getOriginalFilename());
         return cloudinary.uploader()
                 .upload(multipartFile.getBytes(),
                         ObjectUtils.asMap(
