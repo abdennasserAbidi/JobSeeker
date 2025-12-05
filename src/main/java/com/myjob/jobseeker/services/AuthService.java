@@ -123,12 +123,19 @@ public class AuthService implements IAuthService {
         if (v != null) {
             v.setId(validationStatus.getId());
             v.setStatus(validationStatus.getStatus());
-            v.setDocs(validationStatus.getDocs());
             v.setEmail(validationStatus.getEmail());
             v.setLinkedin(validationStatus.getLinkedin());
             v.setRegistrationNumber(validationStatus.getRegistrationNumber());
             v.setTypeValidation(validationStatus.getTypeValidation());
-            v.setDocuments(validationStatus.getDocuments());
+
+            List<String> docs =  v.getDocs();
+            docs.addAll(validationStatus.getDocs());
+            v.setDocs(docs);
+
+            List<Documents> documents =  v.getDocuments();
+            documents.addAll(validationStatus.getDocuments());
+            v.setDocuments(documents);
+
             user.setValidationStatus(v);
             user.getValidationStepStatus().add(v);
         } else {

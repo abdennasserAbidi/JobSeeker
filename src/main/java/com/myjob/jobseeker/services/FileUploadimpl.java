@@ -18,6 +18,7 @@ public class FileUploadimpl implements FileUpload {
 
     @Override
     public String uploadFile(MultipartFile multipartFile) throws IOException {
+        multipartFile.getName();
         return cloudinary.uploader()
                 .upload(multipartFile.getBytes(),
                         ObjectUtils.asMap(
@@ -37,12 +38,12 @@ public class FileUploadimpl implements FileUpload {
                     .secure(true)
                     .resourceType("raw")
                     .format("pdf")
-                    .generate("document "+documents.getId());
+                    .generate("document"+documents.getId());
         } else {
             documentUrl = cloudinary.url()
                     .secure(true)
                     .format(documents.getType())
-                    .generate("document "+documents.getId());
+                    .generate("document"+documents.getId());
         }
 
         return documentUrl;
