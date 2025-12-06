@@ -15,6 +15,8 @@ public interface IAnnouncementService {
     void removeLike(int idAnnounce, int idConnected);
     Page<AnnounceModel> getPaginatedAnnouncement(int id, int page, int size);
 
+    Page<AnnounceModel> getPaginatedAnnouncementCandidate(int page, int size);
+
     Boolean getLiked(int idAnnounce, int idConnected);
 
     List<Boolean> getLikedAllPost(int idConnected);

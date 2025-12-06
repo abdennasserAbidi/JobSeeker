@@ -162,4 +162,15 @@ public class AnnouncementController {
 
         return ResponseEntity.ok(invitation);
     }
+
+    @GetMapping("/getAnnouncementsCandidate")
+    public ResponseEntity<Page<AnnounceModel>> getCompanyAnnouncementsCandidate(
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<AnnounceModel> invitation = announcementService.getPaginatedAnnouncementCandidate(page, size);
+
+
+        return ResponseEntity.ok(invitation);
+    }
 }

@@ -5,9 +5,12 @@ import com.myjob.jobseeker.model.*;
 import com.myjob.jobseeker.model.post.*;
 import com.myjob.jobseeker.repo.UserRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -145,6 +148,27 @@ public class AnnouncementService implements IAnnouncementService {
         return userRepository.findPaginatedAnnouncement(id, page, size);
     }
 
+    @Override
+    public Page<AnnounceModel> getPaginatedAnnouncementCandidate(int page, int size) {
+        List<User> userList = userRepository.findAll();
+        List<AnnounceModel> newList = new ArrayList<>();
+        for (User user: userList) {
+            List<AnnounceModel> announceModelList = user.getAnnounces();
+            newList.addAll(announceModelList);
+        }
+
+        PageRequest pageable = PageRequest.of(page - 1, 3);
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), newList.size());
+
+        Page<AnnounceModel> pager;
+
+        if (start < newList.size() && start < end) {
+            pager = new PageImpl<>(newList.subList(start, end), pageable, newList.size());
+        } else pager = new PageImpl<>(Collections.emptyList(), pageable, newList.size());
+
+        return pager;
+    }
 
     @Override
     public Boolean getLiked(int idAnnounce, int idConnected) {
