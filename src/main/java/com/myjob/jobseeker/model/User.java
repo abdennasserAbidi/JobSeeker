@@ -1,5 +1,6 @@
 package com.myjob.jobseeker.model;
 
+import com.myjob.jobseeker.model.chat.ChatModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -120,6 +121,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NotificationModel> notifications = new ArrayList<>();
 
+    private List<ChatModel> messages = new ArrayList<>();
+
     private List<String> preferredWorkType = new ArrayList<>();
     private List<String> workPreferences = new ArrayList<>();
 
@@ -129,14 +132,6 @@ public class User implements UserDetails {
 
     public boolean getIResetPasswordTokenValid() {
         return isResetPasswordTokenValid;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     @Override
@@ -149,27 +144,4 @@ public class User implements UserDetails {
         return email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

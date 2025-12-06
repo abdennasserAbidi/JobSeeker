@@ -52,20 +52,8 @@ public class AnnouncementService implements IAnnouncementService {
 
         if (indexPost != -1) {
             User user = userRepository.findById(idUser).orElseThrow();
-            User userConnected = userRepository.findById(commentsPost.getIdCandidate()).orElseThrow();
-
             AnnounceModel announceModel = user.getAnnounces().get(indexPost);
-
-            System.out.println("jgzgrzgrgz    "+commentsPost.getUserName());
-
-            /*if (user.getRole().equals("Candidate") || user.getRole().equals("Candidat")) {
-                commentsPost.setUserName(userConnected.getFullName());
-            } else {
-                commentsPost.setUserName(userConnected.getCompanyName());
-            }*/
-
             announceModel.getComments().add(commentsPost);
-
             user.getAnnounces().set(indexPost, announceModel);
             userRepository.save(user);
         }
@@ -76,8 +64,7 @@ public class AnnouncementService implements IAnnouncementService {
         List<User> users = userRepository.findAll();
         int idUser = -1;
         int indexPost = -1;
-        for (int i = 0; i < users.size(); i++) {
-            User user = users.get(i);
+        for (User user : users) {
             List<AnnounceModel> announceModelList = user.getAnnounces();
             for (int j = 0; j < announceModelList.size(); j++) {
                 AnnounceModel post = announceModelList.get(j);
@@ -112,8 +99,7 @@ public class AnnouncementService implements IAnnouncementService {
         List<User> users = userRepository.findAll();
         int idUser = -1;
         int indexPost = -1;
-        for (int i = 0; i < users.size(); i++) {
-            User user = users.get(i);
+        for (User user : users) {
             List<AnnounceModel> announceModelList = user.getAnnounces();
             for (int j = 0; j < announceModelList.size(); j++) {
                 AnnounceModel post = announceModelList.get(j);
@@ -176,21 +162,17 @@ public class AnnouncementService implements IAnnouncementService {
     public Boolean getLiked(int idAnnounce, int idConnected) {
         List<User> users = userRepository.findAll();
         int idUser = -1;
-        int indexUser = -1;
         int indexPost = -1;
 
-        int count = 0;
-        Boolean isThere = false;
+        boolean isThere = false;
 
-        for (int i = 0; i < users.size(); i++) {
-            User user = users.get(i);
+        for (User user : users) {
             List<AnnounceModel> announceModelList = user.getAnnounces();
             for (int j = 0; j < announceModelList.size(); j++) {
                 AnnounceModel post = announceModelList.get(j);
                 if (post.getIdAnnounce() == idAnnounce) {
                     idUser = user.getId();
                     indexPost = j;
-                    indexUser = i;
                 }
             }
         }
@@ -204,7 +186,6 @@ public class AnnouncementService implements IAnnouncementService {
             for (int k = 0; k < announceModel.getLikes().size(); k++) {
                 LikesPost likesPost = announceModel.getLikes().get(k);
                 if (likesPost.getIdCandidate() == idConnected) {
-                    count += 1;
                     isThere = true;
                 }
             }
