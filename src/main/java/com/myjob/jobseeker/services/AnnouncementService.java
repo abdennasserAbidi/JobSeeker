@@ -56,11 +56,13 @@ public class AnnouncementService implements IAnnouncementService {
 
             AnnounceModel announceModel = user.getAnnounces().get(indexPost);
 
-            if (user.getRole().equals("Candidate") || user.getRole().equals("Candidat")) {
+            System.out.println("jgzgrzgrgz    "+commentsPost.getUserName());
+
+            /*if (user.getRole().equals("Candidate") || user.getRole().equals("Candidat")) {
                 commentsPost.setUserName(userConnected.getFullName());
             } else {
                 commentsPost.setUserName(userConnected.getCompanyName());
-            }
+            }*/
 
             announceModel.getComments().add(commentsPost);
 
