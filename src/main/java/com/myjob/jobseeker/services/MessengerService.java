@@ -2,23 +2,36 @@ package com.myjob.jobseeker.services;
 
 import com.myjob.jobseeker.interfaces.IMessengerService;
 import com.myjob.jobseeker.model.chat.ChatModel;
-import com.myjob.jobseeker.repo.UserRepository;
+import com.myjob.jobseeker.repo.messenger.ChatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class MessengerService implements IMessengerService {
 
-    private final UserRepository userRepository;
+    private final ChatRepository chatRepository;
 
     @Autowired
-    public MessengerService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public MessengerService(ChatRepository chatRepository) {
+        this.chatRepository = chatRepository;
     }
 
     @Override
     public Page<ChatModel> getListMessages(int id, int page, int size) {
-        return userRepository.findPaginatedMessages(id, page, size);
+        return chatRepository.findAllMessagesForUser(id, PageRequest.of(page, size));
+    }
+
+    @Override
+    public List<ChatModel> getConversation(int idSender, int idReceiver) {
+        return chatRepository.findConversation(idSender, idReceiver);
+    }
+
+    @Override
+    public ChatModel saveMessage(ChatModel msg) {
+        return chatRepository.save(msg);
     }
 }

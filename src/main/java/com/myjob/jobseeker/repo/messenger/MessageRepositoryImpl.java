@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
-public class ChatRepositoryImpl implements ChatRepository {
+public class MessageRepositoryImpl implements MessageRepository {
 
     @Autowired
     private MongoTemplate mongoTemplate;

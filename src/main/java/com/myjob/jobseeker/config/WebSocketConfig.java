@@ -13,7 +13,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // Enable a simple memory-based message broker to carry messages back to the client on destinations prefixed with "/topic"
-        config.enableSimpleBroker("/topic");
+        config.enableSimpleBroker("/queue", "/topic");
+        config.setUserDestinationPrefix("/user");
         // Prefix for messages bound for @MessageMapping-annotated methods
         config.setApplicationDestinationPrefixes("/app");
     }
@@ -23,6 +24,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // Register the /ws endpoint for WebSocket handshake and fallback options
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("http://localhost:*", "http://192.168.*.*")
-                .setAllowedOriginPatterns("*").withSockJS();
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 }

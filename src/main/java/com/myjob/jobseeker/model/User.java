@@ -121,8 +121,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NotificationModel> notifications = new ArrayList<>();
 
-    private List<ChatModel> messages = new ArrayList<>();
-
     private List<String> preferredWorkType = new ArrayList<>();
     private List<String> workPreferences = new ArrayList<>();
 
