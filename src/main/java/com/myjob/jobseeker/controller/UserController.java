@@ -114,7 +114,7 @@ public class UserController {
     @PostMapping("/updatecompany")
     public ResponseEntity<ExperienceResponse> updateCompany(@RequestBody CompanyInfoDto companyInfoDto) {
         authenticationService.saveCompanyInfo(companyInfoDto);
-
+        authenticationService.completeUpdated(companyInfoDto.getId());
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
         experienceResponse.setMessage("saved successfully");
