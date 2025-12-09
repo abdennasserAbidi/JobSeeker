@@ -146,6 +146,13 @@ public class InvitationController {
         return ResponseEntity.ok(experiences);
     }
 
+    @GetMapping("/getInstitutesValidated")
+    public ResponseEntity<java.util.List<String>> getInstitutesValidated() {
+
+        java.util.List<String> experiences = invitationService.getInstitutesValidated();
+        return ResponseEntity.ok(experiences);
+    }
+
     @PostMapping("/acceptRejectInvitation")
     public ResponseEntity<ExperienceResponse> acceptRejectInvitation(@RequestBody InvitationDto invitationDto) {
 

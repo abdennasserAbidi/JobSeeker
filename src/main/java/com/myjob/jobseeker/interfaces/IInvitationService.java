@@ -21,4 +21,5 @@ public interface IInvitationService {
     java.util.List<InvitationModel> getAllInvitations(int idCompany);
 
     List<String> getCompaniesValidated();
+    List<String> getInstitutesValidated();
 }

@@ -171,6 +171,19 @@ public class InvitationService implements IInvitationService {
         }
         return companyNames;
     }
+
+    @Override
+    public List<String> getInstitutesValidated() {
+        List<User> users = userRepository.findAll();
+        List<String> schoolsNames = new ArrayList<>();
+        for (User user : users) {
+            for (Education education : user.getEducation()) {
+                schoolsNames.add(education.getSchoolName());
+            }
+        }
+        return schoolsNames.stream().distinct().toList();
+    }
+
     // private / helper methods (copied) used internally
     private void saveCompanyInvitation(int id, InvitationModel input) {
         User user = userRepository.findById(id).orElseThrow();
