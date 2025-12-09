@@ -53,7 +53,10 @@ public class InvitationService implements IInvitationService {
 
         if (invitationModel != null) {
             User candidate = userRepository.findById(invitationModel.getIdTo()).orElseThrow();
-            invitationUser.setUser(candidate);
+            invitationUser.setUserCandidate(candidate);
+
+            User company = userRepository.findById(invitationModel.getIdCompany()).orElseThrow();
+            invitationUser.setUserCompany(company);
         }
 
         return invitationUser;

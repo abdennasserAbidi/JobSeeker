@@ -7,5 +7,6 @@ import lombok.Data;
 @Data
 public class InvitationUser {
     private InvitationModel invitationModel;
-    private User user;
+    private User userCandidate;
+    private User userCompany;
 }
