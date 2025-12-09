@@ -162,10 +162,10 @@ public class InvitationService implements IInvitationService {
         List<User> users = userRepository.findAll();
         List<String> companyNames = new ArrayList<>();
         for (User user : users) {
+            for (Experience experience : user.getExperiences()) {
+                companyNames.add(experience.getCompanyName());
+            }
             if (user.getRole().equals("Company") || user.getRole().equals("Entreprise")) {
-                /*if (user.isVerified()) {
-                    companyNames.add(user.getCompanyName());
-                }*/
                 companyNames.add(user.getCompanyName());
             }
         }
