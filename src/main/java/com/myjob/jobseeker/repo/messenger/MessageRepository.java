@@ -5,4 +5,5 @@ import org.springframework.data.domain.Page;
 
 public interface MessageRepository {
     Page<ChatModel> findPaginatedMessages(int id, int page, int size);
+    Page<ChatModel> findPaginatedAllMessages(int id, int page, int size);
 }
