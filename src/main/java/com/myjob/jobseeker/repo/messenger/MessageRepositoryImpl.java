@@ -55,10 +55,11 @@ public class MessageRepositoryImpl implements MessageRepository {
         // Unwind the experiences array
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(
-                        new Criteria().orOperator(
+                        /*new Criteria().orOperator(
                                 Criteria.where("userConnectedId").is(id),
                                 Criteria.where("userReceivedId").is(id)
-                        )
+                        )*/
+                        Criteria.where("userReceivedId").is(id)
                 ),
                 Aggregation.unwind("messages"),
                 Aggregation.replaceRoot("messages"),
