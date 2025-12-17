@@ -1,18 +1,12 @@
 package com.myjob.jobseeker.services;
 
-import com.myjob.jobseeker.dtos.Criteria;
 import com.myjob.jobseeker.interfaces.IMessengerService;
-import com.myjob.jobseeker.model.User;
 import com.myjob.jobseeker.model.chat.ChatModel;
 import com.myjob.jobseeker.repo.messenger.ChatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service

@@ -68,7 +68,7 @@ public class MessageRepositoryImpl implements MessageRepository {
         // Execute the aggregation
         AggregationResults<ChatModel> results = mongoTemplate.aggregate(
                 aggregation,
-                "User",
+                "messages",
                 ChatModel.class
         );
 
