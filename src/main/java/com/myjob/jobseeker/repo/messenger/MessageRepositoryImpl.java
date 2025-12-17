@@ -61,7 +61,6 @@ public class MessageRepositoryImpl implements MessageRepository {
                 ),
                 Aggregation.unwind("messages"),
                 Aggregation.replaceRoot("messages"),
-                Aggregation.skip(skip),
                 Aggregation.limit(size)
         );
 
@@ -71,6 +70,8 @@ public class MessageRepositoryImpl implements MessageRepository {
                 "messages",
                 ChatModel.class
         );
+
+        System.out.println("nnnnnnnnnnnnnnnnnnnnnnnnn   "+results.getMappedResults());
 
         long total = mongoTemplate.count(
                 new Query(
