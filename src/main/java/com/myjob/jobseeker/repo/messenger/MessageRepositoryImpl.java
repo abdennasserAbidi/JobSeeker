@@ -50,6 +50,7 @@ public class MessageRepositoryImpl implements MessageRepository {
     @Override
     public Page<ChatModel> findPaginatedAllMessages(int id, int page, int size) {
         long skip = (long) (page - 1) * size;
+        System.out.println("nnnnnnnnnnnnnnnnnnnnnnnnn   "+id);
 
         // Unwind the experiences array
         Aggregation aggregation = Aggregation.newAggregation(
@@ -76,7 +77,7 @@ public class MessageRepositoryImpl implements MessageRepository {
         long total = mongoTemplate.count(
                 new Query(
                         new Criteria().orOperator(
-                                Criteria.where("_id").is(id),
+                                Criteria.where("userConnectedId").is(id),
                                 Criteria.where("userReceivedId").is(id)
                         )
                 ),
