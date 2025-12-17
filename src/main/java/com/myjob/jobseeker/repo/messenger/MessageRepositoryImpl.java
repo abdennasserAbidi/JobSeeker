@@ -50,19 +50,16 @@ public class MessageRepositoryImpl implements MessageRepository {
     @Override
     public Page<ChatModel> findPaginatedAllMessages(int id, int page, int size) {
         long skip = (long) (page - 1) * size;
-        System.out.println("nnnnnnnnnnnnnnnnnnnnnnnnn   "+id);
 
         // Unwind the experiences array
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(
-                        /*new Criteria().orOperator(
+                        new Criteria().orOperator(
                                 Criteria.where("userConnectedId").is(id),
                                 Criteria.where("userReceivedId").is(id)
-                        )*/
-                        Criteria.where("userReceivedId").is(id)
+                        )
                 ),
-                Aggregation.unwind("messages"),
-                Aggregation.replaceRoot("messages"),
+                Aggregation.skip(skip),
                 Aggregation.limit(size)
         );
 
