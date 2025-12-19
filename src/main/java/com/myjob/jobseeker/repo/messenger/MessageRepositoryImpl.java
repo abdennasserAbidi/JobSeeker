@@ -70,8 +70,6 @@ public class MessageRepositoryImpl implements MessageRepository {
                 ChatModel.class
         );
 
-        System.out.println("nnnnnnnnnnnnnnnnnnnnnnnnn   "+results.getMappedResults());
-
         long total = mongoTemplate.count(
                 new Query(
                         new Criteria().orOperator(
