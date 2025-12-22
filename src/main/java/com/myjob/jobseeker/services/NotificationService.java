@@ -40,6 +40,7 @@ public class NotificationService implements INotificationService {
                 String key = entry.getKey();
                 String value = entry.getValue();
                 System.out.println("Key: " + key + ", Value: " + value);
+                System.out.println("ftreeeeeeeeee  error  "+value);
             }
             /*NotificationModel notificationModel = new NotificationModel();
             notificationModel.setIdNotification();
@@ -50,6 +51,7 @@ public class NotificationService implements INotificationService {
 
             return "Success sending notification";
         } catch (Exception e) {
+            System.out.println("ftreeeeeeeeee  error  "+e.getMessage());
             return "Error sending notification";
         }
     }
