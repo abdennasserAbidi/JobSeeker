@@ -1,11 +1,9 @@
 package com.myjob.jobseeker.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Setter
-@Getter
+@Data
 @Document(collection = "notifications")
 public class NotificationModel {
 

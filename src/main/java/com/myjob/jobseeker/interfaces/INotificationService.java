@@ -5,7 +5,7 @@ import com.myjob.jobseeker.model.NotificationModel;
 import org.springframework.data.domain.Page;
 
 public interface INotificationService {
-    String sendNotification(NotificationMessage notificationMessage);
+    String sendNotification(NotificationMessage notificationMessage, String receiverType);
     void updateToken(int id, String token);
     Page<NotificationModel> getCompanyNotifications(int id, int page, int size);
 

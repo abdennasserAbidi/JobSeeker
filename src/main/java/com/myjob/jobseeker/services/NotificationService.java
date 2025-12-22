@@ -10,7 +10,9 @@ import com.myjob.jobseeker.repo.notification.NotifRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.View;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class NotificationService implements INotificationService {
@@ -19,6 +21,8 @@ public class NotificationService implements INotificationService {
     private final UserRepository userRepository;
     private final NotifRepository notifRepository;
 
+    private static final AtomicInteger idCounter = new AtomicInteger();
+
     public NotificationService(FirebaseMessaging firebaseMessaging, UserRepository userRepository, NotifRepository notifRepository) {
         this.firebaseMessaging = firebaseMessaging;
         this.userRepository = userRepository;
@@ -26,7 +30,7 @@ public class NotificationService implements INotificationService {
     }
 
     @Override
-    public String sendNotification(NotificationMessage notificationMessage) {
+    public String sendNotification(NotificationMessage notificationMessage, String receiverType) {
 
         Message message = Message.builder()
                 .setToken(notificationMessage.getRecipientToken())
@@ -37,19 +41,28 @@ public class NotificationService implements INotificationService {
             System.out.println("ftreeeeeeeeee  message  "+notificationMessage);
 
             firebaseMessaging.send(message);
-            Map<String, String> data = notificationMessage.getData();
-            for (Map.Entry<String, String> entry : data.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                System.out.println("Key: " + key + ", Value: " + value);
-                System.out.println("ftreeeeeeeeee  error  "+value);
-            }
-            /*NotificationModel notificationModel = new NotificationModel();
-            notificationModel.setIdNotification();
-            notificationModel.setCompanyName();
-            notificationModel.setIdNotification();
 
-            notifRepository.save(notificationModel);*/
+            NotificationModel notificationModel = new NotificationModel();
+            notificationModel.setIdNotification(idCounter.incrementAndGet());
+
+            Map<String, String> data = notificationMessage.getData();
+
+            if (receiverType.equals("company")) {
+                notificationModel.setIdCompany(Integer.parseInt(data.get("idReceiver")));
+                notificationModel.setIdCandidate(Integer.parseInt(data.get("idCandidate")));
+            } else {
+                notificationModel.setIdCompany(Integer.parseInt(data.get("idCompany")));
+                notificationModel.setIdCandidate(Integer.parseInt(data.get("idReceiver")));
+            }
+
+            notificationModel.setCompanyName(data.get("companyName"));
+            notificationModel.setUsername(data.get("username"));
+
+            notificationModel.setTitle(notificationMessage.getTitle());
+            notificationModel.setDescription(notificationMessage.getBody());
+            //notificationModel.setDate();
+
+            notifRepository.save(notificationModel);
 
             return "Success sending notification";
         } catch (Exception e) {

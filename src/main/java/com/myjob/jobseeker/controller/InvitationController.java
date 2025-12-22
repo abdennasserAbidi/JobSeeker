@@ -28,7 +28,6 @@ public class InvitationController {
     private final IUserService userService;
 
 
-
     @GetMapping("/getCompanyInvitations")
     public ResponseEntity<Page<InvitationModel>> getCompanyInvitations(
             @RequestParam int id,
@@ -51,30 +50,40 @@ public class InvitationController {
         return ResponseEntity.ok(response);
     }
 
-    public void sendNotificationAfterSendInvitation(NotificationMessage notificationMessage) {
-        String res = notificationService.sendNotification(notificationMessage);
+    public void sendNotificationAfterSendInvitation(NotificationMessage notificationMessage, String receiverType) {
+        String res = notificationService.sendNotification(notificationMessage, receiverType);
     }
 
     @PostMapping("/sendInvitation")
     public ResponseEntity<ExperienceResponse> sendInvitation(@RequestBody InvitationDto invitationDto) {
 
         invitationService.sendInvitation(invitationDto.getIdConnected(), invitationDto.getInvitationModel());
+
         int idInvitation = invitationDto.getInvitationModel().getIdInvitation();
         int idReceiver = invitationDto.getInvitationModel().getIdTo();
+        String username = invitationDto.getInvitationModel().getFullName();
+        int idCompany = invitationDto.getInvitationModel().getIdCompany();
+        String companyName = invitationDto.getInvitationModel().getCompanyName();
         int idConnected = invitationDto.getIdConnected();
 
         User user = userService.getUser(idReceiver);
 
         Map<String, String> data = new HashMap<>();
-        data.put("idInvitation", idInvitation+"");
+        data.put("idInvitation", idInvitation + "");
+        data.put("idCompany", idCompany + "");
+        data.put("companyName", companyName);
+        data.put("idReceiver", idReceiver + "");
+        data.put("username", username);
 
         NotificationMessage notificationMessage = new NotificationMessage();
         notificationMessage.setRecipientToken(user.getFcmToken());
+        notificationMessage.setTitle("");
+        notificationMessage.setBody("");
         notificationMessage.setData(data);
 
-        System.out.println("ftreeeeeeeeee  model   "+notificationMessage);
+        System.out.println("ftreeeeeeeeee  model   " + notificationMessage);
 
-        sendNotificationAfterSendInvitation(notificationMessage);
+        sendNotificationAfterSendInvitation(notificationMessage, "candidate");
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -96,6 +105,33 @@ public class InvitationController {
     @PostMapping("/finishProcess")
     public ResponseEntity<InvitationDto> finishProcess(@RequestBody InvitationDto invitationDto) {
         invitationService.finishProcess(invitationDto.getIdConnected(), invitationDto.getInvitationModel());
+
+        int idInvitation = invitationDto.getInvitationModel().getIdInvitation();
+        int idReceiver = invitationDto.getInvitationModel().getIdTo();
+        String username = invitationDto.getInvitationModel().getFullName();
+        int idCompany = invitationDto.getInvitationModel().getIdCompany();
+        String companyName = invitationDto.getInvitationModel().getCompanyName();
+        int idConnected = invitationDto.getIdConnected();
+
+        User user = userService.getUser(idReceiver);
+
+        Map<String, String> data = new HashMap<>();
+        data.put("idInvitation", idInvitation + "");
+        data.put("idCompany", idCompany + "");
+        data.put("companyName", companyName);
+        data.put("idReceiver", idReceiver + "");
+        data.put("username", username);
+
+        NotificationMessage notificationMessage = new NotificationMessage();
+        notificationMessage.setRecipientToken(user.getFcmToken());
+        notificationMessage.setTitle("");
+        notificationMessage.setBody("");
+        notificationMessage.setData(data);
+
+        System.out.println("ftreeeeeeeeee  model   " + notificationMessage);
+
+        sendNotificationAfterSendInvitation(notificationMessage, "candidate");
+
         return ResponseEntity.ok(invitationDto);
     }
 
@@ -160,6 +196,32 @@ public class InvitationController {
     public ResponseEntity<ExperienceResponse> acceptRejectInvitation(@RequestBody InvitationDto invitationDto) {
 
         String status = invitationService.acceptRejectInvitation(invitationDto);
+
+        int idInvitation = invitationDto.getInvitationModel().getIdInvitation();
+        int idReceiver = invitationDto.getInvitationModel().getIdCompany();
+        String companyName = invitationDto.getInvitationModel().getCompanyName();
+        int idCandidate = invitationDto.getInvitationModel().getIdTo();
+        String username = invitationDto.getInvitationModel().getFullName();
+        int idConnected = invitationDto.getIdConnected();
+
+        User user = userService.getUser(idReceiver);
+
+        Map<String, String> data = new HashMap<>();
+        data.put("idInvitation", idInvitation + "");
+        data.put("idCandidate", idCandidate + "");
+        data.put("companyName", companyName);
+        data.put("idReceiver", idReceiver + "");
+        data.put("username", username);
+
+        NotificationMessage notificationMessage = new NotificationMessage();
+        notificationMessage.setRecipientToken(user.getFcmToken());
+        notificationMessage.setTitle("");
+        notificationMessage.setBody("");
+        notificationMessage.setData(data);
+
+        System.out.println("ftreeeeeeeeee  model   " + notificationMessage);
+
+        sendNotificationAfterSendInvitation(notificationMessage, "company");
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
