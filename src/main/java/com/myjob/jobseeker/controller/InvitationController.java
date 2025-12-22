@@ -71,6 +71,8 @@ public class InvitationController {
         notificationMessage.setRecipientToken(user.getFcmToken());
         notificationMessage.setData(data);
 
+        System.out.println("ftreeeeeeeeee  model   "+notificationMessage);
+
         sendNotificationAfterSendInvitation(notificationMessage);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
