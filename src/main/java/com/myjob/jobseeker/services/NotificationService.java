@@ -34,7 +34,7 @@ public class NotificationService implements INotificationService {
                 .build();
 
         try {
-            System.out.println("ftreeeeeeeeee  message  "+message);
+            System.out.println("ftreeeeeeeeee  message  "+notificationMessage);
 
             firebaseMessaging.send(message);
             Map<String, String> data = notificationMessage.getData();
