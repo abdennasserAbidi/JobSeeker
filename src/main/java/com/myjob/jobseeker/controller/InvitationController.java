@@ -60,9 +60,10 @@ public class InvitationController {
 
         invitationService.sendInvitation(invitationDto.getIdConnected(), invitationDto.getInvitationModel());
         int idInvitation = invitationDto.getInvitationModel().getIdInvitation();
+        int idReceiver = invitationDto.getInvitationModel().getIdTo();
         int idConnected = invitationDto.getIdConnected();
 
-        User user = userService.getUser(idConnected);
+        User user = userService.getUser(idReceiver);
 
         Map<String, String> data = new HashMap<>();
         data.put("idInvitation", idInvitation+"");
