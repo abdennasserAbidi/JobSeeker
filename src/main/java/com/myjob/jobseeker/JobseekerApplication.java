@@ -23,8 +23,9 @@ public class JobseekerApplication {
 		InputStream serviceAccount;
 
 		String credentialsPath = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+		serviceAccount = new FileInputStream("/etc/secrets/firebase-service-account.json");
 
-		if (credentialsPath != null) {
+		/*if (credentialsPath != null) {
 			// Render / Production
 			serviceAccount = new FileInputStream(credentialsPath);
 		} else {
@@ -32,11 +33,8 @@ public class JobseekerApplication {
 			serviceAccount = new ClassPathResource(
 					"firebase-service-account.json"
 			).getInputStream();
-		}
+		}*/
 
-		/*GoogleCredentials googleCredentials = GoogleCredentials.fromStream(
-				new ClassPathResource("firebase-service-account.json").getInputStream()
-		);*/
 		GoogleCredentials googleCredentials = GoogleCredentials.fromStream(serviceAccount);
 		FirebaseOptions firebaseOptions = FirebaseOptions.builder()
 				.setCredentials(googleCredentials).build();
