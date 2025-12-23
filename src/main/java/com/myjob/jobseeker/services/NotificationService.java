@@ -74,7 +74,7 @@ public class NotificationService implements INotificationService {
 
             return "Success sending notification";
         } catch (Exception e) {
-            System.out.println("ftreeeeeeeeee  error  "+e.getMessage());
+            System.out.println("ftreeeeeeeeee  error  " + e.getMessage());
             return "Error sending notification";
         }
     }
@@ -89,9 +89,17 @@ public class NotificationService implements INotificationService {
     }
 
     @Override
+    public void seenNotification(int idNotification) {
+        NotificationModel notificationModel = notifRepository.findById(idNotification).orElseThrow();
+        notificationModel.setRead(true);
+        notifRepository.save(notificationModel);
+    }
+
+    @Override
     public Page<NotificationModel> getCompanyNotifications(int id, int page, int size) {
         return notifRepository.findPaginatedNotification(id, page, size);
     }
+
     @Override
     public Page<NotificationModel> getPaginatedNotification(int id, int page, int size) {
         return notifRepository.findPaginatedNotification(id, page, size);

@@ -39,6 +39,17 @@ public class NotificationController {
         return ResponseEntity.ok(experienceResponse);
     }
 
+    @PostMapping("/seenNotification")
+    public ResponseEntity<ExperienceResponse> seenNotification(@RequestParam int idNotification) {
+        notificationService.seenNotification(idNotification);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
     @GetMapping("/getNotifications")
     public ResponseEntity<Page<NotificationModel>> getNotifications(
             @RequestParam int id,
