@@ -91,8 +91,10 @@ public class NotificationService implements INotificationService {
 
     @Override
     public void seenNotification(int idNotification) {
+        System.out.println("wxwxwxxwxwwxwx   idNotification   "+idNotification);
         NotificationModel notificationModel = notifRepository.findById(idNotification).orElseThrow();
         notificationModel.setRead(true);
+        System.out.println("wxwxwxxwxwwxwx   notificationModel   "+notificationModel);
         notifRepository.save(notificationModel);
     }
 
