@@ -2,6 +2,7 @@ package com.myjob.jobseeker.services;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import com.myjob.jobseeker.dtos.NotificationMessage;
 import com.myjob.jobseeker.interfaces.INotificationService;
 import com.myjob.jobseeker.model.NotificationModel;
@@ -34,11 +35,16 @@ public class NotificationService implements INotificationService {
 
         Message message = Message.builder()
                 .setToken(notificationMessage.getRecipientToken())
+                .setNotification(
+                        Notification.builder()
+                                .setTitle(notificationMessage.getTitle())
+                                .setBody(notificationMessage.getBody())
+                                .build()
+                )
                 .putAllData(notificationMessage.getData())
                 .build();
 
         try {
-            System.out.println("ftreeeeeeeeee  message  "+notificationMessage);
 
             firebaseMessaging.send(message);
 
@@ -50,9 +56,11 @@ public class NotificationService implements INotificationService {
             if (receiverType.equals("company")) {
                 notificationModel.setIdCompany(Integer.parseInt(data.get("idReceiver")));
                 notificationModel.setIdCandidate(Integer.parseInt(data.get("idCandidate")));
+                notificationModel.setIdSender(Integer.parseInt(data.get("idCandidate")));
             } else {
                 notificationModel.setIdCompany(Integer.parseInt(data.get("idCompany")));
                 notificationModel.setIdCandidate(Integer.parseInt(data.get("idReceiver")));
+                notificationModel.setIdSender(Integer.parseInt(data.get("idCompany")));
             }
 
             notificationModel.setCompanyName(data.get("companyName"));

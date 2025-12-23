@@ -11,6 +11,7 @@ public class NotificationModel {
     private String title;
     private String description;
     private String date;
+    private int idSender;
     private int idCompany;
     private String companyName;
     private int idCandidate;

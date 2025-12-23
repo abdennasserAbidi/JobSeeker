@@ -23,9 +23,7 @@ public class NotificationRepositoryImpl implements NotificationRepository {
 
         // Unwind the experiences array
         Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("_id").is(userId)), // Match the user by userId
-                Aggregation.unwind("notifications"),
-                Aggregation.replaceRoot("notifications"),
+                Aggregation.match(Criteria.where("idSender").ne(userId)),
                 Aggregation.skip(skip),
                 Aggregation.limit(size)
         );
@@ -33,14 +31,13 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         // Execute the aggregation
         AggregationResults<NotificationModel> results = mongoTemplate.aggregate(
                 aggregation,
-                "User", // The collection name
+                "notifications", // The collection name
                 NotificationModel.class // The class type to map the results
         );
 
-        // Count the total number of experiences for the user
         long total = mongoTemplate.count(
-                new Query(Criteria.where("_id").is(userId)), // Count experiences for the user
-                "User" // The collection name
+                new Query(Criteria.where("idSender").ne(userId)),
+                "notifications"
         );
 
         return new PageImpl<>(results.getMappedResults(), PageRequest.of(page, size), total);

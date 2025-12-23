@@ -39,8 +39,8 @@ public class NotificationController {
         return ResponseEntity.ok(experienceResponse);
     }
 
-    @GetMapping("/getCompanyNotifications")
-    public ResponseEntity<Page<NotificationModel>> getCompanyNotifications(
+    @GetMapping("/getNotifications")
+    public ResponseEntity<Page<NotificationModel>> getNotifications(
             @RequestParam int id,
             @RequestParam int page,
             @RequestParam int size) {
