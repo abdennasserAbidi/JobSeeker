@@ -68,6 +68,7 @@ public class NotificationService implements INotificationService {
 
             notificationModel.setTitle(notificationMessage.getTitle());
             notificationModel.setDescription(notificationMessage.getBody());
+            notificationModel.setRead(false);
             //notificationModel.setDate();
 
             notifRepository.save(notificationModel);
