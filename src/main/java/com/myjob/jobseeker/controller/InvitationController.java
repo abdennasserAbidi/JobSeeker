@@ -77,8 +77,8 @@ public class InvitationController {
 
         NotificationMessage notificationMessage = new NotificationMessage();
         notificationMessage.setRecipientToken(user.getFcmToken());
-        notificationMessage.setTitle("");
-        notificationMessage.setBody("");
+        notificationMessage.setTitle(companyName);
+        notificationMessage.setBody("Cette entreprise vous a envoyé une invitation");
         notificationMessage.setData(data);
 
         System.out.println("ftreeeeeeeeee  model   " + notificationMessage);
@@ -111,6 +111,7 @@ public class InvitationController {
         String username = invitationDto.getInvitationModel().getFullName();
         int idCompany = invitationDto.getInvitationModel().getIdCompany();
         String companyName = invitationDto.getInvitationModel().getCompanyName();
+        String status = invitationDto.getInvitationModel().getStatus();
         int idConnected = invitationDto.getIdConnected();
 
         User user = userService.getUser(idReceiver);
@@ -124,11 +125,11 @@ public class InvitationController {
 
         NotificationMessage notificationMessage = new NotificationMessage();
         notificationMessage.setRecipientToken(user.getFcmToken());
-        notificationMessage.setTitle("");
-        notificationMessage.setBody("");
-        notificationMessage.setData(data);
 
-        System.out.println("ftreeeeeeeeee  model   " + notificationMessage);
+        notificationMessage.setTitle(companyName);
+        if (status.equals("HIRED")) notificationMessage.setBody("L'entreprise vous a embauché");
+        else notificationMessage.setBody("L'entreprise a rejeté votre candidature");
+        notificationMessage.setData(data);
 
         sendNotificationAfterSendInvitation(notificationMessage, "candidate");
 
@@ -215,8 +216,11 @@ public class InvitationController {
 
         NotificationMessage notificationMessage = new NotificationMessage();
         notificationMessage.setRecipientToken(user.getFcmToken());
-        notificationMessage.setTitle("");
-        notificationMessage.setBody("");
+
+        notificationMessage.setTitle(username);
+        if (status.equals("IN_PROCESS")) notificationMessage.setBody("Ce candidat a accepté votre invitation");
+        else notificationMessage.setBody("Ce candidat a refusé votre une invitation");
+
         notificationMessage.setData(data);
 
         System.out.println("ftreeeeeeeeee  model   " + notificationMessage);
