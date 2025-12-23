@@ -51,6 +51,8 @@ public class NotificationService implements INotificationService {
             NotificationModel notificationModel = new NotificationModel();
             notificationModel.setIdNotification(idCounter.incrementAndGet());
 
+            System.out.println("ftreeeeeeeeee   id   "+idCounter.incrementAndGet());
+
             Map<String, String> data = notificationMessage.getData();
 
             if (receiverType.equals("company")) {
