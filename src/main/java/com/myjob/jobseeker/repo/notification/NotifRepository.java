@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NotifRepository  extends MongoRepository<NotificationModel, Integer>, NotificationRepository {
-
+    NotificationModel findByIdNotification(int idNotification);
 }
