@@ -29,8 +29,8 @@ public class NotificationController {
     }
 
     @PostMapping("/sendnotification")
-    public ResponseEntity<ExperienceResponse> sendNotification(@RequestBody NotificationMessage notificationMessage) {
-        String res = notificationService.sendNotification(notificationMessage);
+    public ResponseEntity<ExperienceResponse> sendNotification(@RequestBody NotificationMessage notificationMessage, String receiverType) {
+        String res = notificationService.sendNotification(notificationMessage, receiverType);
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
