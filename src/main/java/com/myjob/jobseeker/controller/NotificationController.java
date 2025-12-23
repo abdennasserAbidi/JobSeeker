@@ -39,6 +39,17 @@ public class NotificationController {
         return ResponseEntity.ok(experienceResponse);
     }
 
+    @PostMapping("/removeNotification")
+    public ResponseEntity<ExperienceResponse> removeNotification(@RequestParam int idNotification) {
+        notificationService.removeNotification(idNotification);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("removed successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
     @PostMapping("/seenNotification")
     public ResponseEntity<ExperienceResponse> seenNotification(@RequestParam int idNotification) {
         notificationService.seenNotification(idNotification);

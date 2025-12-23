@@ -99,6 +99,12 @@ public class NotificationService implements INotificationService {
     }
 
     @Override
+    public void removeNotification(int idNotification) {
+        NotificationModel notificationModel = notifRepository.findById(idNotification).orElseThrow();
+        notifRepository.delete(notificationModel);
+    }
+
+    @Override
     public Page<NotificationModel> getCompanyNotifications(int id, int page, int size) {
         return notifRepository.findPaginatedNotification(id, page, size);
     }
