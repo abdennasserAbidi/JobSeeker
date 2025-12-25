@@ -59,7 +59,7 @@ public class AnnouncementController {
             notificationMessage.setBody("Cette entreprise vous a envoyé une invitation");
             notificationMessage.setData(data);
 
-            sendNotificationAfterSendInvitation(notificationMessage);
+            sendNotificationAfterPost(notificationMessage);
         }
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
@@ -69,7 +69,7 @@ public class AnnouncementController {
         return ResponseEntity.ok(experienceResponse);
     }
 
-    public void sendNotificationAfterSendInvitation(NotificationMessage notificationMessage) {
+    public void sendNotificationAfterPost(NotificationMessage notificationMessage) {
         String res = notificationService.sendNotification(notificationMessage);
     }
 

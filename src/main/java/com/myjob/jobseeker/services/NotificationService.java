@@ -65,7 +65,9 @@ public class NotificationService implements INotificationService {
 
             notificationModel.setCompanyName(data.get("companyName"));
             notificationModel.setUsername(data.get("username"));
+
             notificationModel.setIdInvitation(Integer.parseInt(data.get("idInvitation")));
+            notificationModel.setIdPost(-1);
 
             notificationModel.setTitle(notificationMessage.getTitle());
             notificationModel.setDescription(notificationMessage.getBody());
@@ -109,7 +111,9 @@ public class NotificationService implements INotificationService {
             notificationModel.setIdSender(Integer.parseInt(data.get("idCompany")));
             notificationModel.setCompanyName(data.get("companyName"));
             notificationModel.setUsername(data.get("username"));
-            notificationModel.setIdInvitation(Integer.parseInt(data.get("idInvitation")));
+
+            notificationModel.setIdPost(Integer.parseInt(data.get("idAnnounce")));
+            notificationModel.setIdInvitation(-1);
 
             notificationModel.setTitle(notificationMessage.getTitle());
             notificationModel.setDescription(notificationMessage.getBody());
