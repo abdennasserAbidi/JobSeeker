@@ -1,8 +1,12 @@
 package com.myjob.jobseeker.controller;
 
 import com.myjob.jobseeker.dtos.ExperienceResponse;
+import com.myjob.jobseeker.dtos.NotificationMessage;
 import com.myjob.jobseeker.interfaces.IAnnouncementService;
+import com.myjob.jobseeker.interfaces.INotificationService;
+import com.myjob.jobseeker.interfaces.IUserService;
 import com.myjob.jobseeker.model.AnnounceModel;
+import com.myjob.jobseeker.model.User;
 import com.myjob.jobseeker.model.post.CommentsPost;
 import com.myjob.jobseeker.model.post.LikesPost;
 import lombok.AllArgsConstructor;
@@ -10,7 +14,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/auth")
 @RestController
@@ -19,7 +25,8 @@ import java.util.List;
 public class AnnouncementController {
 
     private final IAnnouncementService announcementService;
-
+    private final IUserService userService;
+    private final INotificationService notificationService;
 
     @PostMapping("/makeAnnouncement")
     public ResponseEntity<ExperienceResponse> makeAnnouncement(
@@ -28,11 +35,53 @@ public class AnnouncementController {
 
         announcementService.makeAnnouncement(idUserConnected, announceModel);
 
+        String title = announceModel.getTitle();
+        String description = announceModel.getDescription();
+        int idCompany = announceModel.getIdAnnounce();
+        String companyName = announceModel.getCompanyName();
+        int idAnnounce = announceModel.getIdAnnounce();
+
+        List<User> candidates = userService.getCandidate();
+
+        for (User user : candidates) {
+            Map<String, String> data = new HashMap<>();
+            data.put("idReceiver", user.getId() + "");
+            data.put("username", user.getFullName());
+            data.put("idAnnounce", idAnnounce + "");
+            data.put("idCompany", idCompany + "");
+            data.put("companyName", companyName);
+            data.put("title", title);
+            data.put("description", description);
+
+            NotificationMessage notificationMessage = new NotificationMessage();
+            notificationMessage.setRecipientToken(user.getFcmToken());
+            notificationMessage.setTitle(companyName);
+            notificationMessage.setBody("Cette entreprise vous a envoyé une invitation");
+            notificationMessage.setData(data);
+
+            sendNotificationAfterSendInvitation(notificationMessage);
+        }
+
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
         experienceResponse.setMessage("saved successfully");
 
         return ResponseEntity.ok(experienceResponse);
+    }
+
+    public void sendNotificationAfterSendInvitation(NotificationMessage notificationMessage) {
+        String res = notificationService.sendNotification(notificationMessage);
+    }
+
+    @GetMapping("/getAnnouncement")
+    public ResponseEntity<AnnounceModel> getAnnouncement(
+            @RequestParam int idAnnounce,
+            @RequestParam int idCompany
+    ) {
+
+        AnnounceModel announce = announcementService.getAnnouncement(idAnnounce, idCompany);
+
+        return ResponseEntity.ok(announce);
     }
 
     @GetMapping("/checkUserLike")

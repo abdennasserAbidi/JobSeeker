@@ -137,6 +137,14 @@ public class AnnouncementService implements IAnnouncementService {
     }
 
     @Override
+    public AnnounceModel getAnnouncement(int idAnnounce, int idCompany) {
+        User company = userRepository.findById(idCompany).orElseThrow();
+        List<AnnounceModel> list = company.getAnnounces().stream().filter(post -> post.getIdAnnounce() == idAnnounce).toList();
+        if (list.isEmpty()) return new AnnounceModel();
+        else return list.get(0);
+    }
+
+    @Override
     public Page<AnnounceModel> getPaginatedAnnouncementCandidate(int page, int size) {
         List<User> userList = userRepository.findAll();
         List<AnnounceModel> newList = new ArrayList<>();

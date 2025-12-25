@@ -4,6 +4,8 @@ import com.myjob.jobseeker.dtos.*;
 import com.myjob.jobseeker.model.*;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 
 public interface IUserService {
     void saveProfessionalInfo(ProfessionalStatus professionalStatus);
@@ -12,6 +14,7 @@ public interface IUserService {
     void savePersonal(PersonalInfoDto input);
     void saveCompanyInfo(CompanyInfoDto input);
     User getUser(int id);
+    List<User> getCandidate();
     Page<User> getUsers(int id, int page, int size);
     Page<User> getNewCandidate(int id, int page, int size);
     Page<User> getUsersFavorites(int id, int page, int size);

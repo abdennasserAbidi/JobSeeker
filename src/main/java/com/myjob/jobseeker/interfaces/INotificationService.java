@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 
 public interface INotificationService {
     String sendNotification(NotificationMessage notificationMessage, String receiverType);
+    String sendNotification(NotificationMessage notificationMessage);
     void updateToken(int id, String token);
     void seenNotification(int idNotification);
     void removeNotification(int idNotification);

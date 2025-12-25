@@ -129,6 +129,12 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public List<User> getCandidate() {
+        List<User> list = userRepository.findAll();
+        return list.stream().filter(user -> user.getRole().equals("Candidate") || user.getRole().equals("Candidat")).toList();
+    }
+
+    @Override
     public Page<User> getUsers(int id, int page, int size) {
         User user = userRepository.findById(id).orElseThrow();
 

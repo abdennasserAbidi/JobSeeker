@@ -82,6 +82,50 @@ public class NotificationService implements INotificationService {
     }
 
     @Override
+    public String sendNotification(NotificationMessage notificationMessage) {
+
+        Message message = Message.builder()
+                .setToken(notificationMessage.getRecipientToken())
+                .setNotification(
+                        Notification.builder()
+                                .setTitle(notificationMessage.getTitle())
+                                .setBody(notificationMessage.getBody())
+                                .build()
+                )
+                .putAllData(notificationMessage.getData())
+                .build();
+
+        try {
+
+            firebaseMessaging.send(message);
+
+            NotificationModel notificationModel = new NotificationModel();
+            notificationModel.setIdNotification(idCounter.incrementAndGet());
+
+            Map<String, String> data = notificationMessage.getData();
+
+            notificationModel.setIdCandidate(Integer.parseInt(data.get("idReceiver")));
+            notificationModel.setIdCompany(Integer.parseInt(data.get("idCompany")));
+            notificationModel.setIdSender(Integer.parseInt(data.get("idCompany")));
+            notificationModel.setCompanyName(data.get("companyName"));
+            notificationModel.setUsername(data.get("username"));
+            notificationModel.setIdInvitation(Integer.parseInt(data.get("idInvitation")));
+
+            notificationModel.setTitle(notificationMessage.getTitle());
+            notificationModel.setDescription(notificationMessage.getBody());
+            notificationModel.setRead(false);
+            //notificationModel.setDate();
+
+            notifRepository.save(notificationModel);
+
+            return "Success sending notification";
+        } catch (Exception e) {
+            System.out.println("ftreeeeeeeeee  error  " + e.getMessage());
+            return "Error sending notification";
+        }
+    }
+
+    @Override
     public void updateToken(int email, String token) {
         java.util.Optional<com.myjob.jobseeker.model.User> user = userRepository.findById(email);
         user.ifPresent(u -> {
