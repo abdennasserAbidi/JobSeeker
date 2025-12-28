@@ -151,6 +151,7 @@ public class AuthController {
         emailResponse.setId(1);
 
         if (!message.contains("User not found with email:")) {
+            System.out.println("qqqqqqqqqqqqqqqqqqqq   "+email);
             emailService.sendResetToken(email, message);
             emailResponse.setMessage("Password reset link sent to your email.");
         } else {
