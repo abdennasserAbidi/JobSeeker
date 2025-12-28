@@ -124,7 +124,6 @@ public class NotificationService implements INotificationService {
 
             return "Success sending notification";
         } catch (Exception e) {
-            System.out.println("ftreeeeeeeeee  error  " + e.getMessage());
             return "Error sending notification";
         }
     }

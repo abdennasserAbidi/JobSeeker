@@ -1,18 +1,8 @@
 package com.myjob.jobseeker;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.messaging.FirebaseMessaging;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.ClassPathResource;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 @SpringBootApplication
 public class JobseekerApplication {
@@ -39,6 +29,7 @@ public class JobseekerApplication {
 		System.setProperty("CLOUDINARY_API_SECRET", dotenv.get("CLOUDINARY_API_SECRET"));
 		System.setProperty("CLOUDINARY_API_KEY", dotenv.get("CLOUDINARY_API_KEY"));
 		System.setProperty("CLOUDINARY_CLOUD_NAME", dotenv.get("CLOUDINARY_CLOUD_NAME"));
+		System.setProperty("RESEND_API_KEY", dotenv.get("RESEND_API_KEY"));
 
 
 		SpringApplication.run(JobseekerApplication.class, args);
