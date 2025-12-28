@@ -143,7 +143,7 @@ public class AuthController {
 
     }
 
-    @PostMapping("/forgot-password")
+    @PostMapping("/forgotpassword")
     public ResponseEntity<EmailResponse> forgotPassword(@RequestParam String email) {
 
         String token = passwordResetService.createPasswordResetTokenForUser(email);
