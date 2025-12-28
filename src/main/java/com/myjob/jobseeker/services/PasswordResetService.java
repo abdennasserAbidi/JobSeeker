@@ -26,12 +26,10 @@ public class PasswordResetService {
     }
 
     public String createPasswordResetTokenForUser(String userEmail) {
-        System.err.println("haw l email : "+userEmail);
         Optional<User> user = userRepository.findByEmail(userEmail);
-        System.out.println("ktykjhkljkkkkkkkk  "+user);
 
         if (user.isEmpty()) {
-            throw new IllegalArgumentException("User not found with email: " + userEmail);
+            return "User not found with email: " + userEmail;
         }
 
         String token = UUID.randomUUID().toString();

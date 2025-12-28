@@ -143,14 +143,19 @@ public class AuthController {
 
     }
 
-    @PostMapping("/forgotpassword")
-    public ResponseEntity<EmailResponse> forgotPassword(@RequestBody LoginUserDto loginUserDto) {
+    @PostMapping("/forgot-password")
+    public ResponseEntity<EmailResponse> forgotPassword(@RequestParam String email) {
 
-        String token = passwordResetService.createPasswordResetTokenForUser(loginUserDto.getEmail());
-        emailService.sendResetToken(loginUserDto.getEmail(), token);
+        String message = passwordResetService.createPasswordResetTokenForUser(email);
         EmailResponse emailResponse = new EmailResponse();
         emailResponse.setId(1);
-        emailResponse.setMessage("Password reset link sent to your email.");
+
+        if (!message.contains("User not found with email:")) {
+            emailService.sendResetToken(email, message);
+            emailResponse.setMessage("Password reset link sent to your email.");
+        } else {
+            emailResponse.setMessage(message);
+        }
         return ResponseEntity.ok(emailResponse);
     }
 
