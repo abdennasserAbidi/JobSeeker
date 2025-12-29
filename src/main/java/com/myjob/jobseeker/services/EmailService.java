@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Properties;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -66,20 +67,41 @@ public class EmailService {
     public void sendResetToken(String email, String token) {
         String url = "myapp://resetpassword/" + token;
         SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setFrom(email);
         mailMessage.setTo(email);
         mailMessage.setSubject("Password Reset Request");
         mailMessage.setText("To reset your password, click here : " + url );
         System.out.println("qqqqqqqqqqqqqqqqqqqq   mailMessage   "+mailMessage);
 
-        /*JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost(host);
         javaMailSender.setPort(port);
         javaMailSender.setUsername(username);
         javaMailSender.setPassword(password);
-        javaMailSender.setProtocol("smtps");*/
+        javaMailSender.setProtocol("smtps");
+
+        Properties props = javaMailSender.getJavaMailProperties();
+
+        // For Port 465 (SSL)
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.ssl.enable", "true");
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.socketFactory.fallback", "false");
+
+        // Timeouts
+        props.put("mail.smtp.connectiontimeout", "10000");
+        props.put("mail.smtp.timeout", "10000");
+        props.put("mail.smtp.writetimeout", "10000");
+
+        // Debug (remove in production)
+        props.put("mail.debug", "true");
 
 
-        mailSender.send(mailMessage);
+
+        javaMailSender.send(mailMessage);
     }
 
     public void sendTokenValidation(String email) {
