@@ -73,7 +73,9 @@ public class EmailService {
         mailMessage.setText("To reset your password, click here : " + url );
         System.out.println("qqqqqqqqqqqqqqqqqqqq   mailMessage   "+mailMessage);
 
-        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        JavaMailSenderImpl javaMailSender = (JavaMailSenderImpl) mailSender;
+
+        //JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost(host);
         javaMailSender.setPort(port);
         javaMailSender.setUsername(username);
@@ -96,10 +98,12 @@ public class EmailService {
         props.put("mail.smtp.timeout", "10000");
         props.put("mail.smtp.writetimeout", "10000");
 
-        // Debug (remove in production)
-        props.put("mail.debug", "true");
-
-
+        try {
+            javaMailSender.testConnection();
+            System.out.println("connection    SUCCESS");
+        } catch (Exception e) {
+            System.out.println("connection    FAILED  "+e.getMessage());
+        }
 
         javaMailSender.send(mailMessage);
     }
