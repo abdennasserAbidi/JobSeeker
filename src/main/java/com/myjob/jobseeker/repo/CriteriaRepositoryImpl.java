@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 
-import com.myjob.jobseeker.dtos.Criteria;
+import org.springframework.data.mongodb.core.query.Criteria;
 import com.myjob.jobseeker.model.User;
 
 public class CriteriaRepositoryImpl implements CriteriaRepository {
@@ -15,7 +15,7 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<User> searchUsers(Criteria request) {
+    public List<User> searchUsers(com.myjob.jobseeker.dtos.Criteria request) {
 
         Query query = new Query();
 
@@ -25,8 +25,14 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
         }
 
         if (!request.getCategories().isEmpty()) {
+
+            /*Criteria criteria = new Criteria().orOperator(
+                    Criteria.where("preferredWorkType").is(id),
+                    Criteria.where("preferredEmploymentType").is(id)
+            );*/
+
             List<String> asector = request.getCategories();
-            addCriterias(asector, query, "categories");
+            addCriterias(asector, query, "preferredWorkType");
         }
         
         if (!request.getExperiences().isEmpty()) {

@@ -164,14 +164,12 @@ public class AuthService implements IAuthService {
     @Override
     public Page<User> getByCriteria(Criteria criteria, int page, int size) {
         List<User> users = userRepository.searchUsers(criteria);
-        System.out.println("elkhlakgekage   users  "+users.size());
         List<User> newUser = new ArrayList<>();
         for (User user : users) {
             if (user.getRole().equals("Candidate") || user.getRole().equals("Candidat")) {
                 newUser.add(user);
             }
         }
-        System.out.println("elkhlakgekage   newUser  "+newUser.size());
 
         PageRequest pageable = PageRequest.of(page - 1, 3);
         final int start = (int) pageable.getOffset();
