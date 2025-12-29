@@ -7,6 +7,7 @@ import okhttp3.RequestBody;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,11 +21,23 @@ public class EmailService {
     @Value("${resend.api.key}")
     private String resendApiKey;
 
+    @Value("${spring.mail.username}")
+    private String username;
+
+    @Value("${spring.mail.password}")
+    private String password;
+
+    @Value("${spring.mail.port}")
+    private int port;
+
+    @Value("${spring.mail.host}")
+    private String host;
+
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
-    public void sendResetToken(String email, String token) {
+    public void sendResetTokenResend(String email, String token) {
         OkHttpClient client = new OkHttpClient();
         String url = "myapp://reset-password/" + token;
 
@@ -50,14 +63,21 @@ public class EmailService {
         }
     }
 
-    public void sendResetToken1(String email, String token) {
-        String url = "https://192.168.1.13/reset-password/" + token;
-        //String url = "http://192.168.1.13/" + token;
+    public void sendResetToken(String email, String token) {
+        String url = "myapp://resetpassword/" + token;
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
         mailMessage.setSubject("Password Reset Request");
         mailMessage.setText("To reset your password, click here : " + url );
         System.out.println("qqqqqqqqqqqqqqqqqqqq   mailMessage   "+mailMessage);
+
+        /*JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        javaMailSender.setHost(host);
+        javaMailSender.setPort(port);
+        javaMailSender.setUsername(username);
+        javaMailSender.setPassword(password);
+        javaMailSender.setProtocol("smtps");*/
+
 
         mailSender.send(mailMessage);
     }
