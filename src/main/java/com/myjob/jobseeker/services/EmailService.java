@@ -38,7 +38,7 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    public void sendResetTokenResend(String email, String token) {
+    public void sendResetToken(String email, String token) {
         OkHttpClient client = new OkHttpClient();
         String url = "myapp://reset-password/" + token;
 
@@ -64,7 +64,7 @@ public class EmailService {
         }
     }
 
-    public void sendResetToken(String email, String token) {
+    public void sendResetToken1(String email, String token) {
         String url = "myapp://resetpassword/" + token;
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(email);
