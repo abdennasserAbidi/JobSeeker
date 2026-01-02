@@ -118,25 +118,18 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {
-        User authenticatedUser;
-        String error = "";
-        try {
-            authenticatedUser = authenticationService.authenticate(loginUserDto);
-        } catch (Exception exception) {
-            authenticatedUser = new User();
-            error = exception.getMessage();
-        }
 
-        String jwtToken = jwtService.generateToken(authenticatedUser);
+        UserResponse userResponse = authenticationService.authenticate(loginUserDto);
 
         LoginResponse loginResponse = new LoginResponse();
 
-        if (!Objects.equals(error, "")) {
-            loginResponse.setMessageError(error);
+        if (!userResponse.getMessage().isEmpty()) {
+            loginResponse.setMessageError(userResponse.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(loginResponse);
         } else {
+            String jwtToken = jwtService.generateToken(userResponse.getUser());
             loginResponse.setToken(jwtToken);
-            loginResponse.setUser(authenticatedUser);
+            loginResponse.setUser(userResponse.getUser());
             loginResponse.setExpiresIn(jwtService.getExpirationTime());
             return ResponseEntity.ok(loginResponse);
         }
@@ -151,7 +144,6 @@ public class AuthController {
         emailResponse.setId(1);
 
         if (!message.contains("User not found with email:")) {
-            System.out.println("qqqqqqqqqqqqqqqqqqqq   "+email);
             emailService.sendResetToken(email, message);
             emailResponse.setMessage("Password reset link sent to your email.");
         } else {

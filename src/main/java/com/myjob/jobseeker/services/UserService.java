@@ -124,8 +124,16 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getUser(int id) {
-        return userRepository.findById(id).orElseThrow();
+    public UserResponse getUser(int id) {
+
+        Optional<User> user = userRepository.findById(id);
+        User user1 = user.orElseGet(User::new);
+        UserResponse userResponse = new UserResponse();
+        userResponse.setUser(user1);
+        if (user1.getId() == 0) userResponse.setMessage("There are no such user");
+        else userResponse.setMessage("");
+
+        return userResponse;
     }
 
     @Override

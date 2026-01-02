@@ -1,6 +1,7 @@
 package com.myjob.jobseeker.controller;
 
 import com.myjob.jobseeker.dtos.ExperienceResponse;
+import com.myjob.jobseeker.dtos.UserResponse;
 import com.myjob.jobseeker.interfaces.FileUpload;
 import com.myjob.jobseeker.model.*;
 import com.myjob.jobseeker.services.AuthService;
@@ -90,8 +91,8 @@ public class FileController {
     public ResponseEntity<?> getFiles(@RequestParam("id") int id) {
         try {
             List<String> list = new ArrayList<>();
-            User user = authService.getUser(id);
-            List<Documents> documents = user.getValidationStatus().getDocuments();
+            UserResponse user = authService.getUser(id);
+            List<Documents> documents = user.getUser().getValidationStatus().getDocuments();
             for (Documents doc : documents) {
                 list.add(fileUpload.getFile(doc));
             }

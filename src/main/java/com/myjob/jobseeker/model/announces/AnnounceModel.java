@@ -1,16 +1,16 @@
-package com.myjob.jobseeker.model;
+package com.myjob.jobseeker.model.announces;
 
 import com.myjob.jobseeker.model.post.CommentsPost;
 import com.myjob.jobseeker.model.post.LikesPost;
 import com.myjob.jobseeker.model.post.StatusPost;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
-@Getter
+@Data
 public class AnnounceModel {
     private int idAnnounce;
     private String title;
@@ -18,6 +18,7 @@ public class AnnounceModel {
     private String date;
     private int idCompany;
     private String companyName;
+    private String postType;
     private StatusPost status;
     private List<CommentsPost> comments = new ArrayList<>();
     private List<LikesPost> likes = new ArrayList<>();

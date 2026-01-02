@@ -123,9 +123,8 @@ public class UserController {
     }
 
     @GetMapping("/getUser")
-    public ResponseEntity<User> getUser(@RequestParam int id) {
-        User user = authenticationService.getUser(id);
-
+    public ResponseEntity<UserResponse> getUser(@RequestParam int id) {
+        UserResponse user = authenticationService.getUser(id);
         return ResponseEntity.ok(user);
     }
 }

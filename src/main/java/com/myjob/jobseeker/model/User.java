@@ -1,5 +1,6 @@
 package com.myjob.jobseeker.model;
 
+import com.myjob.jobseeker.model.announces.AnnounceModel;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

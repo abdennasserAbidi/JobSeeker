@@ -12,7 +12,7 @@ import org.springframework.core.io.ResourceLoader;
 
 import java.io.InputStream;
 
-@Configuration
+//@Configuration
 public class FirebaseConfig {
     private final ResourceLoader resourceLoader;
 

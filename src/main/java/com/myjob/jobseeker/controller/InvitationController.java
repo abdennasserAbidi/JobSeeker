@@ -66,24 +66,24 @@ public class InvitationController {
         String companyName = invitationDto.getInvitationModel().getCompanyName();
         int idConnected = invitationDto.getIdConnected();
 
-        User user = userService.getUser(idReceiver);
+        UserResponse user = userService.getUser(idReceiver);
 
-        Map<String, String> data = new HashMap<>();
-        data.put("idInvitation", idInvitation + "");
-        data.put("idCompany", idCompany + "");
-        data.put("companyName", companyName);
-        data.put("idReceiver", idReceiver + "");
-        data.put("username", username);
+        if (user.getMessage().isEmpty()) {
+            Map<String, String> data = new HashMap<>();
+            data.put("idInvitation", idInvitation + "");
+            data.put("idCompany", idCompany + "");
+            data.put("companyName", companyName);
+            data.put("idReceiver", idReceiver + "");
+            data.put("username", username);
 
-        NotificationMessage notificationMessage = new NotificationMessage();
-        notificationMessage.setRecipientToken(user.getFcmToken());
-        notificationMessage.setTitle(companyName);
-        notificationMessage.setBody("Cette entreprise vous a envoyé une invitation");
-        notificationMessage.setData(data);
+            NotificationMessage notificationMessage = new NotificationMessage();
+            notificationMessage.setRecipientToken(user.getUser().getFcmToken());
+            notificationMessage.setTitle(companyName);
+            notificationMessage.setBody("Cette entreprise vous a envoyé une invitation");
+            notificationMessage.setData(data);
 
-        System.out.println("ftreeeeeeeeee  model   " + notificationMessage);
-
-        sendNotificationAfterSendInvitation(notificationMessage, "candidate");
+            sendNotificationAfterSendInvitation(notificationMessage, "candidate");
+        }
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
@@ -114,24 +114,26 @@ public class InvitationController {
         String status = invitationDto.getInvitationModel().getStatus();
         int idConnected = invitationDto.getIdConnected();
 
-        User user = userService.getUser(idReceiver);
+        UserResponse user = userService.getUser(idReceiver);
 
-        Map<String, String> data = new HashMap<>();
-        data.put("idInvitation", idInvitation + "");
-        data.put("idCompany", idCompany + "");
-        data.put("companyName", companyName);
-        data.put("idReceiver", idReceiver + "");
-        data.put("username", username);
+        if (user.getMessage().isEmpty()) {
+            Map<String, String> data = new HashMap<>();
+            data.put("idInvitation", idInvitation + "");
+            data.put("idCompany", idCompany + "");
+            data.put("companyName", companyName);
+            data.put("idReceiver", idReceiver + "");
+            data.put("username", username);
 
-        NotificationMessage notificationMessage = new NotificationMessage();
-        notificationMessage.setRecipientToken(user.getFcmToken());
+            NotificationMessage notificationMessage = new NotificationMessage();
+            notificationMessage.setRecipientToken(user.getUser().getFcmToken());
 
-        notificationMessage.setTitle(companyName);
-        if (status.equals("HIRED")) notificationMessage.setBody("L'entreprise vous a embauché");
-        else notificationMessage.setBody("L'entreprise a rejeté votre candidature");
-        notificationMessage.setData(data);
+            notificationMessage.setTitle(companyName);
+            if (status.equals("HIRED")) notificationMessage.setBody("L'entreprise vous a embauché");
+            else notificationMessage.setBody("L'entreprise a rejeté votre candidature");
+            notificationMessage.setData(data);
 
-        sendNotificationAfterSendInvitation(notificationMessage, "candidate");
+            sendNotificationAfterSendInvitation(notificationMessage, "candidate");
+        }
 
         return ResponseEntity.ok(invitationDto);
     }
@@ -205,27 +207,29 @@ public class InvitationController {
         String username = invitationDto.getInvitationModel().getFullName();
         int idConnected = invitationDto.getIdConnected();
 
-        User user = userService.getUser(idReceiver);
+        UserResponse user = userService.getUser(idReceiver);
 
-        Map<String, String> data = new HashMap<>();
-        data.put("idInvitation", idInvitation + "");
-        data.put("idCandidate", idCandidate + "");
-        data.put("companyName", companyName);
-        data.put("idReceiver", idReceiver + "");
-        data.put("username", username);
+        if (user.getMessage().isEmpty()) {
+            Map<String, String> data = new HashMap<>();
+            data.put("idInvitation", idInvitation + "");
+            data.put("idCandidate", idCandidate + "");
+            data.put("companyName", companyName);
+            data.put("idReceiver", idReceiver + "");
+            data.put("username", username);
 
-        NotificationMessage notificationMessage = new NotificationMessage();
-        notificationMessage.setRecipientToken(user.getFcmToken());
+            NotificationMessage notificationMessage = new NotificationMessage();
+            notificationMessage.setRecipientToken(user.getUser().getFcmToken());
 
-        notificationMessage.setTitle(username);
-        if (status.equals("IN_PROCESS")) notificationMessage.setBody("Ce candidat a accepté votre invitation");
-        else notificationMessage.setBody("Ce candidat a refusé votre une invitation");
+            notificationMessage.setTitle(username);
+            if (status.equals("IN_PROCESS")) notificationMessage.setBody("Ce candidat a accepté votre invitation");
+            else notificationMessage.setBody("Ce candidat a refusé votre une invitation");
 
-        notificationMessage.setData(data);
+            notificationMessage.setData(data);
 
-        System.out.println("ftreeeeeeeeee  model   " + notificationMessage);
+            System.out.println("ftreeeeeeeeee  model   " + notificationMessage);
 
-        sendNotificationAfterSendInvitation(notificationMessage, "company");
+            sendNotificationAfterSendInvitation(notificationMessage, "company");
+        }
 
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);

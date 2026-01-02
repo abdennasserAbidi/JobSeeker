@@ -1,6 +1,8 @@
 package com.myjob.jobseeker.interfaces;
 
-import com.myjob.jobseeker.model.AnnounceModel;
+import com.myjob.jobseeker.dtos.ExperienceResponse;
+import com.myjob.jobseeker.model.announces.AnnounceModel;
+import com.myjob.jobseeker.model.announces.AnnounceResponse;
 import com.myjob.jobseeker.model.post.CommentsPost;
 import com.myjob.jobseeker.model.post.LikesPost;
 import org.springframework.data.domain.Page;
@@ -28,9 +30,15 @@ public interface IAnnouncementService {
 
     List<Integer> getNumberCommentAllPostsCompany(int idConnected);
 
-    List<CommentsPost> getCommentAllPostsCompany(int idAnnounce, int idConnected);
+    List<CommentsPost> getCommentAllPostsCompany(int idAnnounce);
 
-    List<Integer> getNumberLikeAllPosts(int idConnected);
+    List<Integer> getNumberLikeAllPosts();
 
-    List<Integer> getNumberCommentAllPosts(int idConnected);
+    List<Integer> getNumberCommentAllPosts();
+
+    ExperienceResponse deletePostCompany(int idAnnounce, int idConnected);
+
+    AnnounceResponse findAnnounceCompany(String type, int idConnected);
+
+    Page<AnnounceModel> findAnnounceCandidate(String type, int page, int size);
 }

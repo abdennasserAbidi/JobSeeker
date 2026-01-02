@@ -11,7 +11,7 @@ public interface IAuthService {
     void verifyAccountCompany(int id);
     String updateToken(int email, String token);
     UserResponse signup(RegisterUserDto input);
-    User authenticate(LoginUserDto input);
+    UserResponse authenticate(LoginUserDto input);
     User authenticateByEmail(String email);
     String createPasswordResetTokenForUser(String userEmail);
     boolean validatePasswordResetToken(String token);
@@ -26,7 +26,7 @@ public interface IAuthService {
 
     Page<User> getUsers(int id, int page, int size);
 
-    User getUser(int id);
+    UserResponse getUser(int id);
 
     void saveCompanyInfo(CompanyInfoDto input);
 

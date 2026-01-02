@@ -31,8 +31,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // Register the /ws endpoint for WebSocket handshake and fallback options
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("http://localhost:*", "http://192.168.*.*")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
+                .setAllowedOriginPatterns("*");
     }
 
     // 👇 THIS IS MANDATORY FOR REAL-TIME PRIVATE CHAT

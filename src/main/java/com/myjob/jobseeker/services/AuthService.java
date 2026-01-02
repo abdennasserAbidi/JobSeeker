@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -82,15 +82,34 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public User authenticate(LoginUserDto input) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        input.getEmail(),
-                        input.getPassword()
-                )
-        );
+    public UserResponse authenticate(LoginUserDto input) {
+        UserResponse userResponse = new UserResponse();
 
-        return userRepository.findByEmail(input.getEmail()).orElseThrow();
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            input.getEmail(),
+                            input.getPassword()
+                    )
+            );
+
+            Optional<User> user = userRepository.findByEmail(input.getEmail());
+            User user1 = user.orElseGet(User::new);
+            userResponse.setUser(user1);
+            if (user1.getId() == 0) userResponse.setMessage("There are no such user");
+            else userResponse.setMessage("");
+
+        } catch (Exception exception) {
+            userResponse.setUser(new User());
+            if (exception instanceof BadCredentialsException)
+                userResponse.setMessage("email or password incorrect");
+            else if (exception instanceof DisabledException)
+                userResponse.setMessage("Ce compte est désactivé");
+            else if (exception instanceof LockedException)
+                userResponse.setMessage("Ce compte est bloqué");
+            else userResponse.setMessage("email or password incorrect");
+        }
+        return userResponse;
     }
 
     @Override
@@ -241,16 +260,33 @@ public class AuthService implements IAuthService {
             }
         }*/
 
-        int s = Math.min(size, newUsers.size());
+        int pageSize = Math.min(size, newUsers.size());
 
-        PageRequest pageable = PageRequest.of(page - 1, s);
+        PageRequest pageable = PageRequest.of(page - 1, pageSize);
         final int start = (int) pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), s);
-        return new PageImpl<>(newUsers.subList(start, end), pageable, s);
+        final int end = Math.min((start + pageable.getPageSize()), pageSize);
+
+        Page<User> pager;
+
+        if (start < newUsers.size() && start < end) {
+            pager = new PageImpl<>(newUsers.subList(start, end), pageable, newUsers.size());
+        } else pager = new PageImpl<>(Collections.emptyList(), pageable, newUsers.size());
+
+        return pager;
     }
+
     @Override
-    public User getUser(int id) {
-        return userRepository.findById(id).orElseThrow();
+    public UserResponse getUser(int id) {
+        Optional<User> user = userRepository.findById(id);
+        User user1 = user.orElseGet(User::new);
+        UserResponse userResponse = new UserResponse();
+        userResponse.setUser(user1);
+        if (user1.getId() == 0) {
+            userResponse.setMessage("There are no user with this id");
+        }
+        else userResponse.setMessage("");
+
+        return userResponse;
     }
 
     @Override

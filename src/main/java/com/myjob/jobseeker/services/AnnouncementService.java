@@ -1,7 +1,10 @@
 package com.myjob.jobseeker.services;
 
+import com.myjob.jobseeker.dtos.ExperienceResponse;
 import com.myjob.jobseeker.interfaces.IAnnouncementService;
 import com.myjob.jobseeker.model.*;
+import com.myjob.jobseeker.model.announces.AnnounceModel;
+import com.myjob.jobseeker.model.announces.AnnounceResponse;
 import com.myjob.jobseeker.model.post.*;
 import com.myjob.jobseeker.repo.UserRepository;
 import org.springframework.data.domain.Page;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AnnouncementService implements IAnnouncementService {
@@ -31,6 +35,60 @@ public class AnnouncementService implements IAnnouncementService {
         list.add(input);
         user.setAnnounces(list);
         userRepository.save(user);
+    }
+
+    @Override
+    public AnnounceResponse findAnnounceCompany(String type, int idConnected) {
+        Optional<User> userValue = userRepository.findById(idConnected);
+        AnnounceResponse announceResponse = new AnnounceResponse();
+        announceResponse.setIdAnnounceResponse(5211);
+        String confirm = "";
+        if (userValue.isPresent()) {
+            User user = userValue.get();
+
+            List<AnnounceModel> announceModelList = user.getAnnounces().stream().filter(announceModel ->
+                    announceModel.getPostType().equals(type)
+            ).toList();
+
+            if (announceModelList.isEmpty()) {
+                confirm = "Annonce n'existe pas";
+            } else {
+                announceResponse.setAnnounceModel(announceModelList);
+            }
+        } else confirm = "Utilisateur non trouvé";
+
+        announceResponse.setMessage(confirm);
+
+        System.out.println(announceResponse.getAnnounceModel());
+        return announceResponse;
+    }
+
+    @Override
+    public Page<AnnounceModel> findAnnounceCandidate(String type, int page, int size) {
+        List<User> users = userRepository.findAll();
+        List<AnnounceModel> list = new ArrayList<>();
+
+        for (User user : users) {
+            if (user.getRole().equals("Company") || user.getRole().equals("Entreprise")) {
+                List<AnnounceModel> announceModelList = user.getAnnounces().stream().filter(announceModel ->
+                        announceModel.getPostType().equals(type)
+                ).toList();
+
+                list.addAll(announceModelList);
+            }
+        }
+
+        PageRequest pageable = PageRequest.of(page - 1, size);
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), list.size());
+
+        Page<AnnounceModel> pager;
+
+        if (start < list.size() && start < end) {
+            pager = new PageImpl<>(list.subList(start, end), pageable, list.size());
+        } else pager = new PageImpl<>(Collections.emptyList(), pageable, list.size());
+
+        return pager;
     }
 
     @Override
@@ -153,7 +211,7 @@ public class AnnouncementService implements IAnnouncementService {
             newList.addAll(announceModelList);
         }
 
-        PageRequest pageable = PageRequest.of(page - 1, 3);
+        PageRequest pageable = PageRequest.of(page - 1, size);
         final int start = (int) pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), newList.size());
 
@@ -211,9 +269,12 @@ public class AnnouncementService implements IAnnouncementService {
             List<AnnounceModel> announceModelList = value.getAnnounces();
             for (AnnounceModel model : announceModelList) {
                 boolean isThere = false;
-                for (int k = 0; k < model.getLikes().size(); k++) {
+                int k = 0;
+                while (k < model.getLikes().size() && !isThere) {
                     LikesPost likesPost = model.getLikes().get(k);
-                    isThere = likesPost.getIdCandidate() == idConnected;
+                    if (likesPost.getIdCandidate() != idConnected) {
+                        k += 1;
+                    } else isThere = true;
                 }
                 booleanList.add(isThere);
             }
@@ -231,9 +292,12 @@ public class AnnouncementService implements IAnnouncementService {
             for (AnnounceModel model : announceModelList) {
                 if (model.getIdCompany() == idConnected) {
                     boolean isThere = false;
-                    for (int k = 0; k < model.getLikes().size(); k++) {
+                    int k = 0;
+                    while (k < model.getLikes().size() && !isThere) {
                         LikesPost likesPost = model.getLikes().get(k);
-                        isThere = likesPost.getIdCandidate() == idConnected;
+                        if (likesPost.getIdCandidate() != idConnected) {
+                            k += 1;
+                        } else isThere = true;
                     }
                     booleanList.add(isThere);
                 }
@@ -249,13 +313,7 @@ public class AnnouncementService implements IAnnouncementService {
 
         List<AnnounceModel> announceModelList = user.getAnnounces();
         for (AnnounceModel model : announceModelList) {
-            int isThere = 0;
-            for (int k = 0; k < model.getLikes().size(); k++) {
-                LikesPost likesPost = model.getLikes().get(k);
-                if (likesPost.getIdCandidate() == idConnected)
-                    isThere += 1;
-            }
-            booleanList.add(isThere);
+            booleanList.add(model.getLikes().size());
         }
         return booleanList;
     }
@@ -267,65 +325,84 @@ public class AnnouncementService implements IAnnouncementService {
 
         List<AnnounceModel> announceModelList = user.getAnnounces();
         for (AnnounceModel model : announceModelList) {
-            int isThere = 0;
-            for (int k = 0; k < model.getComments().size(); k++) {
-                CommentsPost likesPost = model.getComments().get(k);
-                if (likesPost.getIdCandidate() == idConnected)
-                    isThere += 1;
-            }
-            booleanList.add(isThere);
+            booleanList.add(model.getComments().size());
         }
         return booleanList;
     }
 
     @Override
-    public List<CommentsPost> getCommentAllPostsCompany(int idAnnounce, int idConnected) {
-        User user = userRepository.findById(idConnected).orElseThrow();
+    public List<Integer> getNumberLikeAllPosts() {
+        List<User> users = userRepository.findAll();
+        List<Integer> booleanList = new ArrayList<>();
+
+        for (User user : users) {
+            if (user.getRole().equals("Company") || user.getRole().equals("Entreprise")) {
+                List<AnnounceModel> announceModelList = user.getAnnounces();
+                for (AnnounceModel model : announceModelList) {
+                    booleanList.add(model.getLikes().size());
+                }
+            }
+        }
+
+        return booleanList;
+    }
+
+    @Override
+    public List<Integer> getNumberCommentAllPosts() {
+        List<User> users = userRepository.findAll();
+        List<Integer> booleanList = new ArrayList<>();
+
+        for (User user : users) {
+            if (user.getRole().equals("Company") || user.getRole().equals("Entreprise")) {
+                List<AnnounceModel> announceModelList = user.getAnnounces();
+                for (AnnounceModel model : announceModelList) {
+                    booleanList.add(model.getComments().size());
+                }
+            }
+        }
+        return booleanList;
+    }
+
+    @Override
+    public List<CommentsPost> getCommentAllPostsCompany(int idAnnounce) {
+        List<AnnounceModel> announceList = userRepository.getComments(idAnnounce);
         List<CommentsPost> commentList = new ArrayList<>();
 
-
-        List<AnnounceModel> announceModelList = user.getAnnounces().stream().filter(announceModel ->
-                announceModel.getIdAnnounce() == idAnnounce
-        ).toList();
-        for (AnnounceModel model : announceModelList) {
-            commentList.addAll(model.getComments());
+        if (!announceList.isEmpty()) {
+            for (AnnounceModel model : announceList) {
+                commentList.addAll(model.getComments());
+            }
         }
+
         return commentList;
     }
 
     @Override
-    public List<Integer> getNumberLikeAllPosts(int idConnected) {
-        User user = userRepository.findById(idConnected).orElseThrow();
-        List<Integer> booleanList = new ArrayList<>();
+    public ExperienceResponse deletePostCompany(int idAnnounce, int idConnected) {
+        Optional<User> userValue = userRepository.findById(idConnected);
+        String confirm = "";
+        if (userValue.isPresent()) {
+            User user = userValue.get();
+            List<AnnounceModel> announceModelList = user.getAnnounces().stream().filter(announceModel ->
+                    announceModel.getIdAnnounce() == idAnnounce
+            ).toList();
 
-        List<AnnounceModel> announceModelList = user.getAnnounces();
-        for (AnnounceModel model : announceModelList) {
-            int isThere = 0;
-            for (int k = 0; k < model.getLikes().size(); k++) {
-                LikesPost likesPost = model.getLikes().get(k);
-                if (likesPost.getIdCandidate() == idConnected)
-                    isThere += 1;
+            if (announceModelList.isEmpty()) {
+                confirm = "Annonce n'existe pas";
+            } else {
+                List<AnnounceModel> list = user.getAnnounces();
+                list.remove(announceModelList.get(0));
+                user.setAnnounces(list);
+
+                userRepository.save(user);
+                confirm = "deleted successfully";
             }
-            booleanList.add(isThere);
-        }
-        return booleanList;
-    }
+        } else confirm = "Utilisateur non trouvé";
 
-    @Override
-    public List<Integer> getNumberCommentAllPosts(int idConnected) {
-        User user = userRepository.findById(idConnected).orElseThrow();
-        List<Integer> booleanList = new ArrayList<>();
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(5211);
+        experienceResponse.setMessage(confirm);
 
-        List<AnnounceModel> announceModelList = user.getAnnounces();
-        for (AnnounceModel model : announceModelList) {
-            int isThere = 0;
-            for (int k = 0; k < model.getComments().size(); k++) {
-                CommentsPost likesPost = model.getComments().get(k);
-                if (likesPost.getIdCandidate() == idConnected)
-                    isThere += 1;
-            }
-            booleanList.add(isThere);
-        }
-        return booleanList;
+        return experienceResponse;
     }
 }

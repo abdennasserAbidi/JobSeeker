@@ -5,8 +5,9 @@ import com.myjob.jobseeker.dtos.NotificationMessage;
 import com.myjob.jobseeker.interfaces.IAnnouncementService;
 import com.myjob.jobseeker.interfaces.INotificationService;
 import com.myjob.jobseeker.interfaces.IUserService;
-import com.myjob.jobseeker.model.AnnounceModel;
+import com.myjob.jobseeker.model.announces.AnnounceModel;
 import com.myjob.jobseeker.model.User;
+import com.myjob.jobseeker.model.announces.AnnounceResponse;
 import com.myjob.jobseeker.model.post.CommentsPost;
 import com.myjob.jobseeker.model.post.LikesPost;
 import lombok.AllArgsConstructor;
@@ -84,6 +85,28 @@ public class AnnouncementController {
         return ResponseEntity.ok(announce);
     }
 
+    @GetMapping("/findAnnounceCompany")
+    public ResponseEntity<AnnounceResponse> findAnnounceCompany(
+            @RequestParam String type,
+            @RequestParam int idCompany
+    ) {
+
+        AnnounceResponse announce = announcementService.findAnnounceCompany(type, idCompany);
+
+        return ResponseEntity.ok(announce);
+    }
+
+    @GetMapping("/findAnnounceCandidate")
+    public ResponseEntity<Page<AnnounceModel>> findAnnounceCandidate(
+            @RequestParam String type,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        Page<AnnounceModel> announce = announcementService.findAnnounceCandidate(type, page, size);
+
+        return ResponseEntity.ok(announce);
+    }
+
     @GetMapping("/checkUserLike")
     public ResponseEntity<Boolean> checkUserLike(
             @RequestParam int idAnnounce,
@@ -112,21 +135,20 @@ public class AnnouncementController {
         return ResponseEntity.ok(isAllThere);
     }
 
-    @GetMapping("/getNumberCommentAllPostsCompany")
-    public ResponseEntity<List<Integer>> getNumberCommentAllPostsCompany(
-            @RequestParam int idConnected) {
-
-        List<Integer> isAllThere = announcementService.getNumberCommentAllPostsCompany(idConnected);
-
-        return ResponseEntity.ok(isAllThere);
-    }
-
-    @GetMapping("/getCommentAllPostsCompany")
-    public ResponseEntity<List<CommentsPost>> getCommentAllPostsCompany(
+    @PostMapping("/deletePostCompany")
+    public ResponseEntity<ExperienceResponse> deletePostCompany(
             @RequestParam int idAnnounce,
             @RequestParam int idConnected) {
 
-        List<CommentsPost> isAllThere = announcementService.getCommentAllPostsCompany(idAnnounce, idConnected);
+        ExperienceResponse delete = announcementService.deletePostCompany(idAnnounce, idConnected);
+
+        return ResponseEntity.ok(delete);
+    }
+
+    @GetMapping("/getCommentAllPostsCompany")
+    public ResponseEntity<List<CommentsPost>> getCommentAllPostsCompany(@RequestParam int idAnnounce) {
+
+        List<CommentsPost> isAllThere = announcementService.getCommentAllPostsCompany(idAnnounce);
 
         return ResponseEntity.ok(isAllThere);
     }
@@ -141,19 +163,24 @@ public class AnnouncementController {
     }
 
     @GetMapping("/getNumberLikeAllPosts")
-    public ResponseEntity<List<Integer>> getNumberLikeAllPosts(
-            @RequestParam int idConnected) {
+    public ResponseEntity<List<Integer>> getNumberLikeAllPosts() {
 
-        List<Integer> isAllThere = announcementService.getNumberLikeAllPosts(idConnected);
+        List<Integer> isAllThere = announcementService.getNumberLikeAllPosts();
 
         return ResponseEntity.ok(isAllThere);
     }
 
     @GetMapping("/getNumberCommentAllPosts")
-    public ResponseEntity<List<Integer>> getNumberCommentAllPosts(
+    public ResponseEntity<List<Integer>> getNumberCommentAllPosts() {
+        List<Integer> isAllThere = announcementService.getNumberCommentAllPosts();
+        return ResponseEntity.ok(isAllThere);
+    }
+
+    @GetMapping("/getNumberCommentAllPostsCompany")
+    public ResponseEntity<List<Integer>> getNumberCommentAllPostsCompany(
             @RequestParam int idConnected) {
 
-        List<Integer> isAllThere = announcementService.getNumberCommentAllPosts(idConnected);
+        List<Integer> isAllThere = announcementService.getNumberCommentAllPostsCompany(idConnected);
 
         return ResponseEntity.ok(isAllThere);
     }
