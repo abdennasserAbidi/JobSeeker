@@ -4,30 +4,68 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.myjob.jobseeker.interfaces.FileUpload;
 import com.myjob.jobseeker.model.Documents;
+import com.myjob.jobseeker.model.User;
+import com.myjob.jobseeker.model.ValidationStatus;
+import com.myjob.jobseeker.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class FileUploadimpl implements FileUpload {
 
     private final Cloudinary cloudinary;
+    private final UserRepository userRepository;
 
     @Override
-    public String uploadFile(MultipartFile multipartFile) throws IOException {
-        System.out.println("dahgklehglehagjehja    "+multipartFile.getOriginalFilename());
-        return cloudinary.uploader()
+    public Map<String, String> uploadFile(int idUser, MultipartFile multipartFile) throws IOException {
+
+        Map uploadResult = cloudinary.uploader()
                 .upload(multipartFile.getBytes(),
                         ObjectUtils.asMap(
-                                "resource_type", "raw",
-                                "public_id", multipartFile.getOriginalFilename()
+                                "resource_type", "image",
+                                "folder", multipartFile.getOriginalFilename()
                         )
-                )
-                .get("url")
-                .toString();
+                );
+
+        String secureUrl = uploadResult.get("secure_url").toString(); // URL with version
+        String version = uploadResult.get("version").toString();      // just the version
+        String publicId = uploadResult.get("public_id").toString();   // asset ID
+
+        Map<String, String> result = new HashMap<>();
+        result.put("secure_url", secureUrl);
+        result.put("version", version);
+        result.put("public_id", publicId);
+
+        User user = userRepository.findById(idUser).orElseThrow();
+        ValidationStatus v = user.getValidationStatus();
+
+        List<String> list = extractNumbers(multipartFile.getOriginalFilename());
+        if (!list.isEmpty()) {
+            int id = Integer.parseInt(list.get(0));
+
+            List<Documents> documents = v.getDocuments();
+            for (Documents doc : documents) {
+                if (doc.getId() == id) {
+                    doc.setUrl(secureUrl);
+                }
+            }
+            v.setDocuments(documents);
+            user.setValidationStatus(v);
+
+            userRepository.save(user);
+        }
+
+        return result;
     }
 
     @Override
@@ -48,5 +86,14 @@ public class FileUploadimpl implements FileUpload {
         }
 
         return documentUrl;
+    }
+
+    List<String> extractNumbers(String input) {
+        List<String> numbers = new ArrayList<>();
+        Matcher matcher = Pattern.compile("\\d+").matcher(input);
+        while (matcher.find()) {
+            numbers.add(matcher.group());
+        }
+        return numbers;
     }
 }

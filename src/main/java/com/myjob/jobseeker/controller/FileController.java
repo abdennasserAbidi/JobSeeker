@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/auth")
 @RestController
@@ -76,9 +77,22 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile multipartFile) {
+    public ResponseEntity<?> uploadImage(
+            @RequestParam("idUser") int idUser,
+            @RequestParam("image") MultipartFile multipartFile
+    ) {
         try {
-            String imageURL = fileUpload.uploadFile(multipartFile);
+            Map<String, String> result = fileUpload.uploadFile(idUser, multipartFile);
+
+            String imageURL = result.get("secure_url");
+            String version = result.get("version");
+            String publicId = result.get("version");
+
+
+
+            System.out.println("grzkgjzlgrjglmjgrglmjrlglrz    imageURL    "+imageURL);
+            System.out.println("grzkgjzlgrjglmjgrglmjrlglrz    version    "+version);
+
             JSONObject jsonResponse = new JSONObject();
             jsonResponse.put("imageURL", imageURL);
             return ResponseEntity.ok(jsonResponse.toString());
@@ -94,7 +108,8 @@ public class FileController {
             UserResponse user = authService.getUser(id);
             List<Documents> documents = user.getUser().getValidationStatus().getDocuments();
             for (Documents doc : documents) {
-                list.add(fileUpload.getFile(doc));
+                //list.add(fileUpload.getFile(doc));
+                list.add(doc.getUrl());
             }
 
             FileResponse fileResponse = new FileResponse();

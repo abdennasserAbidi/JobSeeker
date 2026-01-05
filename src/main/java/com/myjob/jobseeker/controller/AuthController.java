@@ -46,15 +46,24 @@ public class AuthController {
 
     @PostMapping("/validate-profile-candidate")
     public ResponseEntity<EmailResponse> validateCandidateProfile(@RequestBody ValidationStatus validationStatus) {
-        authenticationService.saveCandidateStatus(validationStatus);
-
-        if (validationStatus.getTypeValidation().equals("interview")) {
-            emailService.sendLinkValidation(validationStatus.getEmail());
-        }
 
         EmailResponse emailResponse = new EmailResponse();
         emailResponse.setId(1);
-        emailResponse.setMessage("Check your email to validate your account");
+
+        try {
+            authenticationService.saveCandidateStatus(validationStatus);
+
+            if (validationStatus.getTypeValidation().equals("interview")) {
+                emailService.sendLinkValidation(validationStatus.getEmail());
+                emailResponse.setMessage("Check your email to validate your account");
+            } else if (validationStatus.getTypeValidation().equals("doc")) {
+                emailResponse.setMessage("your docs has uploaded");
+            } else
+                emailResponse.setMessage("Check your email to validate your account");
+
+        } catch (Exception exception) {
+            emailResponse.setMessage(exception.getMessage());
+        }
 
         return ResponseEntity.ok(emailResponse);
     }

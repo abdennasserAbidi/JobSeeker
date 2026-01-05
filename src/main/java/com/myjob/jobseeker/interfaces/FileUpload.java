@@ -4,8 +4,9 @@ import com.myjob.jobseeker.model.Documents;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 
 public interface FileUpload {
-    String uploadFile(MultipartFile multipartFile) throws IOException;
+    Map<String, String> uploadFile(int idUser, MultipartFile multipartFile) throws IOException;
     String getFile(Documents documents);
 }
