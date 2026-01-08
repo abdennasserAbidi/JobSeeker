@@ -33,7 +33,7 @@ public class JobseekerApplication {
 				.load();
 
 		// Set environment variables for Spring
-		System.setProperty("SERVER_PORT", dotenv.get("SERVER_PORT"));
+		/*System.setProperty("SERVER_PORT", dotenv.get("SERVER_PORT"));
 		System.setProperty("SOCKET_HOST", dotenv.get("SOCKET_HOST"));
 		System.setProperty("SPRING_DATA_MONGODB_URI", dotenv.get("SPRING_DATA_MONGODB_URI"));
 		System.setProperty("SECURITY_JWT_SECRET_KEY", dotenv.get("SECURITY_JWT_SECRET_KEY"));
@@ -48,7 +48,7 @@ public class JobseekerApplication {
 		System.setProperty("CLOUDINARY_API_SECRET", dotenv.get("CLOUDINARY_API_SECRET"));
 		System.setProperty("CLOUDINARY_API_KEY", dotenv.get("CLOUDINARY_API_KEY"));
 		System.setProperty("CLOUDINARY_CLOUD_NAME", dotenv.get("CLOUDINARY_CLOUD_NAME"));
-		System.setProperty("RESEND_API_KEY", dotenv.get("RESEND_API_KEY"));
+		System.setProperty("RESEND_API_KEY", dotenv.get("RESEND_API_KEY"));*/
 
 
 		SpringApplication.run(JobseekerApplication.class, args);
