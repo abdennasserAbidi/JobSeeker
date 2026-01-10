@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -59,6 +60,9 @@ public class MessageRepositoryImpl implements MessageRepository {
                                 Criteria.where("userReceivedId").is(id)
                         )
                 ),
+                Aggregation.group("userConnectedName")
+                        .first("$$ROOT").as("message"),
+                Aggregation.replaceRoot("message"),
                 Aggregation.skip(skip),
                 Aggregation.limit(size)
         );
@@ -70,15 +74,24 @@ public class MessageRepositoryImpl implements MessageRepository {
                 ChatModel.class
         );
 
-        long total = mongoTemplate.count(
-                new Query(
+        // Count total unique conversations
+        Aggregation countAggregation = Aggregation.newAggregation(
+                Aggregation.match(
                         new Criteria().orOperator(
                                 Criteria.where("userConnectedId").is(id),
                                 Criteria.where("userReceivedId").is(id)
                         )
                 ),
-                "messages"
+                Aggregation.group("userConnectedName")
+                        .first("$$ROOT").as("message"),  // Store entire document
+                Aggregation.replaceRoot("message")
         );
+
+        long total = mongoTemplate.aggregate(
+                countAggregation,
+                "messages",
+                ChatModel.class
+        ).getMappedResults().size();
 
         return new PageImpl<>(results.getMappedResults(), PageRequest.of(page, size), total);
     }

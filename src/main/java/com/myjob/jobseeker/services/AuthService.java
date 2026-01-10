@@ -85,30 +85,39 @@ public class AuthService implements IAuthService {
     public UserResponse authenticate(LoginUserDto input) {
         UserResponse userResponse = new UserResponse();
 
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            input.getEmail(),
-                            input.getPassword()
-                    )
-            );
-
+        if (input.getPassword().isEmpty()) {
             Optional<User> user = userRepository.findByEmail(input.getEmail());
             User user1 = user.orElseGet(User::new);
             userResponse.setUser(user1);
             if (user1.getId() == 0) userResponse.setMessage("There are no such user");
             else userResponse.setMessage("");
+        } else {
+            try {
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                input.getEmail(),
+                                input.getPassword()
+                        )
+                );
 
-        } catch (Exception exception) {
-            userResponse.setUser(new User());
-            if (exception instanceof BadCredentialsException)
-                userResponse.setMessage("email or password incorrect");
-            else if (exception instanceof DisabledException)
-                userResponse.setMessage("Ce compte est désactivé");
-            else if (exception instanceof LockedException)
-                userResponse.setMessage("Ce compte est bloqué");
-            else userResponse.setMessage("email or password incorrect");
+                Optional<User> user = userRepository.findByEmail(input.getEmail());
+                User user1 = user.orElseGet(User::new);
+                userResponse.setUser(user1);
+                if (user1.getId() == 0) userResponse.setMessage("There are no such user");
+                else userResponse.setMessage("");
+
+            } catch (Exception exception) {
+                userResponse.setUser(new User());
+                if (exception instanceof BadCredentialsException)
+                    userResponse.setMessage("email or password incorrect");
+                else if (exception instanceof DisabledException)
+                    userResponse.setMessage("Ce compte est désactivé");
+                else if (exception instanceof LockedException)
+                    userResponse.setMessage("Ce compte est bloqué");
+                else userResponse.setMessage("email or password incorrect");
+            }
         }
+
         return userResponse;
     }
 
