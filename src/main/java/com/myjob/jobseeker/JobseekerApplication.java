@@ -10,18 +10,31 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 
 @SpringBootApplication
 public class JobseekerApplication {
 
-	@Bean
+	/*@Bean
 	FirebaseMessaging firebaseMessaging () throws IOException {
 		GoogleCredentials googleCredentials = GoogleCredentials.fromStream(
-				new ClassPathResource("firebase-service-account.json").getInputStream()
+				new ClassPathResource("/opt/backend/firebase/firebase-service-account.json").getInputStream()
 		);
 		FirebaseOptions firebaseOptions = FirebaseOptions.builder()
 				.setCredentials(googleCredentials).build();
+		FirebaseApp firebaseApp = FirebaseApp.initializeApp(firebaseOptions, "My_App");
+		return FirebaseMessaging.getInstance(firebaseApp);
+	}*/
+
+	@Bean
+	FirebaseMessaging firebaseMessaging() throws IOException {
+		FileInputStream serviceAccount = new FileInputStream("/opt/backend/firebase/firebase-service-account.json");
+
+		FirebaseOptions firebaseOptions = FirebaseOptions.builder()
+				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+				.build();
+
 		FirebaseApp firebaseApp = FirebaseApp.initializeApp(firebaseOptions, "My_App");
 		return FirebaseMessaging.getInstance(firebaseApp);
 	}
