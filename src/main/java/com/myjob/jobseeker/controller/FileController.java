@@ -88,10 +88,26 @@ public class FileController {
             String version = result.get("version");
             String publicId = result.get("version");
 
+            JSONObject jsonResponse = new JSONObject();
+            jsonResponse.put("imageURL", result.get("secure_url"));
+            return ResponseEntity.ok(jsonResponse.toString());
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Une erreur s'est produite lors du téléchargement de l'image.");
+        }
+    }
 
+    @PostMapping("/uploadChat")
+    public ResponseEntity<?> uploadImageChat(
+            @RequestParam("idFrom") int idFrom,
+            @RequestParam("idTo") int idTo,
+            @RequestParam("image") MultipartFile multipartFile
+    ) {
+        try {
+            Map<String, String> result = fileUpload.uploadFileChat(idFrom, idTo, multipartFile);
 
-            System.out.println("grzkgjzlgrjglmjgrglmjrlglrz    imageURL    "+imageURL);
-            System.out.println("grzkgjzlgrjglmjgrglmjrlglrz    version    "+version);
+            String imageURL = result.get("secure_url");
+            String version = result.get("version");
+            String publicId = result.get("version");
 
             JSONObject jsonResponse = new JSONObject();
             jsonResponse.put("imageURL", imageURL);

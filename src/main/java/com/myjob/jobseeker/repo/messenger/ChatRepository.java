@@ -31,4 +31,6 @@ public interface ChatRepository extends MongoRepository<ChatModel, Integer>, Mes
         }
     """)
     Page<ChatModel> findAllMessagesForUser(int userId, Pageable pageable);
+
+    List<ChatModel> findByUserConnectedId(int userConnectedId);
 }
