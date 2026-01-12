@@ -9,9 +9,9 @@ import com.myjob.jobseeker.model.NotificationModel;
 import com.myjob.jobseeker.repo.UserRepository;
 import com.myjob.jobseeker.repo.notification.NotifRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.View;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,13 +21,15 @@ public class NotificationService implements INotificationService {
     private final FirebaseMessaging firebaseMessaging;
     private final UserRepository userRepository;
     private final NotifRepository notifRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     private static final AtomicInteger idCounter = new AtomicInteger();
 
-    public NotificationService(FirebaseMessaging firebaseMessaging, UserRepository userRepository, NotifRepository notifRepository) {
+    public NotificationService(FirebaseMessaging firebaseMessaging, UserRepository userRepository, NotifRepository notifRepository, SimpMessagingTemplate messagingTemplate) {
         this.firebaseMessaging = firebaseMessaging;
         this.userRepository = userRepository;
         this.notifRepository = notifRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Override
@@ -75,6 +77,13 @@ public class NotificationService implements INotificationService {
             //notificationModel.setDate();
 
             notifRepository.save(notificationModel);
+
+            // Send to recipient
+            messagingTemplate.convertAndSendToUser(
+                    data.get("idReceiver"),
+                    "/queue/notifications",
+                    notificationModel
+            );
 
             return "Success sending notification";
         } catch (Exception e) {
