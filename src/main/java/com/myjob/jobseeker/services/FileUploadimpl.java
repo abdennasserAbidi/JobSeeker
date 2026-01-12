@@ -88,11 +88,19 @@ public class FileUploadimpl implements FileUpload {
         result.put("public_id", publicId);
 
         List<ChatModel> listChat = messageRepository.findConversation(idFrom, idTo);
-
+        System.out.println("rzjgrhgrhzgzrgzh   idFrom   "+idFrom);
+        System.out.println("rzjgrhgrhzgzrgzh   idTo     "+idTo);
+        System.out.println("rzjgrhgrhzgzrgzh   "+listChat);
         for (ChatModel chatModel: listChat) {
             List<String> documents = chatModel.getDocuments();
-            documents.add(secureUrl);
-            chatModel.setDocuments(documents);
+            if (documents != null) {
+                documents.add(secureUrl);
+                chatModel.setDocuments(documents);
+            } else {
+                List<String> doc = new ArrayList<>();
+                doc.add(secureUrl);
+                chatModel.setDocuments(doc);
+            }
         }
 
         messageRepository.saveAll(listChat);

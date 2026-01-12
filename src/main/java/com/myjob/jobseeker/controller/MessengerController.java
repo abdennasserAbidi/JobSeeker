@@ -47,7 +47,7 @@ public class MessengerController {
 
         // Save to DB
         ChatModel saved = messengerService.saveMessage(msg);
-
+        System.out.println("rzjgrhgrhzgzrgzh   saved     "+saved);
         // Send to recipient
         messagingTemplate.convertAndSendToUser(
                 String.valueOf(msg.getUserReceivedId()),
