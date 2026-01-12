@@ -16,18 +16,18 @@ import java.io.IOException;
 @SpringBootApplication
 public class JobseekerApplication {
 
-	/*@Bean
+	@Bean
 	FirebaseMessaging firebaseMessaging () throws IOException {
 		GoogleCredentials googleCredentials = GoogleCredentials.fromStream(
-				new ClassPathResource("/opt/backend/firebase/firebase-service-account.json").getInputStream()
+				new ClassPathResource("firebase-service-account.json").getInputStream()
 		);
 		FirebaseOptions firebaseOptions = FirebaseOptions.builder()
 				.setCredentials(googleCredentials).build();
 		FirebaseApp firebaseApp = FirebaseApp.initializeApp(firebaseOptions, "My_App");
 		return FirebaseMessaging.getInstance(firebaseApp);
-	}*/
+	}
 
-	@Bean
+	/*@Bean
 	FirebaseMessaging firebaseMessaging() throws IOException {
 		FileInputStream serviceAccount = new FileInputStream("/opt/backend/firebase/firebase-service-account.json");
 
@@ -37,7 +37,7 @@ public class JobseekerApplication {
 
 		FirebaseApp firebaseApp = FirebaseApp.initializeApp(firebaseOptions, "My_App");
 		return FirebaseMessaging.getInstance(firebaseApp);
-	}
+	}*/
 
 	public static void main(String[] args) {
 		// Load .env file
