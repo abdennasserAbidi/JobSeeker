@@ -108,6 +108,28 @@ public class FileUploadimpl implements FileUpload {
         return result;
     }
 
+    public Map<String, String> uploadFileChatDirect(MultipartFile multipartFile) throws IOException {
+
+        Map uploadResult = cloudinary.uploader()
+                .upload(multipartFile.getBytes(),
+                        ObjectUtils.asMap(
+                                "resource_type", "image",
+                                "folder", multipartFile.getOriginalFilename()
+                        )
+                );
+
+        String secureUrl = uploadResult.get("secure_url").toString(); // URL with version
+        String version = uploadResult.get("version").toString();      // just the version
+        String publicId = uploadResult.get("public_id").toString();   // asset ID
+
+        Map<String, String> result = new HashMap<>();
+        result.put("secure_url", secureUrl);
+        result.put("version", version);
+        result.put("public_id", publicId);
+
+        return result;
+    }
+
     @Override
     public String getFile(Documents documents) {
         System.out.println("vbfbfgdfdfdfch   "+documents.getId());

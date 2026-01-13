@@ -47,7 +47,21 @@ public class MessengerController {
 
         // Save to DB
         ChatModel saved = messengerService.saveMessage(msg);
-        System.out.println("rzjgrhgrhzgzrgzh   saved     "+saved);
+        // Send to recipient
+        messagingTemplate.convertAndSendToUser(
+                String.valueOf(msg.getUserReceivedId()),
+                "/queue/messages",
+                saved
+        );
+    }
+
+    @MessageMapping("/image.send")
+    public void sendImage(ChatModel msg, Principal principal) {
+
+        msg.setTimestamp(System.currentTimeMillis());
+
+        // Save to DB
+        ChatModel saved = messengerService.saveMessage(msg);
         // Send to recipient
         messagingTemplate.convertAndSendToUser(
                 String.valueOf(msg.getUserReceivedId()),
