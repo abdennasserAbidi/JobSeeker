@@ -8,7 +8,8 @@ import com.myjob.jobseeker.model.ValidationStatus;
 import org.springframework.data.domain.Page;
 
 public interface IAuthService {
-    void verifyAccountCompany(int id);
+    NotificationMessage verifyAccountCompany(int id, String status);
+    NotificationMessage verifyAccountCandidate(int id, String status);
     String updateToken(int email, String token);
     UserResponse signup(RegisterUserDto input);
     UserResponse authenticate(LoginUserDto input);

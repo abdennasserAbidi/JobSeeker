@@ -4,19 +4,18 @@ import com.myjob.jobseeker.dtos.*;
 import com.myjob.jobseeker.interfaces.IAuthService;
 import com.myjob.jobseeker.model.*;
 import com.myjob.jobseeker.repo.UserRepository;
+import com.myjob.jobseeker.repo.notification.NotifRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class AuthService implements IAuthService {
@@ -25,25 +24,24 @@ public class AuthService implements IAuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final PasswordResetService passwordResetService;
+    private final NotifRepository notifRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+    private static final AtomicInteger idCounter = new AtomicInteger();
 
     @Autowired
     public AuthService(UserRepository userRepository,
                        AuthenticationManager authenticationManager,
                        PasswordEncoder passwordEncoder,
-                       PasswordResetService passwordResetService) {
+                       PasswordResetService passwordResetService,
+                       NotifRepository notifRepository,
+                       SimpMessagingTemplate messagingTemplate
+    ) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.passwordResetService = passwordResetService;
-    }
-
-    @Override
-    public void verifyAccountCompany(int id) {
-        Optional<User> user = userRepository.findById(id);
-        user.ifPresent(u -> {
-            u.setVerified(true);
-            userRepository.save(u);
-        });
+        this.notifRepository = notifRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Override
@@ -185,10 +183,57 @@ public class AuthService implements IAuthService {
     }
 
     @Override
+    public NotificationMessage verifyAccountCandidate(int id, String status) {
+        Optional<User> user = userRepository.findById(id);
+        NotificationMessage notificationMessage = new NotificationMessage();
+
+        user.ifPresent(u -> {
+            u.setVerified(status.equals("VERIFIED"));
+            u.getValidationStatus().setStatus(status);
+            userRepository.save(u);
+
+            Map<String, String> data = new HashMap<>();
+            data.put("validation", "validation");
+
+            notificationMessage.setRecipientToken(u.getFcmToken());
+            if (status.equals("VERIFIED")) notificationMessage.setBody("Votre profile est vérifié");
+            else notificationMessage.setBody("Votre profile n'est vérifié");
+
+            notificationMessage.setTitle("Vérification profile");
+            notificationMessage.setData(data);
+        });
+        return notificationMessage;
+    }
+
+    @Override
+    public NotificationMessage verifyAccountCompany(int id, String status) {
+        NotificationMessage notificationMessage = new NotificationMessage();
+        Optional<User> user = userRepository.findById(id);
+        user.ifPresent(u -> {
+            u.setVerified(status.equals("VERIFIED"));
+            u.getValidationStatus().setStatus(status);
+            userRepository.save(u);
+
+            Map<String, String> data = new HashMap<>();
+            data.put("validation", "validation");
+
+            notificationMessage.setRecipientToken(u.getFcmToken());
+            if (status.equals("VERIFIED")) notificationMessage.setBody("Votre profile est vérifié");
+            else notificationMessage.setBody("Votre profile n'est vérifié");
+
+            notificationMessage.setTitle("Vérification profile");
+            notificationMessage.setData(data);
+        });
+
+        return notificationMessage;
+    }
+
+    @Override
     public java.util.List<ValidationStatus> getListStatusCandidateValidation(int id) {
         User user = userRepository.findById(id).orElseThrow();
         return user.getValidationStepStatus();
     }
+
     @Override
     public Page<User> getByCriteria(Criteria criteria, int page, int size) {
         List<User> users = userRepository.searchUsers(criteria);

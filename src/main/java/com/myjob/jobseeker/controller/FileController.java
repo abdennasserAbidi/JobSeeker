@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RequestMapping("/auth")
 @RestController
@@ -41,6 +42,7 @@ public class FileController {
 
     private final IMessengerService messengerService;
     private final SimpMessagingTemplate messagingTemplate;
+    private static final AtomicInteger idCounter = new AtomicInteger();
 
     @PostMapping("/uploadCV")
     public ResponseEntity<ExperienceResponse> uploadFileCV(@RequestParam("file") MultipartFile file) {
@@ -159,7 +161,7 @@ public class FileController {
                 chatModel.setUserReceivedName(userTo.getFullName());
             } else chatModel.setUserReceivedName(userTo.getCompanyName());
 
-            chatModel.setId(4353053);
+            chatModel.setId(idCounter.incrementAndGet());
             chatModel.setUserConnectedId(idFrom);
             chatModel.setUserReceivedId(idTo);
             chatModel.setContent("");
@@ -170,7 +172,6 @@ public class FileController {
             chatModel.setTimestamp(System.currentTimeMillis());
 
             ChatModel saved = messengerService.saveMessage(chatModel);
-            System.out.println("fezghrgkzgr    "+saved);
             // Send to recipient
             messagingTemplate.convertAndSendToUser(
                     String.valueOf(idTo),

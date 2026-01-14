@@ -23,7 +23,9 @@ public class JobseekerApplication {
 		);
 		FirebaseOptions firebaseOptions = FirebaseOptions.builder()
 				.setCredentials(googleCredentials).build();
-		FirebaseApp firebaseApp = FirebaseApp.initializeApp(firebaseOptions, "My_App");
+
+
+		FirebaseApp firebaseApp = FirebaseApp.initializeApp(firebaseOptions, "dev project");
 		return FirebaseMessaging.getInstance(firebaseApp);
 	}
 
