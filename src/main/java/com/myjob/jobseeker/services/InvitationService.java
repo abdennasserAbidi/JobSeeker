@@ -7,8 +7,7 @@ import com.myjob.jobseeker.repo.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class InvitationService implements IInvitationService {
@@ -114,20 +113,23 @@ public class InvitationService implements IInvitationService {
 
     @Override
     public void deleteInvitation(int idInvitation, int idFrom) {
-        User user = userRepository.findById(idFrom).orElseThrow();
+        //User user = userRepository.findById(idFrom).orElseThrow();
+        Optional<User> user = userRepository.findById(idFrom);
 
         List<InvitationModel> newListInvitation = new ArrayList<>();
 
-        List<InvitationModel> listInvitations = user.getInvitations();
+        user.ifPresent(u -> {
+            List<InvitationModel> listInvitations = u.getInvitations();
 
-        for (InvitationModel invitationModel : listInvitations) {
-            if (invitationModel.getIdInvitation() != idInvitation) {
-                newListInvitation.add(invitationModel);
+            for (InvitationModel invitationModel : listInvitations) {
+                if (invitationModel.getIdInvitation() != idInvitation) {
+                    newListInvitation.add(invitationModel);
+                }
             }
-        }
 
-        user.setInvitations(newListInvitation);
-        userRepository.save(user);
+            u.setInvitations(newListInvitation);
+            userRepository.save(u);
+        });
     }
 
     @Override
