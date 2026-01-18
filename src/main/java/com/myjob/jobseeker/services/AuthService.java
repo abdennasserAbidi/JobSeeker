@@ -296,23 +296,14 @@ public class AuthService implements IAuthService {
         System.out.println("jgrklznhkrnzh  " + candidates);
 
         for (User candidat : allUsers) {
-            if (candidat.isCandidate()) {
+            if (candidat.getId() != id) {
                 newUsers.add(candidat);
             }
-        }
 
-        /*if (!user.getInvitations().isEmpty()) {
-            for (InvitationModel i : user.getInvitations()) {
-                ids.add(i.getIdTo());
-            }
-        }
-
-
-        for (User candidat : candidates) {
-            if (!ids.contains(candidat.getId())) {
+            /*if (candidat.isCandidate()) {
                 newUsers.add(candidat);
-            }
-        }*/
+            }*/
+        }
 
         int pageSize = Math.min(size, newUsers.size());
 

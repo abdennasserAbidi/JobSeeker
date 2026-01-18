@@ -23,6 +23,7 @@ public class InvitationModel {
     private boolean accepted = false;
     //candidate info
     private int idTo;
+    private String roleReceiver;
     private String date;
     private String fullName;
     private String gender;

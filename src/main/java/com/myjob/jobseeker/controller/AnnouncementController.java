@@ -57,7 +57,7 @@ public class AnnouncementController {
             NotificationMessage notificationMessage = new NotificationMessage();
             notificationMessage.setRecipientToken(user.getFcmToken());
             notificationMessage.setTitle(companyName);
-            notificationMessage.setBody("Cette entreprise vous a envoyé une invitation");
+            notificationMessage.setBody("Cette entreprise à publé une poste");
             notificationMessage.setData(data);
 
             sendNotificationAfterPost(notificationMessage);
