@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-
 public interface IAnnouncementService {
     void makeAnnouncement(int id, AnnounceModel input);
     void addComment(int idAnnounce, CommentsPost commentsPost);

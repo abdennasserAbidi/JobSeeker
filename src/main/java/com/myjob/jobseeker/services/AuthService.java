@@ -4,19 +4,18 @@ import com.myjob.jobseeker.dtos.*;
 import com.myjob.jobseeker.interfaces.IAuthService;
 import com.myjob.jobseeker.model.*;
 import com.myjob.jobseeker.repo.UserRepository;
+import com.myjob.jobseeker.repo.notification.NotifRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class AuthService implements IAuthService {
@@ -25,25 +24,24 @@ public class AuthService implements IAuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final PasswordResetService passwordResetService;
+    private final NotifRepository notifRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+    private static final AtomicInteger idCounter = new AtomicInteger();
 
     @Autowired
     public AuthService(UserRepository userRepository,
                        AuthenticationManager authenticationManager,
                        PasswordEncoder passwordEncoder,
-                       PasswordResetService passwordResetService) {
+                       PasswordResetService passwordResetService,
+                       NotifRepository notifRepository,
+                       SimpMessagingTemplate messagingTemplate
+    ) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.passwordResetService = passwordResetService;
-    }
-
-    @Override
-    public void verifyAccountCompany(int id) {
-        Optional<User> user = userRepository.findById(id);
-        user.ifPresent(u -> {
-            u.setVerified(true);
-            userRepository.save(u);
-        });
+        this.notifRepository = notifRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Override
@@ -85,30 +83,39 @@ public class AuthService implements IAuthService {
     public UserResponse authenticate(LoginUserDto input) {
         UserResponse userResponse = new UserResponse();
 
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            input.getEmail(),
-                            input.getPassword()
-                    )
-            );
-
+        if (input.getPassword().isEmpty()) {
             Optional<User> user = userRepository.findByEmail(input.getEmail());
             User user1 = user.orElseGet(User::new);
             userResponse.setUser(user1);
             if (user1.getId() == 0) userResponse.setMessage("There are no such user");
             else userResponse.setMessage("");
+        } else {
+            try {
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                input.getEmail(),
+                                input.getPassword()
+                        )
+                );
 
-        } catch (Exception exception) {
-            userResponse.setUser(new User());
-            if (exception instanceof BadCredentialsException)
-                userResponse.setMessage("email or password incorrect");
-            else if (exception instanceof DisabledException)
-                userResponse.setMessage("Ce compte est désactivé");
-            else if (exception instanceof LockedException)
-                userResponse.setMessage("Ce compte est bloqué");
-            else userResponse.setMessage("email or password incorrect");
+                Optional<User> user = userRepository.findByEmail(input.getEmail());
+                User user1 = user.orElseGet(User::new);
+                userResponse.setUser(user1);
+                if (user1.getId() == 0) userResponse.setMessage("There are no such user");
+                else userResponse.setMessage("");
+
+            } catch (Exception exception) {
+                userResponse.setUser(new User());
+                if (exception instanceof BadCredentialsException)
+                    userResponse.setMessage("email or password incorrect");
+                else if (exception instanceof DisabledException)
+                    userResponse.setMessage("Ce compte est désactivé");
+                else if (exception instanceof LockedException)
+                    userResponse.setMessage("Ce compte est bloqué");
+                else userResponse.setMessage("email or password incorrect");
+            }
         }
+
         return userResponse;
     }
 
@@ -176,10 +183,57 @@ public class AuthService implements IAuthService {
     }
 
     @Override
+    public NotificationMessage verifyAccountCandidate(int id, String status) {
+        Optional<User> user = userRepository.findById(id);
+        NotificationMessage notificationMessage = new NotificationMessage();
+
+        user.ifPresent(u -> {
+            u.setVerified(status.equals("VERIFIED"));
+            u.getValidationStatus().setStatus(status);
+            userRepository.save(u);
+
+            Map<String, String> data = new HashMap<>();
+            data.put("validation", "validation");
+
+            notificationMessage.setRecipientToken(u.getFcmToken());
+            if (status.equals("VERIFIED")) notificationMessage.setBody("Votre profile est vérifié");
+            else notificationMessage.setBody("Votre profile n'est vérifié");
+
+            notificationMessage.setTitle("Vérification profile");
+            notificationMessage.setData(data);
+        });
+        return notificationMessage;
+    }
+
+    @Override
+    public NotificationMessage verifyAccountCompany(int id, String status) {
+        NotificationMessage notificationMessage = new NotificationMessage();
+        Optional<User> user = userRepository.findById(id);
+        user.ifPresent(u -> {
+            u.setVerified(status.equals("VERIFIED"));
+            u.getValidationStatus().setStatus(status);
+            userRepository.save(u);
+
+            Map<String, String> data = new HashMap<>();
+            data.put("validation", "validation");
+
+            notificationMessage.setRecipientToken(u.getFcmToken());
+            if (status.equals("VERIFIED")) notificationMessage.setBody("Votre profile est vérifié");
+            else notificationMessage.setBody("Votre profile n'est vérifié");
+
+            notificationMessage.setTitle("Vérification profile");
+            notificationMessage.setData(data);
+        });
+
+        return notificationMessage;
+    }
+
+    @Override
     public java.util.List<ValidationStatus> getListStatusCandidateValidation(int id) {
         User user = userRepository.findById(id).orElseThrow();
         return user.getValidationStepStatus();
     }
+
     @Override
     public Page<User> getByCriteria(Criteria criteria, int page, int size) {
         List<User> users = userRepository.searchUsers(criteria);
@@ -239,26 +293,15 @@ public class AuthService implements IAuthService {
         List<User> candidates = userRepository.findByRole("Candidat");
         List<User> allUsers = userRepository.findAll();
 
-        System.out.println("jgrklznhkrnzh  " + candidates);
-
         for (User candidat : allUsers) {
-            if (candidat.isCandidate()) {
+            if (candidat.getId() != id && !candidat.isFirstTimeUse()) {
                 newUsers.add(candidat);
             }
-        }
 
-        /*if (!user.getInvitations().isEmpty()) {
-            for (InvitationModel i : user.getInvitations()) {
-                ids.add(i.getIdTo());
-            }
-        }
-
-
-        for (User candidat : candidates) {
-            if (!ids.contains(candidat.getId())) {
+            /*if (candidat.isCandidate()) {
                 newUsers.add(candidat);
-            }
-        }*/
+            }*/
+        }
 
         int pageSize = Math.min(size, newUsers.size());
 
@@ -296,6 +339,7 @@ public class AuthService implements IAuthService {
         user.setCompanyName(input.getCompanyName());
         user.setCompanyActivitySector(input.getCompanyActivitySector());
         user.setCompanyDescription(input.getCompanyDescription());
+        user.setCountry(input.getCountry());
         user.setLinkLinkedIn(input.getLinkLinkedIn());
         user.setFaxCompany(input.getFaxCompany());
         user.setPhoneCompany(input.getPhoneCompany());
@@ -354,6 +398,8 @@ public class AuthService implements IAuthService {
     @Override
     public void savePersonal(PersonalInfoDto input) {
         User user = userRepository.findById(input.getId()).orElseThrow();
+
+        System.out.println("fezhfealagaeghegl    "+input.getBio());
 
         user.setFullName(input.getFullName());
         user.setBio(input.getBio());

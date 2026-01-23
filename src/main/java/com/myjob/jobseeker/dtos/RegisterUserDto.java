@@ -12,9 +12,9 @@ public class RegisterUserDto {
     private int id;
 
     private String email;
-    
+
     private String password;
-    
+
     private String fullName;
 
     private String companyName;

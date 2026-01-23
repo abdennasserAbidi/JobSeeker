@@ -21,8 +21,10 @@ public class InvitationModel {
     private String reason;
     private String dateEnd;
     private boolean accepted = false;
+    private boolean vu = false;
     //candidate info
     private int idTo;
+    private String roleReceiver;
     private String date;
     private String fullName;
     private String gender;

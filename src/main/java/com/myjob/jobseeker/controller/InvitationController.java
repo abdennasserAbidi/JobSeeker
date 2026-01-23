@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class InvitationController {
     private final IInvitationService invitationService;
     private final INotificationService notificationService;
     private final IUserService userService;
+    private final SimpMessagingTemplate messagingTemplate;
 
 
     @GetMapping("/getCompanyInvitations")
@@ -83,6 +85,16 @@ public class InvitationController {
             notificationMessage.setData(data);
 
             sendNotificationAfterSendInvitation(notificationMessage, "candidate");
+
+            System.out.println("gtrrrrrrrrrrrrrrrr  "+idReceiver);
+            System.out.println("gtrrrrrrrrrrrrrrrr  "+invitationDto.getInvitationModel());
+
+            // Send to recipient
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(idReceiver),
+                    "/queue/invitations",
+                    invitationDto.getInvitationModel()
+            );
         }
 
         ExperienceResponse experienceResponse = new ExperienceResponse();

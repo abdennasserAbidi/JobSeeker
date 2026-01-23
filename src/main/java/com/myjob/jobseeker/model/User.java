@@ -49,7 +49,7 @@ public class User implements UserDetails {
     private boolean company;
 
     private String sexe;
-    
+
     private String birthDate;
 
     private String activitySector;
@@ -79,17 +79,17 @@ public class User implements UserDetails {
     private String phoneCompany;
 
     private String faxCompany;
-    
+
     private String linkLinkedIn;
-    
+
     private String companyActivitySector;
-    
+
     private String companyDescription;
 
     private String companyAddress;
 
     private String companySecondAddress;
-    
+
     private String secondPhoneCompany;
 
     private ValidationStatus validationStatus;

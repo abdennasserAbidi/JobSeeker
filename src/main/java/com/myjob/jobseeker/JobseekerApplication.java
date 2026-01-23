@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 
 @SpringBootApplication
@@ -22,9 +23,23 @@ public class JobseekerApplication {
 		);
 		FirebaseOptions firebaseOptions = FirebaseOptions.builder()
 				.setCredentials(googleCredentials).build();
-		FirebaseApp firebaseApp = FirebaseApp.initializeApp(firebaseOptions, "My_App");
+
+
+		FirebaseApp firebaseApp = FirebaseApp.initializeApp(firebaseOptions, "dev project");
 		return FirebaseMessaging.getInstance(firebaseApp);
 	}
+
+	/*@Bean
+	FirebaseMessaging firebaseMessaging() throws IOException {
+		FileInputStream serviceAccount = new FileInputStream("/opt/backend/firebase/firebase-service-account.json");
+
+		FirebaseOptions firebaseOptions = FirebaseOptions.builder()
+				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+				.build();
+
+		FirebaseApp firebaseApp = FirebaseApp.initializeApp(firebaseOptions, "My_App");
+		return FirebaseMessaging.getInstance(firebaseApp);
+	}*/
 
 	public static void main(String[] args) {
 		// Load .env file
@@ -33,7 +48,7 @@ public class JobseekerApplication {
 				.load();
 
 		// Set environment variables for Spring
-		System.setProperty("SERVER_PORT", dotenv.get("SERVER_PORT"));
+		/*System.setProperty("SERVER_PORT", dotenv.get("SERVER_PORT"));
 		System.setProperty("SOCKET_HOST", dotenv.get("SOCKET_HOST"));
 		System.setProperty("SPRING_DATA_MONGODB_URI", dotenv.get("SPRING_DATA_MONGODB_URI"));
 		System.setProperty("SECURITY_JWT_SECRET_KEY", dotenv.get("SECURITY_JWT_SECRET_KEY"));
@@ -48,7 +63,7 @@ public class JobseekerApplication {
 		System.setProperty("CLOUDINARY_API_SECRET", dotenv.get("CLOUDINARY_API_SECRET"));
 		System.setProperty("CLOUDINARY_API_KEY", dotenv.get("CLOUDINARY_API_KEY"));
 		System.setProperty("CLOUDINARY_CLOUD_NAME", dotenv.get("CLOUDINARY_CLOUD_NAME"));
-		System.setProperty("RESEND_API_KEY", dotenv.get("RESEND_API_KEY"));
+		System.setProperty("RESEND_API_KEY", dotenv.get("RESEND_API_KEY"));*/
 
 
 		SpringApplication.run(JobseekerApplication.class, args);

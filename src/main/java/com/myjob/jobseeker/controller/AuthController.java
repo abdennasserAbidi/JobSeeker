@@ -1,14 +1,19 @@
 package com.myjob.jobseeker.controller;
 
 import com.myjob.jobseeker.dtos.*;
-import com.myjob.jobseeker.model.*;
-import com.myjob.jobseeker.services.*;
+import com.myjob.jobseeker.interfaces.INotificationService;
+import com.myjob.jobseeker.model.LoginResponse;
+import com.myjob.jobseeker.model.ValidationStatus;
+import com.myjob.jobseeker.services.AuthService;
+import com.myjob.jobseeker.services.EmailService;
+import com.myjob.jobseeker.services.JwtService;
+import com.myjob.jobseeker.services.PasswordResetService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Objects;
 
 @RequestMapping("/auth")
 @RestController
@@ -20,13 +25,31 @@ public class AuthController {
     private final EmailService emailService;
     private final PasswordResetService passwordResetService;
     private final AuthService authenticationService;
-
+    private final INotificationService notificationService;
     ///////////////////////////////////////////////////////////////////////////
     // VERIFICATION
     ///////////////////////////////////////////////////////////////////////////
     @PostMapping("/verifyAccountCompany")
-    public ResponseEntity<ExperienceResponse> verifyAccountCompany(@RequestParam int id) {
-        authenticationService.verifyAccountCompany(id);
+    public ResponseEntity<ExperienceResponse> verifyAccountCompany(
+            @RequestParam int id,
+            @RequestParam String status
+    ) {
+        NotificationMessage notificationMessage = authenticationService.verifyAccountCompany(id, status);
+        notificationService.sendNotificationValidationCompany(notificationMessage, id);
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @PostMapping("/verifyAccountCandidate")
+    public ResponseEntity<ExperienceResponse> verifyAccountCandidate(
+            @RequestParam int id,
+            @RequestParam String status
+    ) {
+        NotificationMessage notificationMessage = authenticationService.verifyAccountCandidate(id, status);
+        notificationService.sendNotificationValidationCandidate(notificationMessage, id);
         ExperienceResponse experienceResponse = new ExperienceResponse();
         experienceResponse.setId(1);
         experienceResponse.setMessage("saved successfully");

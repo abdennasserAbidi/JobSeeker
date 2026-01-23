@@ -1,5 +1,6 @@
 package com.myjob.jobseeker.config;
 
+import com.myjob.jobseeker.repo.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,14 +12,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.myjob.jobseeker.repo.UserRepository;
-
 
 @Configuration
 @AllArgsConstructor
 public class ApplicationConfiguration {
 
-private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
 
     @Bean

@@ -9,10 +9,11 @@ import com.myjob.jobseeker.model.NotificationModel;
 import com.myjob.jobseeker.repo.UserRepository;
 import com.myjob.jobseeker.repo.notification.NotifRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.View;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -21,13 +22,15 @@ public class NotificationService implements INotificationService {
     private final FirebaseMessaging firebaseMessaging;
     private final UserRepository userRepository;
     private final NotifRepository notifRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     private static final AtomicInteger idCounter = new AtomicInteger();
 
-    public NotificationService(FirebaseMessaging firebaseMessaging, UserRepository userRepository, NotifRepository notifRepository) {
+    public NotificationService(FirebaseMessaging firebaseMessaging, UserRepository userRepository, NotifRepository notifRepository, SimpMessagingTemplate messagingTemplate) {
         this.firebaseMessaging = firebaseMessaging;
         this.userRepository = userRepository;
         this.notifRepository = notifRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Override
@@ -76,9 +79,60 @@ public class NotificationService implements INotificationService {
 
             notifRepository.save(notificationModel);
 
+            // Send to recipient
+            messagingTemplate.convertAndSendToUser(
+                    data.get("idReceiver"),
+                    "/queue/notifications",
+                    notificationModel
+            );
+
             return "Success sending notification";
         } catch (Exception e) {
             System.out.println("ftreeeeeeeeee  error  " + e.getMessage());
+            return "Error sending notification";
+        }
+    }
+
+    @Override
+    public String sendNotificationChat(NotificationMessage notificationMessage) {
+
+        Message message = Message.builder()
+                .setToken(notificationMessage.getRecipientToken())
+                .setNotification(
+                        Notification.builder()
+                                .setTitle(notificationMessage.getTitle())
+                                .setBody(notificationMessage.getBody())
+                                .build()
+                )
+                .putAllData(notificationMessage.getData())
+                .build();
+
+        try {
+
+            firebaseMessaging.send(message);
+
+            NotificationModel notificationModel = new NotificationModel();
+            notificationModel.setIdNotification(idCounter.incrementAndGet());
+
+            Map<String, String> data = notificationMessage.getData();
+
+            notificationModel.setIdCandidate(Integer.parseInt(data.get("idReceiver")));
+            notificationModel.setIdCompany(Integer.parseInt(data.get("idCompany")));
+            notificationModel.setIdSender(Integer.parseInt(data.get("idCompany")));
+            notificationModel.setCompanyName(data.get("companyName"));
+            notificationModel.setUsername(data.get("username"));
+
+            notificationModel.setIdPost(Integer.parseInt(data.get("idAnnounce")));
+            notificationModel.setIdInvitation(-1);
+
+            notificationModel.setTitle(notificationMessage.getTitle());
+            notificationModel.setDescription(notificationMessage.getBody());
+            notificationModel.setRead(false);
+
+            notifRepository.save(notificationModel);
+
+            return "Success sending notification";
+        } catch (Exception e) {
             return "Error sending notification";
         }
     }
@@ -129,6 +183,87 @@ public class NotificationService implements INotificationService {
     }
 
     @Override
+    public String sendNotificationValidationCompany(NotificationMessage notificationMessage, int id) {
+
+        Message message = Message.builder()
+                .setToken(notificationMessage.getRecipientToken())
+                .setNotification(
+                        Notification.builder()
+                                .setTitle(notificationMessage.getTitle())
+                                .setBody(notificationMessage.getBody())
+                                .build()
+                )
+                .putAllData(notificationMessage.getData())
+                .build();
+
+        try {
+
+            firebaseMessaging.send(message);
+
+            NotificationModel notificationModel = new NotificationModel();
+            notificationModel.setIdNotification(idCounter.incrementAndGet());
+            notificationModel.setIdCompany(id);
+            notificationModel.setTitle(notificationMessage.getTitle());
+            notificationModel.setDescription(notificationMessage.getBody());
+            notificationModel.setRead(false);
+
+            notifRepository.save(notificationModel);
+
+            // Send to recipient
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(id),
+                    "/queue/notifications",
+                    notificationModel
+            );
+
+            return "Success sending notification";
+        } catch (Exception e) {
+            return "Error sending notification";
+        }
+    }
+
+    @Override
+    public String sendNotificationValidationCandidate(NotificationMessage notificationMessage, int id) {
+
+        Message message = Message.builder()
+                .setToken(notificationMessage.getRecipientToken())
+                .setNotification(
+                        Notification.builder()
+                                .setTitle(notificationMessage.getTitle())
+                                .setBody(notificationMessage.getBody())
+                                .build()
+                )
+                .putAllData(notificationMessage.getData())
+                .build();
+
+        try {
+
+            firebaseMessaging.send(message);
+
+            NotificationModel notificationModel = new NotificationModel();
+            notificationModel.setIdNotification(idCounter.incrementAndGet());
+            notificationModel.setIdCandidate(id);
+            notificationModel.setTitle(notificationMessage.getTitle());
+            notificationModel.setDescription(notificationMessage.getBody());
+            notificationModel.setRead(false);
+
+            notifRepository.save(notificationModel);
+
+            // Send to recipient
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(id),
+                    "/queue/notifications",
+                    notificationModel
+            );
+
+            return "Success sending notification";
+        } catch (Exception e) {
+            return "Error sending notification";
+        }
+    }
+
+
+    @Override
     public void updateToken(int email, String token) {
         java.util.Optional<com.myjob.jobseeker.model.User> user = userRepository.findById(email);
         user.ifPresent(u -> {
@@ -139,9 +274,12 @@ public class NotificationService implements INotificationService {
 
     @Override
     public void seenNotification(int idNotification) {
-        NotificationModel notificationModel = notifRepository.findById(idNotification).orElseThrow();
-        notificationModel.setRead(true);
-        notifRepository.save(notificationModel);
+        Optional<NotificationModel> notifModel = notifRepository.findById(idNotification);
+
+        notifModel.ifPresent(notificationModel -> {
+            notificationModel.setRead(true);
+            notifRepository.save(notificationModel);
+        });
     }
 
     @Override
