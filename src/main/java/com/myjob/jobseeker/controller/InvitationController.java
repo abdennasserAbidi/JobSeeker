@@ -86,9 +86,6 @@ public class InvitationController {
 
             sendNotificationAfterSendInvitation(notificationMessage, "candidate");
 
-            System.out.println("gtrrrrrrrrrrrrrrrr  "+idReceiver);
-            System.out.println("gtrrrrrrrrrrrrrrrr  "+invitationDto.getInvitationModel());
-
             // Send to recipient
             messagingTemplate.convertAndSendToUser(
                     String.valueOf(idReceiver),

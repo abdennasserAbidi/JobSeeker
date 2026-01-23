@@ -41,41 +41,12 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    public void sendResetToken1(String email, String token) {
-        OkHttpClient client = new OkHttpClient();
-        String url = "myapp://reset-password/" + token;
-
-        String json = """
-                {
-                  "from": "onboarding@resend.dev",
-                  "to": "%s",
-                  "subject": "%s",
-                  "html": "%s"
-                }
-                """.formatted(email, "Password Reset Request", url);
-
-        Request request = new Request.Builder()
-                .url("https://api.resend.com/emails")
-                .post(RequestBody.create(json, MediaType.parse("application/json")))
-                .addHeader("Authorization", "Bearer " + "")
-                .build();
-
-        try {
-            client.newCall(request).execute();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void sendResetToken(String email, String token) {
-        String url = "myapp://resetpassword/" + token;
-        String link = "https://jobdeal?token=" + token;
 
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        /*SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
         mailMessage.setSubject("Password Reset Request");
-        mailMessage.setText("To reset your password, click here : " + url);
-
+        mailMessage.setText("To reset your password, click here : " + link);*/
 
         String html = """
                 <html>
@@ -85,7 +56,7 @@ public class EmailService {
                     <a href="%s" target="_blank">Open in app</a>
                   </body>
                 </html>
-                """.formatted(link);
+                """.formatted("https://jobdeal?token=" + token);
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper;
@@ -97,10 +68,11 @@ public class EmailService {
             helper.setText(html, true);
             //helper.setFrom("yourapp@gmail.com");
         } catch (MessagingException e) {
+            System.out.println("errrorrrrrr email   :   "+e.getMessage() );
             throw new RuntimeException(e);
         }
 
-
+        System.out.println("successs  email   :   "+message);
         mailSender.send(message);
     }
 

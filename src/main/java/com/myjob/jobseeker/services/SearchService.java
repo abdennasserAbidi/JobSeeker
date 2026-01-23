@@ -131,7 +131,7 @@ public class SearchService implements ISearchService {
 
         List<User> newUsers = new ArrayList<>();
         List<Integer> ids = new ArrayList<>();
-        List<User> candidates = userRepository.findByRole("Candidate");
+        List<User> candidates = userRepository.findByRole("Candidat");
 
         if (!user.getInvitations().isEmpty()) {
             for (InvitationModel i : user.getInvitations()) {
