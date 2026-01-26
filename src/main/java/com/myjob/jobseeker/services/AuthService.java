@@ -289,18 +289,12 @@ public class AuthService implements IAuthService {
         User user = userRepository.findById(id).orElseThrow();
 
         List<User> newUsers = new ArrayList<>();
-        List<Integer> ids = new ArrayList<>();
-        List<User> candidates = userRepository.findByRole("Candidat");
         List<User> allUsers = userRepository.findAll();
 
-        for (User candidat : allUsers) {
-            if (candidat.getId() != id && !candidat.isFirstTimeUse()) {
-                newUsers.add(candidat);
+        for (User candidate : allUsers) {
+            if (candidate.getId() != id && !candidate.isFirstTimeUse()) {
+                newUsers.add(candidate);
             }
-
-            /*if (candidat.isCandidate()) {
-                newUsers.add(candidat);
-            }*/
         }
 
         int pageSize = Math.min(size, newUsers.size());

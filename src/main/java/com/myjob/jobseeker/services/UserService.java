@@ -216,12 +216,13 @@ public class UserService implements IUserService {
         List<User> users = userRepository.searchUsers(criteria);
         List<User> newUser = new ArrayList<>();
         for (User user : users) {
-            if (user.getRole().equals("Candidate") || user.getRole().equals("Candidat")) {
+            boolean isCandidate = user.getRole().equals("Candidate") || user.getRole().equals("Candidat");
+            if (!user.isFirstTimeUse() && isCandidate) {
                 newUser.add(user);
             }
         }
 
-        PageRequest pageable = PageRequest.of(page - 1, 3);
+        PageRequest pageable = PageRequest.of(page - 1, size);
         final int start = (int) pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), newUser.size());
 

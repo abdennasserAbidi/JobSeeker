@@ -29,6 +29,20 @@ public class AnnouncementController {
     private final IUserService userService;
     private final INotificationService notificationService;
 
+    @PostMapping("/updateAnnouncement")
+    public ResponseEntity<ExperienceResponse> updateAnnouncement(
+            @RequestParam int idUserConnected,
+            @RequestBody AnnounceModel announceModel) {
+
+        announcementService.updateAnnouncement(idUserConnected, announceModel);
+
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
     @PostMapping("/makeAnnouncement")
     public ResponseEntity<ExperienceResponse> makeAnnouncement(
             @RequestParam int idUserConnected,

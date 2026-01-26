@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface IAnnouncementService {
     void makeAnnouncement(int id, AnnounceModel input);
+    void updateAnnouncement(int id, AnnounceModel input);
     void addComment(int idAnnounce, CommentsPost commentsPost);
     void addLike(int idAnnounce, LikesPost likesPost);
     void removeLike(int idAnnounce, int idConnected);

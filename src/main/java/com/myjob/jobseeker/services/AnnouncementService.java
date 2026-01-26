@@ -38,6 +38,31 @@ public class AnnouncementService implements IAnnouncementService {
     }
 
     @Override
+    public void updateAnnouncement(int id, AnnounceModel input) {
+        Optional<User> u = userRepository.findById(id);
+        u.ifPresent(user -> {
+            input.setIdCompany(user.getId());
+            input.setCompanyName(user.getCompanyName());
+
+            List<AnnounceModel> list = user.getAnnounces();
+
+            System.out.println("fezfzzrgzrgz     "+input);
+
+            int indicator = -1;
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getIdAnnounce() == input.getIdAnnounce())
+                    indicator = i;
+            }
+            System.out.println("fezfzzrgzrgz    indicator  "+indicator);
+            if (indicator != -1) {
+                list.set(indicator, input);
+                user.setAnnounces(list);
+                userRepository.save(user);
+            }
+        });
+    }
+
+    @Override
     public AnnounceResponse findAnnounceCompany(String type, int idConnected) {
         Optional<User> userValue = userRepository.findById(idConnected);
         AnnounceResponse announceResponse = new AnnounceResponse();
@@ -206,7 +231,7 @@ public class AnnouncementService implements IAnnouncementService {
     public Page<AnnounceModel> getPaginatedAnnouncementCandidate(int page, int size) {
         List<User> userList = userRepository.findAll();
         List<AnnounceModel> newList = new ArrayList<>();
-        for (User user: userList) {
+        for (User user : userList) {
             List<AnnounceModel> announceModelList = user.getAnnounces();
             newList.addAll(announceModelList);
         }
