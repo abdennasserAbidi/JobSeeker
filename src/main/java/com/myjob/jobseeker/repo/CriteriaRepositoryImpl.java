@@ -29,12 +29,6 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
         }
 
         if (!request.getCategories().isEmpty()) {
-
-            /*Criteria criteria = new Criteria().orOperator(
-                    Criteria.where("preferredWorkType").is(id),
-                    Criteria.where("preferredEmploymentType").is(id)
-            );*/
-
             List<String> asector = request.getCategories();
             addCriterias(asector, query, "preferredWorkType");
         }

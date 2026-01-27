@@ -14,6 +14,8 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 @Service
@@ -127,37 +129,42 @@ public class SearchService implements ISearchService {
     @Override
     public Page<User> getUserFiltered(String word, int id, int page, int size) {
 
-        User user = userRepository.findById(id).orElseThrow();
-
+        Optional<User> optionalUser = userRepository.findById(id);
         List<User> newUsers = new ArrayList<>();
-        List<Integer> ids = new ArrayList<>();
-        List<User> candidates = userRepository.findByRole("Candidat");
 
-        if (!user.getInvitations().isEmpty()) {
-            for (InvitationModel i : user.getInvitations()) {
-                ids.add(i.getIdTo());
+        AtomicReference<Page<User>> userPage = new AtomicReference<>();
+        userPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
+
+        optionalUser.ifPresent(user -> {
+            List<User> allUsers = userRepository.findAll();
+
+            for (User candidate : allUsers) {
+
+                boolean nameContains;
+                if (candidate.isCandidate())
+                    nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(candidate.getFullName()).find();
+                else
+                    nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(candidate.getCompanyName()).find();
+
+
+                if (candidate.getId() != id && !candidate.isFirstTimeUse() && nameContains) {
+                    newUsers.add(candidate);
+                }
             }
-        }
 
-        for (User candidat : candidates) {
-            boolean nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(candidat.getFullName()).find();
+            if (newUsers.isEmpty()) {
+                userPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
+            } else {
+                int s = Math.min(size, newUsers.size());
 
-            if (nameContains) {
-                newUsers.add(candidat);
+                PageRequest pageable = PageRequest.of(page - 1, s);
+                final int start = (int) pageable.getOffset();
+                final int end = Math.min((start + pageable.getPageSize()), s);
+                userPage.set(new PageImpl<>(newUsers.subList(start, end), pageable, s));
             }
-        }
+        });
 
-        if (newUsers.isEmpty()) {
-            return new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
-
-        } else {
-            int s = Math.min(size, newUsers.size());
-
-            PageRequest pageable = PageRequest.of(page - 1, s);
-            final int start = (int) pageable.getOffset();
-            final int end = Math.min((start + pageable.getPageSize()), s);
-            return new PageImpl<>(newUsers.subList(start, end), pageable, s);
-        }
+        return userPage.get();
     }
 
 }

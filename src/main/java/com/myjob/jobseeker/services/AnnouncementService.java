@@ -46,14 +46,12 @@ public class AnnouncementService implements IAnnouncementService {
 
             List<AnnounceModel> list = user.getAnnounces();
 
-            System.out.println("fezfzzrgzrgz     "+input);
-
             int indicator = -1;
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).getIdAnnounce() == input.getIdAnnounce())
                     indicator = i;
             }
-            System.out.println("fezfzzrgzrgz    indicator  "+indicator);
+
             if (indicator != -1) {
                 list.set(indicator, input);
                 user.setAnnounces(list);

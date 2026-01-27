@@ -239,7 +239,7 @@ public class AuthService implements IAuthService {
         List<User> users = userRepository.searchUsers(criteria);
         List<User> newUser = new ArrayList<>();
         for (User user : users) {
-            if (user.getRole().equals("Candidate") || user.getRole().equals("Candidat")) {
+            if (user.getId() != criteria.getIdUser() && !user.isFirstTimeUse()) {
                 newUser.add(user);
             }
         }
