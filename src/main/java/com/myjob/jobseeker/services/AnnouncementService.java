@@ -214,7 +214,28 @@ public class AnnouncementService implements IAnnouncementService {
 
     @Override
     public Page<AnnounceModel> getPaginatedAnnouncement(int id, int page, int size) {
-        return userRepository.findPaginatedAnnouncement(id, page, size);
+        //return userRepository.findPaginatedAnnouncement(id, page, size);
+        PageRequest pageable = PageRequest.of(page - 1, size);
+        final int start = (int) pageable.getOffset();
+
+        Page<AnnounceModel> pager;
+
+        List<User> userList = userRepository.findAll();
+        List<AnnounceModel> newList = new ArrayList<>();
+        for (User user : userList) {
+            if (!user.isCandidate()) {
+                List<AnnounceModel> announceModelList = user.getAnnounces();
+                newList.addAll(announceModelList);
+            }
+        }
+
+        final int end = Math.min((start + pageable.getPageSize()), newList.size());
+
+        if (start < newList.size() && start < end) {
+            pager = new PageImpl<>(newList.subList(start, end), pageable, newList.size());
+        } else pager = new PageImpl<>(Collections.emptyList(), pageable, newList.size());
+
+        return pager;
     }
 
     @Override
