@@ -80,7 +80,7 @@ public class UserService implements IUserService {
         user.setBio(input.getBio());
         user.setNationality(input.getNationality());
         user.setActivitySector(input.getActivitySector());
-        user.setAddressList(input.getAddress());
+        user.setAddressList(input.getAddressList());
         user.setCountry(input.getCountry());
         user.setBirthDate(input.getBirthDate());
 
@@ -101,7 +101,7 @@ public class UserService implements IUserService {
 
         user.setRangeSalary(input.getRangeSalary());
         user.setPreferredActivitySector(input.getPreferredActivitySector());
-        user.setPhoneList(input.getPhone());
+        user.setPhoneList(input.getPhoneList());
 
         userRepository.save(user);
     }

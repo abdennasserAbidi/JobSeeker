@@ -395,13 +395,14 @@ public class AuthService implements IAuthService {
     public void savePersonal(PersonalInfoDto input) {
         User user = userRepository.findById(input.getId()).orElseThrow();
 
-        System.out.println("fezhfealagaeghegl    "+input.getBio());
+        System.out.println("fezhfealagaeghegl  add  "+input.getAddressList());
+        System.out.println("fezhfealagaeghegl  ph  "+input.getPhoneList());
 
         user.setFullName(input.getFullName());
         user.setBio(input.getBio());
         user.setNationality(input.getNationality());
         user.setActivitySector(input.getActivitySector());
-        user.setAddressList(input.getAddress());
+        user.setAddressList(input.getAddressList());
         user.setCountry(input.getCountry());
         user.setBirthDate(input.getBirthDate());
 
@@ -429,7 +430,7 @@ public class AuthService implements IAuthService {
 
         user.setRangeSalary(input.getRangeSalary());
         user.setPreferredActivitySector(input.getPreferredActivitySector());
-        user.setPhoneList(input.getPhone());
+        user.setPhoneList(input.getPhoneList());
 
         userRepository.save(user);
     }

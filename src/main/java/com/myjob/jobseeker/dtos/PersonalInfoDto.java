@@ -15,7 +15,7 @@ public class PersonalInfoDto {
 
     private String bio;
 
-    private List<String> address;
+    private List<String> addressList;
 
     private String sexe;
 
@@ -35,5 +35,5 @@ public class PersonalInfoDto {
 
     private String preferredEmploymentType;
 
-    private List<String> phone;
+    private List<String> phoneList;
 }
