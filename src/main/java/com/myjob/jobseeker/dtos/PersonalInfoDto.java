@@ -3,6 +3,8 @@ package com.myjob.jobseeker.dtos;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Setter
 @Getter
 public class PersonalInfoDto {
@@ -13,7 +15,7 @@ public class PersonalInfoDto {
 
     private String bio;
 
-    private String address;
+    private List<String> address;
 
     private String sexe;
 
@@ -33,5 +35,5 @@ public class PersonalInfoDto {
 
     private String preferredEmploymentType;
 
-    private String phone;
+    private List<String> phone;
 }

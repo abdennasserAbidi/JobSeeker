@@ -37,4 +37,14 @@ public class MarketDemandController {
         return ResponseEntity.ok(experienceResponse);
     }
 
+    @PostMapping("/countDownTrial")
+    public ResponseEntity<ExperienceResponse> countDownTrial(@RequestParam int idDemand) {
+        marketDemandService.countDownTrial(idDemand);
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
 }

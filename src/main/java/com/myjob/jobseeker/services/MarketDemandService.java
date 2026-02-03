@@ -2,6 +2,7 @@ package com.myjob.jobseeker.services;
 
 import com.myjob.jobseeker.interfaces.IMarketDemandService;
 import com.myjob.jobseeker.model.MarketDemandModel;
+import com.myjob.jobseeker.model.User;
 import com.myjob.jobseeker.repo.UserRepository;
 import com.myjob.jobseeker.repo.marketDemand.MarketDemandRepository;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
@@ -29,7 +31,22 @@ public class MarketDemandService implements IMarketDemandService {
 
     @Override
     public void saveDemand(MarketDemandModel demand) {
-        marketDemandRepository.save(demand);
+        Optional<User> optionalUser = userRepository.findById(demand.getIdSender());
+        optionalUser.ifPresent(user -> {
+            demand.setUserSender(user);
+            marketDemandRepository.save(demand);
+        });
+    }
+
+    @Override
+    public void countDownTrial(int idDemand) {
+        Optional<MarketDemandModel> optionalDemand = marketDemandRepository.findById(idDemand);
+        optionalDemand.ifPresent(demand -> {
+            int countTrial = demand.getCountTrial();
+            countTrial -= 1;
+            demand.setCountTrial(countTrial);
+            marketDemandRepository.save(demand);
+        });
     }
 
     @Override

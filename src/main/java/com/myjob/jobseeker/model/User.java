@@ -122,6 +122,8 @@ public class User implements UserDetails {
 
     private List<String> preferredWorkType = new ArrayList<>();
     private List<String> workPreferences = new ArrayList<>();
+    private List<String> phoneList = new ArrayList<>();
+    private List<String> addressList = new ArrayList<>();
 
     public void setIsResetPasswordTokenValid(boolean isResetPasswordTokenValid) {
         this.isResetPasswordTokenValid = isResetPasswordTokenValid;

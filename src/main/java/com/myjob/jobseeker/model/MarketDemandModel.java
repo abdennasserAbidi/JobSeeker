@@ -13,8 +13,11 @@ public class MarketDemandModel {
     private String title;
     private String description;
     private String date;
-    private int idCompany;
-    private String companyName;
+    private String activitySector;
+    private int idSender;
+    private User userSender;
     private int idCandidate;
     private String username;
+    private boolean paidUser;
+    private int countTrial = 10;
 }

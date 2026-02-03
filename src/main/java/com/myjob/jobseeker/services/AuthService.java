@@ -340,6 +340,8 @@ public class AuthService implements IAuthService {
         user.setCompanyAddress(input.getCompanyAddress());
         user.setSecondPhoneCompany(input.getSecondPhoneCompany());
         user.setCompanySecondAddress(input.getCompanySecondAddress());
+        user.setPhoneList(input.getPhoneList());
+        user.setAddressList(input.getAddressList());
 
         userRepository.save(user);
     }
@@ -399,7 +401,7 @@ public class AuthService implements IAuthService {
         user.setBio(input.getBio());
         user.setNationality(input.getNationality());
         user.setActivitySector(input.getActivitySector());
-        user.setAddress(input.getAddress());
+        user.setAddressList(input.getAddress());
         user.setCountry(input.getCountry());
         user.setBirthDate(input.getBirthDate());
 
@@ -427,7 +429,7 @@ public class AuthService implements IAuthService {
 
         user.setRangeSalary(input.getRangeSalary());
         user.setPreferredActivitySector(input.getPreferredActivitySector());
-        user.setPhone(input.getPhone());
+        user.setPhoneList(input.getPhone());
 
         userRepository.save(user);
     }

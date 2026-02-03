@@ -2,6 +2,8 @@ package com.myjob.jobseeker.dtos;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class CompanyInfoDto {
     private int id;
@@ -15,4 +17,6 @@ public class CompanyInfoDto {
     private String companyAddress;
     private String companySecondAddress;
     private String secondPhoneCompany;
+    private List<String> phoneList;
+    private List<String> addressList;
 }
