@@ -82,6 +82,8 @@ public class AuthService implements IAuthService {
     @Override
     public UserResponse authenticate(LoginUserDto input) {
         UserResponse userResponse = new UserResponse();
+        System.out.println("felzghrgrzllkzrlzg    "+input.getEmail()+"feazegeaglakgaekga");
+        System.out.println("felzghrgrzllkzrlzg    "+input.getPassword()+"feazegeaglakgaekga");
 
         if (input.getPassword().isEmpty()) {
             Optional<User> user = userRepository.findByEmail(input.getEmail());
@@ -106,6 +108,7 @@ public class AuthService implements IAuthService {
 
             } catch (Exception exception) {
                 userResponse.setUser(new User());
+                System.out.println("felzghrgrzllkzrlzg  message  "+exception.getMessage());
                 if (exception instanceof BadCredentialsException)
                     userResponse.setMessage("email or password incorrect");
                 else if (exception instanceof DisabledException)
