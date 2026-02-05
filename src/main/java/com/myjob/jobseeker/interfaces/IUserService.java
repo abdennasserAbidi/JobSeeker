@@ -15,6 +15,7 @@ public interface IUserService {
     void saveCompanyInfo(CompanyInfoDto input);
     UserResponse getUser(int id);
     List<User> getCandidate();
+    List<User> getAllUser();
     Page<User> getUsers(int id, int page, int size);
     Page<User> getNewCandidate(int id, int page, int size);
     Page<User> getUsersFavorites(int id, int page, int size);

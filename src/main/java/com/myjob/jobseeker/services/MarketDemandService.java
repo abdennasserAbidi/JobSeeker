@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
 @AllArgsConstructor
@@ -27,8 +26,6 @@ public class MarketDemandService implements IMarketDemandService {
     private final MarketDemandRepository marketDemandRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    private static final AtomicInteger idCounter = new AtomicInteger();
-
     @Override
     public void saveDemand(MarketDemandModel demand) {
         Optional<User> optionalUser = userRepository.findById(demand.getIdSender());
@@ -36,6 +33,13 @@ public class MarketDemandService implements IMarketDemandService {
             demand.setUserSender(user);
             marketDemandRepository.save(demand);
         });
+    }
+
+    @Override
+    public MarketDemandModel getDemand(int idDemand) {
+        return marketDemandRepository
+            .findById(idDemand)
+            .orElse(new MarketDemandModel());
     }
 
     @Override

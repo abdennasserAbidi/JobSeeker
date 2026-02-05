@@ -86,7 +86,7 @@ public class AnnouncementController {
     }
 
     public void sendNotificationAfterPost(NotificationMessage notificationMessage) {
-        String res = notificationService.sendNotification(notificationMessage);
+        notificationService.sendNotification(notificationMessage);
     }
 
     @GetMapping("/getAnnouncement")

@@ -1,6 +1,8 @@
 package com.myjob.jobseeker.model;
 
 import lombok.Data;
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,11 +15,15 @@ public class MarketDemandModel {
     private String title;
     private String description;
     private String date;
-    private String activitySector;
     private int idSender;
     private User userSender;
-    private int idCandidate;
-    private String username;
     private boolean paidUser;
     private int countTrial = 10;
+    private ServiceCategory category;
+    private String location;
+    private String budget;
+    private String urgency;
+    private String status;
+    private String deadline;
+    private List<String> images;
 }

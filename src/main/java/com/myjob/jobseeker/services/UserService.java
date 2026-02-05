@@ -8,13 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Collections;
-import java.util.regex.Pattern;
 
 @Service
 public class UserService implements IUserService {
@@ -23,6 +20,11 @@ public class UserService implements IUserService {
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Override
+    public List<User> getAllUser() {
+        return userRepository.findAll().stream().filter(user -> user.isFirstTimeUse() == false).toList();
     }
 
     @Override
