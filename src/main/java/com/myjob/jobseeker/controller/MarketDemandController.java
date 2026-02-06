@@ -38,6 +38,15 @@ public class MarketDemandController {
         return ResponseEntity.ok(experience);
     }
 
+    @GetMapping("/getDemandFiltered")
+    public ResponseEntity<Page<MarketDemandModel>> getDemandFiltered(
+            @RequestParam String word,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        return ResponseEntity.ok(marketDemandService.getDemandFiltered(word, page, size));
+    }
+
     @GetMapping("/getDemand")
     public ResponseEntity<MarketDemandModel> getDemand(
             @RequestParam int idDemand
@@ -68,7 +77,6 @@ public class MarketDemandController {
         List<User> candidates = userService.getAllUser();
 
         for (User user : candidates) {
-            System.out.println("gzlghrzgjgzrlgrz   "+user.getFcmToken());
             Map<String, String> data = new HashMap<>();
             data.put("idDemand", marketDemandModel.getId() + "");
             data.put("idHoster", id + "");

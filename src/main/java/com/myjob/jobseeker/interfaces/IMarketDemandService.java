@@ -9,4 +9,5 @@ public interface IMarketDemandService {
     void countDownTrial(int idDemand);
     Page<MarketDemandModel> getPaginatedDemands(int page, int size);
     MarketDemandModel getDemand(int idDemand);
+    Page<MarketDemandModel> getDemandFiltered(String word, int page, int size);
 }

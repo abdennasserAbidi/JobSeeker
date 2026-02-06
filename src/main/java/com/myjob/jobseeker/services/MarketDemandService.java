@@ -13,9 +13,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 @Data
 @AllArgsConstructor
@@ -33,6 +36,41 @@ public class MarketDemandService implements IMarketDemandService {
             demand.setUserSender(user);
             marketDemandRepository.save(demand);
         });
+    }
+
+    @Override
+    public Page<MarketDemandModel> getDemandFiltered(String word, int page, int size) {
+
+        List<MarketDemandModel> newDemands = new ArrayList<>();
+
+        AtomicReference<Page<MarketDemandModel>> demandPage = new AtomicReference<>();
+        demandPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
+
+
+        List<MarketDemandModel> allDemand = marketDemandRepository.findAll();
+
+        for (MarketDemandModel demand : allDemand) {
+
+                boolean nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(demand.getTitle()).find();
+                boolean descriptionContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(demand.getDescription()).find();
+
+                if (nameContains || descriptionContains) {
+                    newDemands.add(demand);
+                }
+        }
+
+        if (newDemands.isEmpty()) {
+                demandPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
+        } else {
+                int s = Math.min(size, newDemands.size());
+
+                PageRequest pageable = PageRequest.of(page - 1, s);
+                final int start = (int) pageable.getOffset();
+                final int end = Math.min((start + pageable.getPageSize()), s);
+                demandPage.set(new PageImpl<>(newDemands.subList(start, end), pageable, s));
+        }
+
+        return demandPage.get();
     }
 
     @Override

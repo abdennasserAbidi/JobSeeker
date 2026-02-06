@@ -20,6 +20,9 @@ public class MarketDemandModel {
     private boolean paidUser;
     private int countTrial = 10;
     private ServiceCategory category;
+    private String otherCategory;
+    private ToolCategory tools;
+    private String otherTools;
     private String location;
     private String budget;
     private String urgency;
