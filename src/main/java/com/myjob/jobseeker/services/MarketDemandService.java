@@ -1,5 +1,6 @@
 package com.myjob.jobseeker.services;
 
+import com.myjob.jobseeker.dtos.ExperienceResponse;
 import com.myjob.jobseeker.interfaces.IMarketDemandService;
 import com.myjob.jobseeker.model.MarketDemandModel;
 import com.myjob.jobseeker.model.User;
@@ -36,6 +37,27 @@ public class MarketDemandService implements IMarketDemandService {
             demand.setUserSender(user);
             marketDemandRepository.save(demand);
         });
+    }
+
+    @Override
+    public ExperienceResponse deleteDemand(int demandId) {
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(5211);
+
+        Optional<MarketDemandModel> optionalDemand = marketDemandRepository.findById(demandId);
+        String message = "";
+
+        if (optionalDemand.isPresent()) {
+            MarketDemandModel demand = optionalDemand.get();
+            marketDemandRepository.delete(demand);
+            message = "deleted successfully";
+        } else {
+            message = "demand n'existe pas";
+        }
+        
+        experienceResponse.setMessage(message);
+
+        return experienceResponse;
     }
 
     @Override

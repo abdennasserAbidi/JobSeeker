@@ -36,4 +36,6 @@ public class PersonalInfoDto {
     private String preferredEmploymentType;
 
     private List<String> phoneList;
+
+    private List<String> preferredWorkType;
 }

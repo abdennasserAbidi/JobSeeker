@@ -2,7 +2,6 @@ package com.myjob.jobseeker.repo;
 
 import java.util.List;
 
-import com.myjob.jobseeker.model.InvitationModel;
 import com.myjob.jobseeker.model.announces.AnnounceModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;

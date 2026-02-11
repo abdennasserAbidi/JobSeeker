@@ -42,4 +42,36 @@ public class NotificationRepositoryImpl implements NotificationRepository {
 
         return new PageImpl<>(results.getMappedResults(), PageRequest.of(page, size), total);
     }
+
+    @Override
+    public Page<NotificationModel> findPaginatedDemandNotification(int userId, int page, int size) {
+
+        long skip = (long) (page - 1) * size;
+
+        // Unwind the experiences array
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(
+                        new Criteria().orOperator(
+                                Criteria.where("idSender").ne(userId),
+                                Criteria.where("idDemand").ne(-1)
+                        )
+                ),
+                Aggregation.skip(skip),
+                Aggregation.limit(size)
+        );
+
+        // Execute the aggregation
+        AggregationResults<NotificationModel> results = mongoTemplate.aggregate(
+                aggregation,
+                "notifications", // The collection name
+                NotificationModel.class // The class type to map the results
+        );
+
+        long total = mongoTemplate.count(
+                new Query(Criteria.where("idSender").ne(userId)),
+                "notifications"
+        );
+
+        return new PageImpl<>(results.getMappedResults(), PageRequest.of(page, size), total);
+    }
 }

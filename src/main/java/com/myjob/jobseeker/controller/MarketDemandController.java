@@ -57,6 +57,15 @@ public class MarketDemandController {
         return ResponseEntity.ok(demand);
     }
 
+    @DeleteMapping("/deleteDemand")
+    public ResponseEntity<ExperienceResponse> deleteDemand(
+            @RequestParam int idDemand
+    ) {
+
+       ExperienceResponse experienceResponse = marketDemandService.deleteDemand(idDemand);
+       return ResponseEntity.ok(experienceResponse);
+    }
+
     @PostMapping("/saveDemand")
     public ResponseEntity<ExperienceResponse> saveDemand(
             @RequestBody MarketDemandModel marketDemandModel
@@ -90,7 +99,7 @@ public class MarketDemandController {
             notificationMessage.setBody(description);
             notificationMessage.setData(data);
 
-            notificationService.sendNotification(notificationMessage);
+            notificationService.sendNotificationDemand(notificationMessage);
         }
 
         ExperienceResponse experienceResponse = new ExperienceResponse();

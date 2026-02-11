@@ -1,5 +1,6 @@
 package com.myjob.jobseeker.interfaces;
 
+import com.myjob.jobseeker.dtos.ExperienceResponse;
 import com.myjob.jobseeker.model.MarketDemandModel;
 
 import org.springframework.data.domain.Page;
@@ -10,4 +11,5 @@ public interface IMarketDemandService {
     Page<MarketDemandModel> getPaginatedDemands(int page, int size);
     MarketDemandModel getDemand(int idDemand);
     Page<MarketDemandModel> getDemandFiltered(String word, int page, int size);
+    ExperienceResponse deleteDemand(int demandId);
 }

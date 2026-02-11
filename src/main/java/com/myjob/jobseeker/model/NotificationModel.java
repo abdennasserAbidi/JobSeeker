@@ -17,6 +17,7 @@ public class NotificationModel {
     private int idCompany;
     private String companyName;
     private int idCandidate;
+    private int idDemand;
     private String username;
     private boolean read;
     private int idInvitation;

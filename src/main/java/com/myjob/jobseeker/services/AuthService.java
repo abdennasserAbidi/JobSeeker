@@ -408,6 +408,8 @@ public class AuthService implements IAuthService {
         user.setAddressList(input.getAddressList());
         user.setCountry(input.getCountry());
         user.setBirthDate(input.getBirthDate());
+        user.setPreferredWorkType(input.getPreferredWorkType());
+
 
         if (input.getSexe().equals("Homme") || input.getSexe().equals("Male")) user.setSexe("Male");
         else user.setSexe("Female");

@@ -71,4 +71,15 @@ public class NotificationController {
 
         return ResponseEntity.ok(invitation);
     }
+
+    @GetMapping("/getDemandNotifications")
+    public ResponseEntity<Page<NotificationModel>> getDemandNotifications(
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        Page<NotificationModel> invitation = notificationService.findPaginatedDemandNotification(id, page, size);
+
+        return ResponseEntity.ok(invitation);
+    }
 }

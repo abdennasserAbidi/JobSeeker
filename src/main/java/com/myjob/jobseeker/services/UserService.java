@@ -76,6 +76,7 @@ public class UserService implements IUserService {
 
     @Override
     public void savePersonal(PersonalInfoDto input) {
+        System.out.println("lgrjelgkejgrjeglr    "+ input);
         User user = userRepository.findById(input.getId()).orElseThrow();
 
         user.setFullName(input.getFullName());
@@ -85,6 +86,7 @@ public class UserService implements IUserService {
         user.setAddressList(input.getAddressList());
         user.setCountry(input.getCountry());
         user.setBirthDate(input.getBirthDate());
+        user.setPreferredWorkType(input.getPreferredWorkType());
 
         if (input.getSexe().equals("Homme") || input.getSexe().equals("Male")) user.setSexe("Male");
         else user.setSexe("Female");

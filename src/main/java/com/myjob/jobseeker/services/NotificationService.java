@@ -71,6 +71,7 @@ public class NotificationService implements INotificationService {
 
             notificationModel.setIdInvitation(Integer.parseInt(data.get("idInvitation")));
             notificationModel.setIdPost(-1);
+            notificationModel.setIdDemand(-1);
 
             notificationModel.setTitle(notificationMessage.getTitle());
             notificationModel.setDescription(notificationMessage.getBody());
@@ -124,6 +125,7 @@ public class NotificationService implements INotificationService {
 
             notificationModel.setIdPost(Integer.parseInt(data.get("idAnnounce")));
             notificationModel.setIdInvitation(-1);
+            notificationModel.setIdDemand(-1);
 
             notificationModel.setTitle(notificationMessage.getTitle());
             notificationModel.setDescription(notificationMessage.getBody());
@@ -136,6 +138,47 @@ public class NotificationService implements INotificationService {
             return "Error sending notification";
         }
     }
+
+
+@Override
+public String sendNotificationDemand(NotificationMessage notificationMessage) {
+
+        Message message = Message.builder()
+                .setToken(notificationMessage.getRecipientToken())
+                .setNotification(
+                        Notification.builder()
+                                .setTitle(notificationMessage.getTitle())
+                                .setBody(notificationMessage.getBody())
+                                .build()
+                )
+                .putAllData(notificationMessage.getData())
+                .build();
+
+        try {
+
+            firebaseMessaging.send(message);
+
+            NotificationModel notificationModel = new NotificationModel();
+            notificationModel.setIdNotification(idCounter.incrementAndGet());
+
+            Map<String, String> data = notificationMessage.getData();
+
+            notificationModel.setIdPost(-1);
+            notificationModel.setIdInvitation(-1);
+            notificationModel.setIdDemand(Integer.parseInt(data.get("idDemand")));
+            notificationModel.setIdSender(Integer.parseInt(data.get("idHoster")));
+            notificationModel.setTitle(notificationMessage.getTitle());
+            notificationModel.setDescription(notificationMessage.getBody());
+            notificationModel.setRead(false);
+
+            notifRepository.save(notificationModel);
+
+            return "Success sending notification";
+        } catch (Exception e) {
+            return "Error sending notification";
+        }
+    }
+
 
     @Override
     public String sendNotification(NotificationMessage notificationMessage) {
@@ -296,5 +339,10 @@ public class NotificationService implements INotificationService {
     @Override
     public Page<NotificationModel> getPaginatedNotification(int id, int page, int size) {
         return notifRepository.findPaginatedNotification(id, page, size);
+    }
+
+    @Override
+    public Page<NotificationModel> findPaginatedDemandNotification(int id, int page, int size) {
+        return notifRepository.findPaginatedDemandNotification(id, page, size);
     }
 }
