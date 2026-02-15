@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 import java.util.Collections;
 
 @Service
@@ -194,6 +196,45 @@ public class UserService implements IUserService {
         final int end = Math.min((start + pageable.getPageSize()), s);
         return new PageImpl<>(newUsers.subList(start, end), pageable, s);
     }
+
+    @Override
+    public Page<User> getUserServiceFiltered(String word, int page, int size) {
+
+        List<User> newUsers = new ArrayList<>();
+
+        AtomicReference<Page<User>> userPage = new AtomicReference<>();
+        userPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
+
+
+        List<User> allUser = userRepository.findAll();
+
+        for (User user : allUser) {
+
+                boolean nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getUsername()).find();
+                boolean descriptionContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getBio()).find();
+
+                boolean categoryContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getCategory().getDisplayName()).find();
+                boolean otherategoryContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getOtherCategory()).find();
+
+                if (nameContains || descriptionContains || categoryContains || otherategoryContains) {
+                    newUsers.add(user);
+                }
+        }
+
+        if (newUsers.isEmpty()) {
+                userPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
+        } else {
+                int s = Math.min(size, newUsers.size());
+
+                PageRequest pageable = PageRequest.of(page - 1, s);
+                final int start = (int) pageable.getOffset();
+                final int end = Math.min((start + pageable.getPageSize()), s);
+                userPage.set(new PageImpl<>(newUsers.subList(start, end), pageable, s));
+        }
+
+        return userPage.get();
+    }
+
 
     @Override
     public Page<User> getUsersFavorites(int id, int page, int size) {

@@ -47,6 +47,34 @@ public class UserController {
         return ResponseEntity.ok(authenticationService.getUsers(id, page, size));
     }
 
+    @PostMapping("/countDownTrialUser")
+    public ResponseEntity<ExperienceResponse> countDownTrial(@RequestParam int idUser) {
+        authenticationService.countDownTrial(idUser);
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
+    @GetMapping("/getUserServiceFiltered")
+    public ResponseEntity<Page<User>> getUserServiceFiltered(
+            @RequestParam String word,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        return ResponseEntity.ok(authenticationService.getUserServiceFiltered(word, page, size));
+    }
+
+    @GetMapping("/getAllCandidateService")
+    public ResponseEntity<Page<User>> getAllCandidateService(
+            @RequestParam int id,
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        return ResponseEntity.ok(authenticationService.getUserService(id, page, size));
+    }
+
     @GetMapping("/getAllFavoritesCandidates")
     public ResponseEntity<Page<User>> getUsersFavorites(
             @RequestParam int id,

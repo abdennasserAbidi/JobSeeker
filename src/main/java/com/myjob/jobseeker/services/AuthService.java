@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 @Service
 public class AuthService implements IAuthService {
@@ -68,6 +70,13 @@ public class AuthService implements IAuthService {
         user.setWorkPreferences(input.getWorkPreferences());
         user.setPassword(passwordEncoder.encode(input.getPassword()));
 
+        user.setService(input.isService());
+        user.setUsername(input.getUsername());
+        user.setCategory(input.getCategory());
+        user.setOtherCategory(input.getOtherCategory());
+        user.setCountTrial(input.getCountTrial());
+        user.setPaidUser(input.isPaidUser());
+
         boolean existingUser = userRepository.findByEmail(input.getEmail()).isPresent();
 
         UserResponse userResponse = new UserResponse();
@@ -80,10 +89,19 @@ public class AuthService implements IAuthService {
     }
 
     @Override
+    public void countDownTrial(int idUser) {
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        optionalUser.ifPresent(user -> {
+            int countTrial = user.getCountTrial();
+            countTrial -= 1;
+            user.setCountTrial(countTrial);
+            userRepository.save(user);
+        });
+    }
+
+    @Override
     public UserResponse authenticate(LoginUserDto input) {
         UserResponse userResponse = new UserResponse();
-        System.out.println("felzghrgrzllkzrlzg    "+input.getEmail()+"feazegeaglakgaekga");
-        System.out.println("felzghrgrzllkzrlzg    "+input.getPassword()+"feazegeaglakgaekga");
 
         if (input.getPassword().isEmpty()) {
             Optional<User> user = userRepository.findByEmail(input.getEmail());
@@ -286,6 +304,76 @@ public class AuthService implements IAuthService {
         final int end = Math.min((start + pageable.getPageSize()), s);
         return new PageImpl<>(newUsers.subList(start, end), pageable, s);
     }
+
+    @Override
+    public Page<User> getUserService(int id, int page, int size) {
+
+        User user = userRepository.findById(id).orElseThrow();
+
+        List<User> newUsers = new ArrayList<>();
+        List<User> allUsers = userRepository.findAll();
+
+        for (User candidate : allUsers) {
+            if (candidate.getRole().equals("Services") && candidate.getId() != id) {
+                newUsers.add(candidate);
+            }
+        }
+
+        int pageSize = Math.min(size, newUsers.size());
+
+        PageRequest pageable = PageRequest.of(page - 1, pageSize);
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), pageSize);
+
+        Page<User> pager;
+
+        if (start < newUsers.size() && start < end) {
+            pager = new PageImpl<>(newUsers.subList(start, end), pageable, newUsers.size());
+        } else pager = new PageImpl<>(Collections.emptyList(), pageable, newUsers.size());
+
+        return pager;
+    }
+
+    @Override
+    public Page<User> getUserServiceFiltered(String word, int page, int size) {
+
+        List<User> newUsers = new ArrayList<>();
+
+        AtomicReference<Page<User>> userPage = new AtomicReference<>();
+        userPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
+
+
+        List<User> allUser = userRepository.findAll();
+
+        for (User user : allUser) {
+
+                boolean nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getUsername()).find();
+                boolean descriptionContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getBio()).find();
+
+                boolean categoryContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getCategory().getDisplayName()).find();
+                boolean otherategoryContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getOtherCategory()).find();
+
+                if (nameContains || descriptionContains || categoryContains || otherategoryContains) {
+                    newUsers.add(user);
+                }
+        }
+
+        if (newUsers.isEmpty()) {
+                userPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
+        } else {
+                int s = Math.min(size, newUsers.size());
+
+                PageRequest pageable = PageRequest.of(page - 1, s);
+                final int start = (int) pageable.getOffset();
+                final int end = Math.min((start + pageable.getPageSize()), s);
+                userPage.set(new PageImpl<>(newUsers.subList(start, end), pageable, s));
+        }
+
+        return userPage.get();
+    }
+
+
+
     @Override
     public Page<User> getUsers(int id, int page, int size) {
 
@@ -295,7 +383,7 @@ public class AuthService implements IAuthService {
         List<User> allUsers = userRepository.findAll();
 
         for (User candidate : allUsers) {
-            if (candidate.getId() != id && !candidate.isFirstTimeUse()) {
+            if (!candidate.getRole().equals("Services") && candidate.getId() != id && !candidate.isFirstTimeUse()) {
                 newUsers.add(candidate);
             }
         }

@@ -35,6 +35,7 @@ public class MarketDemandService implements IMarketDemandService {
         Optional<User> optionalUser = userRepository.findById(demand.getIdSender());
         optionalUser.ifPresent(user -> {
             demand.setUserSender(user);
+            System.out.println("rzlkjgrjglgjlrzgrlzjgrglz    "+demand);
             marketDemandRepository.save(demand);
         });
     }
@@ -76,7 +77,12 @@ public class MarketDemandService implements IMarketDemandService {
                 boolean nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(demand.getTitle()).find();
                 boolean descriptionContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(demand.getDescription()).find();
 
-                if (nameContains || descriptionContains) {
+                boolean categoryContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(demand.getCategory().getDisplayName()).find();
+                boolean otherategoryContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(demand.getOtherCategory()).find();
+                boolean toolsContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(demand.getTools().getDisplayName()).find();
+                boolean otherToolsContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(demand.getOtherTools()).find();
+
+                if (nameContains || descriptionContains || categoryContains || otherategoryContains || toolsContains || otherToolsContains) {
                     newDemands.add(demand);
                 }
         }

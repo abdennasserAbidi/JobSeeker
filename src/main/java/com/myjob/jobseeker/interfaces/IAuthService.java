@@ -22,10 +22,13 @@ public interface IAuthService {
     java.util.List<ValidationStatus> getListStatusCandidateValidation(int id);
 
     Page<User> getByCriteria(Criteria criteria, int page, int size);
+    void countDownTrial(int idUser);
 
     Page<User> getNewCandidate(int id, int page, int size);
 
     Page<User> getUsers(int id, int page, int size);
+    Page<User> getUserService(int id, int page, int size);
+    Page<User> getUserServiceFiltered(String word, int page, int size);
 
     UserResponse getUser(int id);
 

@@ -43,6 +43,7 @@ public class AuthController {
         return ResponseEntity.ok(experienceResponse);
     }
 
+
     @PostMapping("/verifyAccountCandidate")
     public ResponseEntity<ExperienceResponse> verifyAccountCandidate(
             @RequestParam int id,

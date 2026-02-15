@@ -96,6 +96,14 @@ public class User implements UserDetails {
     private ProfessionalStatus professionalStatus;
     private CandidateSkills candidateSkills;
 
+    private boolean service = false;
+    private String username;
+    private boolean paidUser;
+    private int countTrial = 10;
+    private ServiceCategory category;
+    private String otherCategory;
+
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ValidationStatus> validationStepStatus = new ArrayList<>();
 

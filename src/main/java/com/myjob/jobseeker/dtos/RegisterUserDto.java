@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import java.util.List;
 
+import com.myjob.jobseeker.model.ServiceCategory;
+
 @Setter
 @Getter
 public class RegisterUserDto {
@@ -27,6 +29,13 @@ public class RegisterUserDto {
     private List<String> preferredWorkType;
 
     private List<String> workPreferences;
+
+    private boolean service;
+    private String username;
+    private boolean paidUser;
+    private int countTrial = 10;
+    private ServiceCategory category;
+    private String otherCategory;
 
 
 }

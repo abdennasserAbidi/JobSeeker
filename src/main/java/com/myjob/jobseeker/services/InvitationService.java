@@ -65,7 +65,9 @@ public class InvitationService implements IInvitationService {
     public void sendInvitation(int id, InvitationModel input) {
         User user = userRepository.findById(id).orElseThrow();
         List<InvitationModel> list = user.getInvitations();
-        List<InvitationModel> filteredList = list.stream().filter(invitation -> invitation.getIdTo() == input.getIdTo()).toList();
+        List<InvitationModel> filteredList = list.stream().filter(invitation -> invitation.getIdTo() == input.getIdTo() && !invitation.getStatus().equals("REJECTED") && !invitation.getStatus().equals("NOT_INTERESTED")).toList();
+
+        System.out.println("khregjhekgljlehglerg     "+filteredList);
 
         if (filteredList.isEmpty()) {
             InvitationModel experience = new InvitationModel();
