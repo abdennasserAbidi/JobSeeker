@@ -150,6 +150,17 @@ public class UserController {
         return ResponseEntity.ok(experienceResponse);
     }
 
+    @PostMapping("/updateService")
+    public ResponseEntity<ExperienceResponse> updateService(@RequestBody ServiceInfoDto serviceInfoDto) {
+        authenticationService.saveServiceInfo(serviceInfoDto);
+        authenticationService.completeUpdated(serviceInfoDto.getId());
+        ExperienceResponse experienceResponse = new ExperienceResponse();
+        experienceResponse.setId(1);
+        experienceResponse.setMessage("saved successfully");
+
+        return ResponseEntity.ok(experienceResponse);
+    }
+
     @GetMapping("/getUser")
     public ResponseEntity<UserResponse> getUser(@RequestParam int id) {
         UserResponse user = authenticationService.getUser(id);

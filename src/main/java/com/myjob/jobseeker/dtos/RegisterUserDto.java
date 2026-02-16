@@ -31,7 +31,7 @@ public class RegisterUserDto {
     private List<String> workPreferences;
 
     private boolean service;
-    private String username;
+    private String userServiceName;
     private boolean paidUser;
     private int countTrial = 10;
     private ServiceCategory category;

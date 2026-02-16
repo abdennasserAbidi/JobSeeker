@@ -13,6 +13,7 @@ public interface IUserService {
     void completeUpdated(int id);
     void savePersonal(PersonalInfoDto input);
     void saveCompanyInfo(CompanyInfoDto input);
+    void saveServiceInfo(ServiceInfoDto input);
     UserResponse getUser(int id);
     List<User> getCandidate();
     List<User> getAllUser();

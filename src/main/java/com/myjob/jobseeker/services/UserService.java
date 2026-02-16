@@ -130,6 +130,22 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public void saveServiceInfo(ServiceInfoDto input) {
+        User user = userRepository.findById(input.getId()).orElseThrow();
+
+        user.setAddressList(input.getAddressList());
+        user.setPhoneList(input.getPhoneList());
+        user.setCategory(input.getCategory());
+        user.setCountry(input.getCountry());
+        user.setCity(input.getCity());
+        user.setBio(input.getBio());
+        user.setEmail(input.getEmail());
+        user.setOtherCategory(input.getOtherCategory());
+
+        userRepository.save(user);
+    }
+
+    @Override
     public UserResponse getUser(int id) {
 
         Optional<User> user = userRepository.findById(id);
@@ -220,6 +236,9 @@ public class UserService implements IUserService {
                     newUsers.add(user);
                 }
         }
+
+        System.out.println("felkaefjajfeiahe  word  "+word);
+        System.out.println("felkaefjajfeiahe    "+newUsers);
 
         if (newUsers.isEmpty()) {
                 userPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));

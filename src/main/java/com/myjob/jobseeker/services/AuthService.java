@@ -71,7 +71,7 @@ public class AuthService implements IAuthService {
         user.setPassword(passwordEncoder.encode(input.getPassword()));
 
         user.setService(input.isService());
-        user.setUsername(input.getUsername());
+        user.setUserServiceName(input.getUserServiceName());
         user.setCategory(input.getCategory());
         user.setOtherCategory(input.getOtherCategory());
         user.setCountTrial(input.getCountTrial());
@@ -308,8 +308,6 @@ public class AuthService implements IAuthService {
     @Override
     public Page<User> getUserService(int id, int page, int size) {
 
-        User user = userRepository.findById(id).orElseThrow();
-
         List<User> newUsers = new ArrayList<>();
         List<User> allUsers = userRepository.findAll();
 
@@ -338,7 +336,7 @@ public class AuthService implements IAuthService {
     public Page<User> getUserServiceFiltered(String word, int page, int size) {
 
         List<User> newUsers = new ArrayList<>();
-
+        System.out.println("felkaefjajfeiahe  word  "+word);
         AtomicReference<Page<User>> userPage = new AtomicReference<>();
         userPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
 
@@ -347,7 +345,9 @@ public class AuthService implements IAuthService {
 
         for (User user : allUser) {
 
-                boolean nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getUsername()).find();
+            if (user.getRole().equals("Services")) {
+                boolean nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getUserServiceName()).find();
+
                 boolean descriptionContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getBio()).find();
 
                 boolean categoryContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getCategory().getDisplayName()).find();
@@ -355,8 +355,12 @@ public class AuthService implements IAuthService {
 
                 if (nameContains || descriptionContains || categoryContains || otherategoryContains) {
                     newUsers.add(user);
-                }
+                }   
+            }
         }
+
+        
+        System.out.println("felkaefjajfeiahe    "+newUsers);
 
         if (newUsers.isEmpty()) {
                 userPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
@@ -433,6 +437,22 @@ public class AuthService implements IAuthService {
         user.setCompanySecondAddress(input.getCompanySecondAddress());
         user.setPhoneList(input.getPhoneList());
         user.setAddressList(input.getAddressList());
+
+        userRepository.save(user);
+    }
+
+    @Override
+    public void saveServiceInfo(ServiceInfoDto input) {
+        User user = userRepository.findById(input.getId()).orElseThrow();
+
+        user.setAddressList(input.getAddressList());
+        user.setPhoneList(input.getPhoneList());
+        user.setCategory(input.getCategory());
+        user.setCountry(input.getCountry());
+        user.setCity(input.getCity());
+        user.setBio(input.getBio());
+        user.setEmail(input.getEmail());
+        user.setOtherCategory(input.getOtherCategory());
 
         userRepository.save(user);
     }

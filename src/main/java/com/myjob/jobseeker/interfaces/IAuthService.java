@@ -20,6 +20,7 @@ public interface IAuthService {
     void saveCandidateStatus(ValidationStatus validationStatus);
     ValidationStatus getStatusCandidateValidation(int id);
     java.util.List<ValidationStatus> getListStatusCandidateValidation(int id);
+    void saveServiceInfo(ServiceInfoDto input);
 
     Page<User> getByCriteria(Criteria criteria, int page, int size);
     void countDownTrial(int idUser);

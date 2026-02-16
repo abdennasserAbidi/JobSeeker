@@ -65,6 +65,7 @@ public class User implements UserDetails {
     private String preferredEmploymentType;
 
     private String country;
+    private String city;
 
     private String phone;
 
@@ -97,7 +98,7 @@ public class User implements UserDetails {
     private CandidateSkills candidateSkills;
 
     private boolean service = false;
-    private String username;
+    private String userServiceName;
     private boolean paidUser;
     private int countTrial = 10;
     private ServiceCategory category;
