@@ -136,6 +136,8 @@ public class UserService implements IUserService {
         user.setAddressList(input.getAddressList());
         user.setPhoneList(input.getPhoneList());
         user.setCategory(input.getCategory());
+        user.setFreelanceSector(input.getFreelanceSector());
+        user.setFreelanceService(input.getFreelanceService());
         user.setCountry(input.getCountry());
         user.setCity(input.getCity());
         user.setBio(input.getBio());
@@ -226,19 +228,16 @@ public class UserService implements IUserService {
 
         for (User user : allUser) {
 
-                boolean nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getUsername()).find();
-                boolean descriptionContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getBio()).find();
+                boolean nameContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getUserServiceName()).find();
+                //boolean descriptionContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getBio()).find();
 
-                boolean categoryContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getCategory().getDisplayName()).find();
+                boolean categoryContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getFreelanceService().getName()).find();
                 boolean otherategoryContains = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(user.getOtherCategory()).find();
 
-                if (nameContains || descriptionContains || categoryContains || otherategoryContains) {
+                if (nameContains || categoryContains || otherategoryContains) {
                     newUsers.add(user);
                 }
         }
-
-        System.out.println("felkaefjajfeiahe  word  "+word);
-        System.out.println("felkaefjajfeiahe    "+newUsers);
 
         if (newUsers.isEmpty()) {
                 userPage.set(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
@@ -252,6 +251,31 @@ public class UserService implements IUserService {
         }
 
         return userPage.get();
+    }
+
+    @Override
+    public Page<User> getUserServiceFilteredList(CategoryModel criteria, int page, int size) {
+
+        List<User> users = userRepository.searchUserSerice(criteria);
+        List<User> newUser = new ArrayList<>();
+        for (User user : users) {
+            boolean isService = user.getRole().equals("Services");
+            if (!user.isFirstTimeUse() && isService) {
+                newUser.add(user);
+            }
+        }
+
+        PageRequest pageable = PageRequest.of(page - 1, size);
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), newUser.size());
+
+        Page<User> pager;
+
+        if (start < newUser.size() && start < end) {
+            pager = new PageImpl<>(newUser.subList(start, end), pageable, newUser.size());
+        } else pager = new PageImpl<>(Collections.emptyList(), pageable, newUser.size());
+
+        return pager;
     }
 
 

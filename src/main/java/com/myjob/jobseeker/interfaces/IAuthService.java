@@ -2,9 +2,15 @@ package com.myjob.jobseeker.interfaces;
 
 import com.myjob.jobseeker.dtos.*;
 import com.myjob.jobseeker.model.CandidateSkills;
+import com.myjob.jobseeker.model.CategoryModel;
+import com.myjob.jobseeker.model.FreelanceService;
 import com.myjob.jobseeker.model.ProfessionalStatus;
+import com.myjob.jobseeker.model.ServiceCategory;
 import com.myjob.jobseeker.model.User;
 import com.myjob.jobseeker.model.ValidationStatus;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 public interface IAuthService {
@@ -44,4 +50,5 @@ public interface IAuthService {
     void savePersonal(PersonalInfoDto input);
 
     Page<User> getUsersFavorites(int id, int page, int size);
+    Page<User> getUserServiceFilteredList(CategoryModel criteria, int page, int size);
 }

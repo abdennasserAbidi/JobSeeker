@@ -22,4 +22,5 @@ public interface IUserService {
     Page<User> getUserServiceFiltered(String word, int page, int size);
     Page<User> getUsersFavorites(int id, int page, int size);
     Page<User> getByCriteria(Criteria criteria, int page, int size);
+    Page<User> getUserServiceFilteredList(CategoryModel criteria, int page, int size);
 }

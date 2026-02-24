@@ -10,12 +10,32 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Query;
 
 import org.springframework.data.mongodb.core.query.Criteria;
+
+import com.myjob.jobseeker.model.CategoryModel;
 import com.myjob.jobseeker.model.User;
 
 public class CriteriaRepositoryImpl implements CriteriaRepository {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    @Override
+    public List<User> searchUserSerice(CategoryModel request) {
+
+        Query query = new Query();
+
+        if (!request.getListSector().isEmpty()) {
+            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("freelanceSector").in(request.getListSector()));
+        }
+
+        if (!request.getListService().isEmpty()) {
+            query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("freelanceService").in(request.getListService()));
+        }
+        
+        return mongoTemplate.find(query, User.class);
+    }
+
+
 
     @Override
     public List<User> searchUsers(com.myjob.jobseeker.dtos.Criteria request) {

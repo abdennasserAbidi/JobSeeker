@@ -2,6 +2,7 @@ package com.myjob.jobseeker.controller;
 
 import com.myjob.jobseeker.dtos.*;
 import com.myjob.jobseeker.model.CandidateSkills;
+import com.myjob.jobseeker.model.CategoryModel;
 import com.myjob.jobseeker.model.ProfessionalStatus;
 import com.myjob.jobseeker.model.User;
 import com.myjob.jobseeker.services.AuthService;
@@ -26,6 +27,16 @@ public class UserController {
             @RequestParam int size
     ) {
         Page<User> experience = authenticationService.getByCriteria(criteria, page, size);
+        return ResponseEntity.ok(experience);
+    }
+
+    @PostMapping("/getUserServiceFilteredLists")
+    public ResponseEntity<Page<User>> getUserServiceFilteredList(
+            @RequestBody CategoryModel categoryModel,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        Page<User> experience = authenticationService.getUserServiceFilteredList(categoryModel, page, size);
         return ResponseEntity.ok(experience);
     }
 

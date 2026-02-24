@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import java.util.List;
 
+import com.myjob.jobseeker.model.FreelanceSector;
+import com.myjob.jobseeker.model.FreelanceService;
 import com.myjob.jobseeker.model.ServiceCategory;
 
 @Setter
@@ -35,6 +37,8 @@ public class RegisterUserDto {
     private boolean paidUser;
     private int countTrial = 10;
     private ServiceCategory category;
+    private FreelanceService freelanceService;
+    private FreelanceSector freelanceSector;
     private String otherCategory;
 
 
