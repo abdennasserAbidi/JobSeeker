@@ -5,6 +5,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+import com.myjob.jobseeker.model.Gender;
+import com.myjob.jobseeker.model.Situation;
+
 @Setter
 @Getter
 public class PersonalInfoDto {
@@ -17,7 +20,7 @@ public class PersonalInfoDto {
 
     private List<String> addressList;
 
-    private String sexe;
+    private Gender sexe;
 
     private String country;
 
@@ -27,7 +30,7 @@ public class PersonalInfoDto {
 
     private String activitySector;
 
-    private String situation;
+    private Situation situation;
 
     private String rangeSalary;
 

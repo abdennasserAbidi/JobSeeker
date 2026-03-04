@@ -9,7 +9,7 @@ public class SearchHistory {
 
     private int id;
     private int idUser;
-    private String gender;
+    private Gender gender;
     private String fullName;
     private String experience;
 

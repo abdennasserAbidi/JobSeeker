@@ -9,6 +9,7 @@ import java.util.List;
 public class Criteria {
     private int id;
     private int idUser;
+    private String language;
     private List<String> situation = new ArrayList<>();
     private List<String> status = new ArrayList<>();
     private List<String> disponibility = new ArrayList<>();

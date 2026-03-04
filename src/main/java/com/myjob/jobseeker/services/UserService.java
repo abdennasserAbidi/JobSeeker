@@ -87,17 +87,11 @@ public class UserService implements IUserService {
         user.setActivitySector(input.getActivitySector());
         user.setAddressList(input.getAddressList());
         user.setCountry(input.getCountry());
+        user.setSituation(input.getSituation());
         user.setBirthDate(input.getBirthDate());
         user.setPreferredWorkType(input.getPreferredWorkType());
+        user.setSexe(input.getSexe());
 
-        if (input.getSexe().equals("Homme") || input.getSexe().equals("Male")) user.setSexe("Male");
-        else user.setSexe("Female");
-
-        switch (input.getSituation()) {
-            case "Single", "Célibataire" -> user.setSituation("Single");
-            case "Engaged", "Engagé" -> user.setSituation("Engaged");
-            case "Married", "Marrié" -> user.setSituation("Married");
-        }
 
         switch (input.getPreferredEmploymentType()) {
             case "Contract", "Contrat" -> user.setPreferredEmploymentType("Contract");

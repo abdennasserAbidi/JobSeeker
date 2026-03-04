@@ -41,6 +41,7 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
     public List<User> searchUsers(com.myjob.jobseeker.dtos.Criteria request) {
 
         Query query = new Query();
+        String lang = request.getLanguage();
 
         if (!request.getStatus().isEmpty()) {
             List<String> asector = request.getStatus();
@@ -87,13 +88,25 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
         }
 
         if (!request.getSituation().isEmpty()) {
-            List<String> asector = request.getSituation();
-            addCriterias(asector, query, "situation");
+            List<String> situation = request.getSituation();
+            String fieldToFilter;
+            if ("Français".equalsIgnoreCase(lang) || "French".equalsIgnoreCase(lang)) {
+                fieldToFilter = "situation.situationFr";
+            } else {
+                fieldToFilter = "situation.situationEng";
+            }
+            addCriterias(situation, query, fieldToFilter);
         }
 
         if (!request.getSex().isEmpty()) {
             List<String> asector = request.getSex();
-            addCriterias(asector, query, "sexe");
+            String fieldToFilter;
+            if ("Français".equalsIgnoreCase(lang) || "French".equalsIgnoreCase(lang)) {
+                fieldToFilter = "sexe.genderFr";
+            } else {
+                fieldToFilter = "sexe.genderEng";
+            }
+            addCriterias(asector, query, fieldToFilter);
         }
 
         if (!request.getDisponibility().isEmpty()) {

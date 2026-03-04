@@ -48,13 +48,13 @@ public class User implements UserDetails {
     private boolean candidate;
     private boolean company;
 
-    private String sexe;
+    private Gender sexe;
 
     private String birthDate;
 
     private String activitySector;
 
-    private String situation;
+    private Situation situation;
 
     private String status = "Available";
 

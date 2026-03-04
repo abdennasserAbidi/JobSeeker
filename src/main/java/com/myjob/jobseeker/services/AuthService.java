@@ -542,19 +542,12 @@ public class AuthService implements IAuthService {
         user.setNationality(input.getNationality());
         user.setActivitySector(input.getActivitySector());
         user.setAddressList(input.getAddressList());
+        user.setSituation(input.getSituation());
+        user.setSexe(input.getSexe());
         user.setCountry(input.getCountry());
         user.setBirthDate(input.getBirthDate());
         user.setPreferredWorkType(input.getPreferredWorkType());
 
-
-        if (input.getSexe().equals("Homme") || input.getSexe().equals("Male")) user.setSexe("Male");
-        else user.setSexe("Female");
-
-        switch (input.getSituation()) {
-            case "Single", "Célibataire" -> user.setSituation("Single");
-            case "Engaged", "Engagé" -> user.setSituation("Engaged");
-            case "Married", "Marrié" -> user.setSituation("Married");
-        }
 
         switch (input.getPreferredEmploymentType()) {
             case "Contract", "Contrat" -> user.setPreferredEmploymentType("Contract");
