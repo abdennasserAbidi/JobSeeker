@@ -1,20 +1,97 @@
 package com.myjob.jobseeker;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.myjob.jobseeker.model.Companies;
+import com.myjob.jobseeker.model.activity.Activities;
+import com.myjob.jobseeker.model.field.Fields;
+import com.myjob.jobseeker.model.institute.Institutes;
+import com.myjob.jobseeker.services.JsonService;
+
 import io.github.cdimascio.dotenv.Dotenv;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.StreamUtils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @SpringBootApplication
-public class JobseekerApplication {
+public class JobseekerApplication implements CommandLineRunner {
+
+	@Autowired
+    ObjectMapper mapper;
+
+	@Autowired
+	JsonService service;
+
+	@Override
+    public void run(String... args) {
+        if (service.getSchoolsCount() == 0) {
+            try {
+				String contentSchools = StreamUtils.copyToString(
+                    new ClassPathResource("schools.json").getInputStream(), 
+                    StandardCharsets.UTF_8
+                );
+               
+                Institutes institutes = mapper.readValue(contentSchools, Institutes.class);
+                service.saveInstitutesFromJsonFile(institutes);
+			} catch(Exception e) {
+               e.printStackTrace();
+			}
+		}
+
+		if (service.getActivityCount() == 0) {
+            try {
+				String contentSubjects = StreamUtils.copyToString(
+                    new ClassPathResource("subjects.json").getInputStream(), 
+                    StandardCharsets.UTF_8
+                );
+               
+                Activities activities = mapper.readValue(contentSubjects, Activities.class);
+                service.saveActivitiesFromJsonFile(activities);
+			} catch(Exception e) {
+               e.printStackTrace();
+			}
+		}
+
+		if (service.getFieldCount() == 0) {
+            try {
+				String contentField = StreamUtils.copyToString(
+                    new ClassPathResource("studyfieldfr.json").getInputStream(), 
+                    StandardCharsets.UTF_8
+                );
+               
+                Fields activities = mapper.readValue(contentField, Fields.class);
+                service.saveFieldsFromJsonFile(activities);
+			} catch(Exception e) {
+               e.printStackTrace();
+			}
+		}
+
+
+		if (service.getCompaniesCount() == 0) {
+		  try {
+			   String content = StreamUtils.copyToString(
+                new ClassPathResource("companies.json").getInputStream(), 
+                StandardCharsets.UTF_8
+               );
+               
+                Companies companies = mapper.readValue(content, Companies.class);
+                service.saveFromJsonFile(companies);
+            } catch (Exception e) {
+			  e.printStackTrace();
+            }	
+	    }
+    }
 
 	@Bean
 	FirebaseMessaging firebaseMessaging () throws IOException {
