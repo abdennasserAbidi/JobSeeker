@@ -101,6 +101,7 @@ public class User implements UserDetails {
     private String userServiceName;
     private boolean paidUser;
     private int countTrial = 10;
+    private double percentageRate = 0f;
     private ServiceCategory category;
     private FreelanceService freelanceService;
     private FreelanceSector freelanceSector;

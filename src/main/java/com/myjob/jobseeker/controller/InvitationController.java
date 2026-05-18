@@ -6,7 +6,6 @@ import com.myjob.jobseeker.interfaces.INotificationService;
 import com.myjob.jobseeker.interfaces.IUserService;
 import com.myjob.jobseeker.model.FilterInvitationBody;
 import com.myjob.jobseeker.model.InvitationModel;
-import com.myjob.jobseeker.model.User;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -53,7 +52,7 @@ public class InvitationController {
     }
 
     public void sendNotificationAfterSendInvitation(NotificationMessage notificationMessage, String receiverType) {
-        String res = notificationService.sendNotification(notificationMessage, receiverType);
+        notificationService.sendNotification(notificationMessage, receiverType);
     }
 
     @PostMapping("/sendInvitation")

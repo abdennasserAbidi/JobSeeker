@@ -67,8 +67,6 @@ public class InvitationService implements IInvitationService {
         List<InvitationModel> list = user.getInvitations();
         List<InvitationModel> filteredList = list.stream().filter(invitation -> invitation.getIdTo() == input.getIdTo() && !invitation.getStatus().equals("REJECTED") && !invitation.getStatus().equals("NOT_INTERESTED")).toList();
 
-        System.out.println("khregjhekgljlehglerg     "+filteredList);
-
         if (filteredList.isEmpty()) {
             InvitationModel experience = new InvitationModel();
             experience.setIdInvitation(input.getIdInvitation());
@@ -85,6 +83,7 @@ public class InvitationService implements IInvitationService {
             experience.setGender(input.getGender());
             experience.setNameContract(input.getNameContract());
             experience.setDuration(input.getDuration());
+            experience.setRoleReceiver(input.getRoleReceiver());
 
             saveCompanyInvitation(id, experience);
             saveUserInvitation(input.getIdTo(), experience);

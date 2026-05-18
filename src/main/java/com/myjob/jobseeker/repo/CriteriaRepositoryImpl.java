@@ -12,6 +12,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import com.myjob.jobseeker.model.CategoryModel;
+import com.myjob.jobseeker.model.FreelanceSector;
+import com.myjob.jobseeker.model.FreelanceService;
 import com.myjob.jobseeker.model.User;
 
 public class CriteriaRepositoryImpl implements CriteriaRepository {
@@ -23,6 +25,25 @@ public class CriteriaRepositoryImpl implements CriteriaRepository {
     public List<User> searchUserSerice(CategoryModel request) {
 
         Query query = new Query();
+
+        List<String> lSector = request.getListSector().stream().map(sector -> sector.getName()).toList();
+        //System.out.println("tyoityoioityoity  sector  "+lSector);
+        List<String> lService = request.getListService().stream().map(sector -> sector.getName()).toList();
+        //System.out.println("tyoityoioityoity  service  "+lService);
+
+        String sector = "";
+        String service = "";
+
+        for(FreelanceSector freelanceSector : request.getListSector()) {
+            sector += freelanceSector.toString() + "\n";
+        }
+        System.out.println("tyoityoioityoity  sector  "+sector);
+
+        for(FreelanceService freelanceService : request.getListService()) {
+            service += freelanceService.toString() + "\n";
+        }
+        System.out.println("tyoityoioityoity  service  "+service);
+
 
         if (!request.getListSector().isEmpty()) {
             query.addCriteria(org.springframework.data.mongodb.core.query.Criteria.where("freelanceSector").in(request.getListSector()));

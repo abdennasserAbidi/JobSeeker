@@ -12,5 +12,4 @@ public class FreelanceSector {
     private String icon;
     private String description;
     private List<FreelanceService> services = new ArrayList<>();
-
 }

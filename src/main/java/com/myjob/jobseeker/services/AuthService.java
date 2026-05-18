@@ -4,6 +4,7 @@ import com.myjob.jobseeker.dtos.*;
 import com.myjob.jobseeker.interfaces.IAuthService;
 import com.myjob.jobseeker.model.*;
 import com.myjob.jobseeker.repo.UserRepository;
+import com.myjob.jobseeker.repo.avis.AvisRepository;
 import com.myjob.jobseeker.repo.notification.NotifRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import java.util.regex.Pattern;
 public class AuthService implements IAuthService {
 
     private final UserRepository userRepository;
+    private final AvisRepository rateRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final PasswordResetService passwordResetService;
@@ -30,13 +32,13 @@ public class AuthService implements IAuthService {
     private final SimpMessagingTemplate messagingTemplate;
     private static final AtomicInteger idCounter = new AtomicInteger();
 
-    @Autowired
     public AuthService(UserRepository userRepository,
                        AuthenticationManager authenticationManager,
                        PasswordEncoder passwordEncoder,
                        PasswordResetService passwordResetService,
                        NotifRepository notifRepository,
-                       SimpMessagingTemplate messagingTemplate
+                       SimpMessagingTemplate messagingTemplate,
+                       AvisRepository rateRepository
     ) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
@@ -44,6 +46,7 @@ public class AuthService implements IAuthService {
         this.passwordResetService = passwordResetService;
         this.notifRepository = notifRepository;
         this.messagingTemplate = messagingTemplate;
+        this.rateRepository = rateRepository;
     }
 
     @Override
@@ -58,12 +61,22 @@ public class AuthService implements IAuthService {
 
     @Override
     public Page<User> getUserServiceFilteredList(CategoryModel criteria, int page, int size) {
-        List<User> users = userRepository.searchUserSerice(criteria);
+        List<User> allUsers = userRepository.findAll();
         List<User> newUser = new ArrayList<>();
+        for (User u : allUsers) {
+            boolean isService = u.getRole().equals("Services");
+            boolean s = criteria.getListSector().contains(u.getFreelanceSector()) || criteria.getListService().contains(u.getFreelanceService());
+            if (!u.isFirstTimeUse() && isService && s) {
+                newUser.add(u);
+            }
+        }
+
+        List<User> users = userRepository.searchUserSerice(criteria);
+        List<User> newUser1 = new ArrayList<>();
         for (User user : users) {
             boolean isService = user.getRole().equals("Services");
             if (!user.isFirstTimeUse() && isService) {
-                newUser.add(user);
+                newUser1.add(user);
             }
         }
 
@@ -332,6 +345,27 @@ public class AuthService implements IAuthService {
         return new PageImpl<>(newUsers.subList(start, end), pageable, s);
     }
 
+    public double getPourcentageRateById(int id) {
+        List<Avis> list = rateRepository.findByIdCandidate(id);
+        int totalAvis = list.size();
+        int numberOfLike = 0;
+        for(Avis avis: list) {
+            if (avis.getLike().equals("LIKE")) {
+                numberOfLike += 1;
+            }
+        }
+
+        long likes = list.stream()
+            .filter(a -> "LIKE".equals(a.getLike()))
+            .count();
+
+        return (likes * 100.0) / totalAvis;
+
+        //float percentageRate = numberOfLike / (totalAvis * 100);
+        
+        //return rateDTO.getPercentageRate();
+    }
+
     @Override
     public Page<User> getUserService(int id, int page, int size) {
 
@@ -340,9 +374,16 @@ public class AuthService implements IAuthService {
 
         for (User candidate : allUsers) {
             if (candidate.getRole().equals("Services") && candidate.getId() != id) {
+                double pourcentageRate = getPourcentageRateById(candidate.getId());
+                if (Double.isNaN(pourcentageRate)) {
+                    pourcentageRate = 0.0;
+                }
+                candidate.setPercentageRate(pourcentageRate);
                 newUsers.add(candidate);
             }
         }
+
+        System.out.println("pooptroptroptrop  "+newUsers);
 
         int pageSize = Math.min(size, newUsers.size());
 
@@ -355,6 +396,8 @@ public class AuthService implements IAuthService {
         if (start < newUsers.size() && start < end) {
             pager = new PageImpl<>(newUsers.subList(start, end), pageable, newUsers.size());
         } else pager = new PageImpl<>(Collections.emptyList(), pageable, newUsers.size());
+
+        System.out.println("qqqqqqqqqqqqqqqqqqqqq  "+pager);
 
         return pager;
     }
